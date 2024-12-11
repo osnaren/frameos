@@ -9,15 +9,21 @@
     font-family: 'Lora', serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Montserrat', sans-serif;
   }
 }
 
 .infinity-header {
-  background: linear-gradient(180deg, 
+  background: linear-gradient(
+    180deg,
     var(--color-background) 0%,
-    var(--color-background)/80 80%,
-    var(--color-background)/0 100%
+    var(--color-background) / 80 80%,
+    var(--color-background) / 0 100%
   );
 }

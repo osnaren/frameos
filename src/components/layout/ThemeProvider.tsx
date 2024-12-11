@@ -16,13 +16,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeContext.Provider value={themeContext}>
       <div
-        style={{
-          '--color-background': themeContext.theme.colors.background,
-          '--color-text': themeContext.theme.colors.text,
-          '--color-primary': themeContext.theme.colors.primary,
-          '--color-secondary': themeContext.theme.colors.secondary,
-          '--color-accent': themeContext.theme.colors.accent,
-        } as React.CSSProperties}
+        style={
+          {
+            '--color-background': themeContext.theme.colors.background,
+            '--color-text': themeContext.theme.colors.text,
+            '--color-primary': themeContext.theme.colors.primary,
+            '--color-secondary': themeContext.theme.colors.secondary,
+            '--color-accent': themeContext.theme.colors.accent,
+          } as React.CSSProperties
+        }
         className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-300"
       >
         {children}

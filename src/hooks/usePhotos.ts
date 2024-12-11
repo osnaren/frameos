@@ -23,10 +23,7 @@ export function useFeaturedPhotos() {
 }
 
 export function usePhotosByCategory(category: string) {
-  const { data, error, isLoading } = useSWR<Photo[]>(
-    ['photos', category],
-    () => getPhotosByCategory(category)
-  );
+  const { data, error, isLoading } = useSWR<Photo[]>(['photos', category], () => getPhotosByCategory(category));
 
   return {
     photos: data || [],

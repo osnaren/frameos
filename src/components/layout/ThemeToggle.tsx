@@ -13,11 +13,7 @@ export default function ThemeToggle() {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
     >
-      {theme.mode === 'dark' ? (
-        <SunIcon className="w-6 h-6" />
-      ) : (
-        <MoonIcon className="w-6 h-6" />
-      )}
+      {theme.mode === 'dark' ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
     </motion.button>
   );
 }

@@ -6,12 +6,15 @@ const cld = new Cloudinary({
   },
 });
 
-export function getOptimizedImageUrl(publicId: string, options: {
-  width?: number;
-  height?: number;
-  quality?: number;
-  format?: string;
-} = {}): string {
+export function getOptimizedImageUrl(
+  publicId: string,
+  options: {
+    width?: number;
+    height?: number;
+    quality?: number;
+    format?: string;
+  } = {}
+): string {
   const transformation = cld
     .image(publicId)
     .format(options.format || 'auto')

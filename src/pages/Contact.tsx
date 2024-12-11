@@ -17,15 +17,11 @@ export default function Contact() {
           className="bg-white shadow-xl rounded-lg overflow-hidden"
         >
           <div className="px-6 py-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Get in Touch</h1>
               <p className="text-gray-600 mb-8">
-                Have a project in mind? I'd love to hear from you. Send me a message and
-                I'll respond as soon as possible.
+                Have a project in mind? I'd love to hear from you. Send me a message and I'll respond as soon as
+                possible.
               </p>
             </motion.div>
             <ContactForm />

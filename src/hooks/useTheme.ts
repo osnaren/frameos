@@ -33,7 +33,7 @@ export function useTheme() {
 
   useEffect(() => {
     localStorage.setItem('theme', storedTheme);
-    
+
     if (storedTheme === 'dynamic' && dominantColor) {
       setTheme({
         mode: 'dynamic',

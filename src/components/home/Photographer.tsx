@@ -28,10 +28,9 @@ export default function Photographer() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg text-gray-600 mb-6"
           >
-            With over a decade of experience capturing life's most precious moments,
-            I specialize in creating timeless photographs that tell your unique story.
-            My passion lies in finding beauty in the ordinary and transforming fleeting
-            moments into lasting memories.
+            With over a decade of experience capturing life's most precious moments, I specialize in creating timeless
+            photographs that tell your unique story. My passion lies in finding beauty in the ordinary and transforming
+            fleeting moments into lasting memories.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -61,11 +60,7 @@ export default function Photographer() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="relative"
         >
-          <img
-            src="/photographer-portrait.jpg"
-            alt="John Doe - Photographer"
-            className="rounded-lg shadow-2xl"
-          />
+          <img src="/photographer-portrait.jpg" alt="John Doe - Photographer" className="rounded-lg shadow-2xl" />
           <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-lg shadow-xl">
             <p className="text-4xl font-bold text-black">10+</p>
             <p className="text-gray-600">Years of Experience</p>

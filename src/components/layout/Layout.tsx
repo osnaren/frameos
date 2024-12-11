@@ -13,7 +13,7 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const { ref: footerRef, inView } = useInView({
     threshold: 0,
-    triggerOnce: false
+    triggerOnce: false,
   });
 
   return (

@@ -30,11 +30,7 @@ export default function PhotoModal({ photo, isOpen, onClose }: PhotoModalProps) 
             <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
             <div className="inline-block w-full max-w-4xl p-6 my-8 text-left align-middle transition-all transform bg-[var(--color-background)] shadow-xl rounded-2xl">
               <div className="relative aspect-w-16 aspect-h-9">
-                <OptimizedImage
-                  publicId={photo.imageUrl}
-                  alt={photo.title}
-                  className="object-contain w-full h-full"
-                />
+                <OptimizedImage publicId={photo.imageUrl} alt={photo.title} className="object-contain w-full h-full" />
               </div>
               <div className="mt-4">
                 <Dialog.Title as="h3" className="text-lg font-medium text-[var(--color-text)]">

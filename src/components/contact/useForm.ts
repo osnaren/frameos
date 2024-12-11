@@ -19,7 +19,7 @@ export function useForm() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    message: ''
+    message: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
@@ -47,14 +47,12 @@ export function useForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
@@ -74,7 +72,7 @@ export function useForm() {
         {
           from_name: formData.name,
           from_email: formData.email,
-          message: formData.message
+          message: formData.message,
         },
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       );
@@ -93,6 +91,6 @@ export function useForm() {
     errors,
     loading,
     handleChange,
-    handleSubmit
+    handleSubmit,
   };
 }
