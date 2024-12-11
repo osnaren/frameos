@@ -93,7 +93,7 @@ export default function Gallery() {
           )}
         </AnimatePresence>
 
-        <PhotoModal photo={selectedPhoto} isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} />
+        <PhotoModal photo={selectedPhoto} isOpen={Boolean(selectedPhoto)} onClose={() => setSelectedPhoto(null)} />
       </div>
     </>
   );
