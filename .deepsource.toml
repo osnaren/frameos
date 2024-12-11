@@ -1,0 +1,25 @@
+version = 1
+
+exclude_patterns = [
+  "bin/**",
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/*.min.js",
+  "vite.config.js"
+]
+
+[[analyzers]]
+name = "javascript"
+
+  [analyzers.meta]
+  module_system = "es-modules"
+  plugins = ["react"]
+  environment = [
+    "nodejs",
+    "browser",
+    "vitest"
+  ]
+  style_guide = "airbnb"
+
+[[transformers]]
+name = "prettier"
