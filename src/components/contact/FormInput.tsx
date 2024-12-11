@@ -11,15 +11,7 @@ interface FormInputProps {
   required?: boolean;
 }
 
-export default function FormInput({
-  id,
-  label,
-  type,
-  value,
-  error,
-  onChange,
-  required
-}: FormInputProps) {
+export default function FormInput({ id, label, type, value, error, onChange, required }: FormInputProps) {
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-gray-700">
@@ -41,11 +33,7 @@ export default function FormInput({
         />
       </div>
       {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-1 text-sm text-red-600"
-        >
+        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mt-1 text-sm text-red-600">
           {error}
         </motion.p>
       )}

@@ -14,10 +14,10 @@ export const featuredPhotos: Photo[] = [
       aperture: 'f/8',
       location: 'Swiss Alps',
       camera: 'Sony A7R IV',
-      lens: '16-35mm f/2.8'
+      lens: '16-35mm f/2.8',
     },
     featured: true,
-    dateCreated: '2023-12-01'
+    dateCreated: '2023-12-01',
   },
   {
     id: '2',
@@ -32,10 +32,10 @@ export const featuredPhotos: Photo[] = [
       aperture: 'f/4',
       location: 'New York City',
       camera: 'Sony A7R IV',
-      lens: '24-70mm f/2.8'
+      lens: '24-70mm f/2.8',
     },
     featured: true,
-    dateCreated: '2023-12-02'
+    dateCreated: '2023-12-02',
   },
   {
     id: '3',
@@ -50,10 +50,10 @@ export const featuredPhotos: Photo[] = [
       aperture: 'f/2.8',
       location: 'Central Park',
       camera: 'Sony A7R IV',
-      lens: '85mm f/1.4'
+      lens: '85mm f/1.4',
     },
     featured: true,
-    dateCreated: '2023-12-03'
+    dateCreated: '2023-12-03',
   },
   {
     id: '4',
@@ -68,10 +68,10 @@ export const featuredPhotos: Photo[] = [
       aperture: 'f/11',
       location: 'Vermont',
       camera: 'Sony A7R IV',
-      lens: '70-200mm f/2.8'
+      lens: '70-200mm f/2.8',
     },
     featured: true,
-    dateCreated: '2023-12-04'
+    dateCreated: '2023-12-04',
   },
   {
     id: '5',
@@ -86,9 +86,9 @@ export const featuredPhotos: Photo[] = [
       aperture: 'f/16',
       location: 'Chicago',
       camera: 'Sony A7R IV',
-      lens: '16-35mm f/2.8'
+      lens: '16-35mm f/2.8',
     },
     featured: true,
-    dateCreated: '2023-12-05'
-  }
+    dateCreated: '2023-12-05',
+  },
 ];

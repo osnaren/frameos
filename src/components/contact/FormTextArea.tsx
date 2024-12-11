@@ -10,14 +10,7 @@ interface FormTextAreaProps {
   required?: boolean;
 }
 
-export default function FormTextArea({
-  id,
-  label,
-  value,
-  error,
-  onChange,
-  required
-}: FormTextAreaProps) {
+export default function FormTextArea({ id, label, value, error, onChange, required }: FormTextAreaProps) {
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-gray-700">
@@ -39,11 +32,7 @@ export default function FormTextArea({
         />
       </div>
       {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-1 text-sm text-red-600"
-        >
+        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mt-1 text-sm text-red-600">
           {error}
         </motion.p>
       )}

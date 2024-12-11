@@ -11,7 +11,7 @@ export default function FeaturedCarousel() {
 
   useEffect(() => {
     if (photos.length === 0) return;
-    
+
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % photos.length);
     }, 5000);
@@ -98,9 +98,7 @@ export default function FeaturedCarousel() {
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-colors ${
-              index === currentIndex ? 'bg-white' : 'bg-white/50'
-            }`}
+            className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white/50'}`}
             aria-label={`Go to photo ${index + 1}`}
           />
         ))}

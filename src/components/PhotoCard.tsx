@@ -13,17 +13,9 @@ export default function PhotoCard({ photo, onClick }: PhotoCardProps) {
   usePreventImageDownload();
 
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      className="relative group cursor-pointer"
-      onClick={onClick}
-    >
+    <motion.div whileHover={{ y: -5 }} className="relative group cursor-pointer" onClick={onClick}>
       <div className="aspect-w-3 aspect-h-2 overflow-hidden rounded-lg bg-gray-100">
-        <OptimizedImage
-          publicId={photo.publicId}
-          alt={photo.title}
-          className="object-cover select-none"
-        />
+        <OptimizedImage publicId={photo.publicId} alt={photo.title} className="object-cover select-none" />
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-200" />
       </div>
       <div className="mt-2">
