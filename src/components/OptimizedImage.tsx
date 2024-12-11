@@ -1,7 +1,7 @@
-import React from 'react';
-import { AdvancedImage, lazyload, responsive } from '@cloudinary/react';
-import { Cloudinary } from '@cloudinary/url-gen';
-import { useThemeContext } from './layout/ThemeProvider';
+import React from "react";
+import { AdvancedImage, lazyload, responsive } from "@cloudinary/react";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { useThemeContext } from "./layout/ThemeProvider";
 
 interface OptimizedImageProps {
   publicId: string;
@@ -30,7 +30,7 @@ export default function OptimizedImage({
       // Extract dominant color and set dynamic theme
       // This would typically be done through a color extraction service
       // For now, we'll use a placeholder implementation
-      setDynamicTheme('#121212');
+      setDynamicTheme("#121212");
     }
   };
 

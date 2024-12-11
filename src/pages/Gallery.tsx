@@ -1,26 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
-import PhotoCard from '../components/PhotoCard';
-import PhotoModal from '../components/PhotoModal';
-import { useAllPhotos } from '../hooks/usePhotos';
-import type { Photo, PhotoCategory } from '../types/photo';
-import { useThemeContext } from '../components/layout/ThemeProvider';
+import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+import { motion, AnimatePresence } from "framer-motion";
+import PhotoCard from "../components/PhotoCard";
+import PhotoModal from "../components/PhotoModal";
+import { useAllPhotos } from "../hooks/usePhotos";
+import type { Photo, PhotoCategory } from "../types/photo";
+import { useThemeContext } from "../components/layout/ThemeProvider";
 
-const categories: PhotoCategory[] = ['portraits', 'landscapes', 'candid', 'street', 'nature', 'architecture'];
+const categories: PhotoCategory[] = [
+  "portraits",
+  "landscapes",
+  "candid",
+  "street",
+  "nature",
+  "architecture",
+];
 
 export default function Gallery() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<PhotoCategory | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
+  const [selectedCategory, setSelectedCategory] = useState<
+    PhotoCategory | "all"
+  >("all");
+  const [sortBy, setSortBy] = useState<"date" | "title">("date");
   const { photos, isLoading, error } = useAllPhotos();
   const { theme } = useThemeContext();
 
   const filteredPhotos = photos
-    .filter(photo => selectedCategory === 'all' || photo.category === selectedCategory)
+    .filter(
+      (photo) =>
+        selectedCategory === "all" || photo.category === selectedCategory
+    )
     .sort((a, b) => {
-      if (sortBy === 'date') {
-        return new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime();
+      if (sortBy === "date") {
+        return (
+          new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime()
+        );
       }
       return a.title.localeCompare(b.title);
     });
@@ -28,7 +42,9 @@ export default function Gallery() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">Failed to load photos. Please try again later.</p>
+        <p className="text-red-500">
+          Failed to load photos. Please try again later.
+        </p>
       </div>
     );
   }
@@ -37,7 +53,10 @@ export default function Gallery() {
     <>
       <Helmet>
         <title>Gallery | PhotoFolio</title>
-        <meta name="description" content="Browse through my photography collection" />
+        <meta
+          name="description"
+          content="Browse through my photography collection"
+        />
       </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
@@ -47,14 +66,16 @@ export default function Gallery() {
         >
           <div className="flex flex-wrap gap-4 items-center justify-between">
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {['all', ...categories].map((category) => (
+              {["all", ...categories].map((category) => (
                 <motion.button
                   key={category}
-                  onClick={() => setSelectedCategory(category as PhotoCategory | 'all')}
+                  onClick={() =>
+                    setSelectedCategory(category as PhotoCategory | "all")
+                  }
                   className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
                     selectedCategory === category
-                      ? 'bg-[var(--color-primary)] text-white'
-                      : 'bg-[var(--color-accent)] text-[var(--color-text)] hover:bg-opacity-80'
+                      ? "bg-[var(--color-primary)] text-white"
+                      : "bg-[var(--color-accent)] text-[var(--color-text)] hover:bg-opacity-80"
                   }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -63,9 +84,13 @@ export default function Gallery() {
                 </motion.button>
               ))}
             </div>
+            <label htmlFor="sort-by" className="sr-only">
+              Sort by
+            </label>
             <select
+              id="sort-by"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
+              onChange={(e) => setSortBy(e.target.value as "date" | "title")}
               className="px-4 py-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-background)] text-[var(--color-text)]"
             >
               <option value="date">Sort by Date</option>
@@ -73,7 +98,7 @@ export default function Gallery() {
             </select>
           </div>
         </motion.div>
-        
+
         <AnimatePresence mode="wait">
           {isLoading ? (
             <motion.div

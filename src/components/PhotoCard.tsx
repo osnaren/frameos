@@ -20,7 +20,7 @@ export default function PhotoCard({ photo, onClick }: PhotoCardProps) {
     >
       <div className="aspect-w-3 aspect-h-2 overflow-hidden rounded-lg bg-gray-100">
         <OptimizedImage
-          publicId={photo.imageUrl}
+          publicId={photo.publicId}
           alt={photo.title}
           className="object-cover select-none"
         />

@@ -3,6 +3,7 @@ export interface Photo {
   title: string;
   description: string;
   imageUrl: string;
+  publicId: string;
   category: PhotoCategory;
   tags: string[];
   metadata: PhotoMetadata;
