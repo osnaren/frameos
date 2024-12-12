@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { Photo } from '../types/photo';
-import { usePreventImageDownload } from '../hooks/usePreventImageDownload';
+import type { Photo } from '@ctypes/photo';
+import { usePreventImageDownload } from '@hooks/usePreventImageDownload';
 import OptimizedImage from './OptimizedImage';
 
 interface PhotoCardProps {
