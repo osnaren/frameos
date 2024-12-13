@@ -1,12 +1,14 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
 import Hero from '@components/about/Hero';
 import ImageGrid from '@components/about/ImageGrid';
 import ContentSection from '@components/about/ContentSection';
 import { useAboutContent } from '@hooks/useAboutContent';
+import { motion } from 'framer-motion';
+import { useLenis } from '@hooks/useLenis';
 
 export default function About() {
+  useLenis();
   const { content, isLoading, error } = useAboutContent();
 
   if (error) {
@@ -35,13 +37,13 @@ export default function About() {
       <div className="min-h-screen">
         <Hero />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <ContentSection title={content.journeyTitle} content={content.journeyContent} />
 
           <ImageGrid images={content.images} />
 
           <ContentSection title={content.approachTitle} content={content.approachContent} align="right" />
-        </div>
+        </motion.div>
       </div>
     </>
   );

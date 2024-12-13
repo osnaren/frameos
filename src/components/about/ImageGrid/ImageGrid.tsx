@@ -1,87 +1,107 @@
 import React, { useRef, useEffect } from 'react';
-import { motion, useAnimation, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import OptimizedImage from '@components/OptimizedImage';
 import type { AboutImage } from '@ctypes/about';
-import './styles.css';
+import './styles.scss';
 
 interface ImageGridProps {
   images: AboutImage[];
 }
 
 export default function ImageGrid({ images }: ImageGridProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const { ref: inViewRef, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
   });
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const { ref: inViewRef, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
 
+  // Smooth spring-based scroll progress
+  const smoothProgress = useSpring(scrollYProgress, {
+    damping: 15,
+    stiffness: 30,
+  });
+
+  // Transform values
+  const translateX = useTransform(smoothProgress, [0, 0.5, 1], ['0%', '-50%', '-100%']);
+
+  const rotateY = useTransform(smoothProgress, [0, 0.5, 1], [20, 0, -20]);
+
+  const scale = useTransform(smoothProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+
+  // Mouse parallax effect
   useEffect(() => {
     if (!gridRef.current) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const rect = gridRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      if (!gridRef.current) return;
 
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const { clientX, clientY } = e;
+      const { width, height, left, top } = gridRef.current.getBoundingClientRect();
 
-      mouseX.set(x / rect.width - 0.5);
-      mouseY.set(y / rect.height - 0.5);
+      const x = (clientX - left) / width - 0.5;
+      const y = (clientY - top) / height - 0.5;
+
+      gridRef.current.style.transform = `
+        rotateY(${x * 5}deg)
+        rotateX(${-y * 5}deg)
+        translateZ(0)
+      `;
     };
 
-    gridRef.current.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      gridRef.current?.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [mouseX, mouseY]);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   return (
-    <motion.div
-      ref={inViewRef}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: inView ? 1 : 0 }}
-      className="grid"
-      style={{ '--perspective': '1000px' } as React.CSSProperties}
-    >
+    <div ref={containerRef} className="image-grid-container">
       <motion.div
-        ref={gridRef}
-        className="grid-wrap"
+        className="image-grid-wrapper"
         style={{
-          rotateX: mouseY.get() * 20,
-          rotateY: mouseX.get() * -20,
+          scale,
         }}
       >
-        {images.map((image, index) => (
-          <motion.div
-            key={image.id}
-            className="grid__item"
-            initial={{ opacity: 0, z: -100 }}
-            animate={{
-              opacity: 1,
-              z: 0,
-              transition: { delay: index * 0.1 },
-            }}
-            whileHover={{
-              z: 50,
-              transition: { duration: 0.3 },
-            }}
-          >
+        <motion.div
+          ref={gridRef}
+          className="image-grid"
+          style={{
+            x: translateX,
+            rotateY,
+          }}
+        >
+          {images.map((image, index) => (
             <motion.div
-              className="grid__item-inner"
-              style={{
-                backgroundImage: `url(${image.imageUrl})`,
+              key={image.id}
+              className="image-item"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{
+                opacity: inView ? 1 : 0,
+                y: inView ? 0 : 50,
               }}
-              whileHover={{
-                scale: 1.2,
+              transition={{
+                duration: 0.8,
+                delay: index * 0.1,
+                ease: [0.43, 0.13, 0.23, 0.96],
               }}
-            />
-          </motion.div>
-        ))}
+              ref={index === 0 ? inViewRef : undefined}
+            >
+              <OptimizedImage
+                publicId={image.publicId}
+                alt={image.description}
+                className="image"
+                priority={index < 4}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

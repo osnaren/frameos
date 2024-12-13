@@ -8,14 +8,11 @@ export default function Header() {
   const location = useLocation();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--color-background)]/80 backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-md border-b border-themed">
       <div className="max-w-7xl mx-auto">
         <nav className="relative px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link
-              to="/"
-              className="text-2xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors"
-            >
+            <Link to="/" className="text-2xl font-bold text-[var(--color-text)] hover-accent transition-colors">
               PhotoFolio
             </Link>
 

@@ -26,8 +26,8 @@ export default function PhotoModal({ photo, isOpen, onClose }: PhotoModalProps) 
           className="fixed inset-0 z-50 overflow-y-auto"
         >
           <div className="min-h-screen px-4 text-center">
-            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-            <div className="inline-block w-full max-w-4xl p-6 my-8 text-left align-middle transition-all transform bg-[var(--color-background)] shadow-xl rounded-2xl">
+            <Dialog.Overlay className="fixed inset-0 bg-[var(--color-text)] opacity-30" />
+            <div className="inline-block w-full max-w-4xl p-6 my-8 text-left align-middle transition-all transform bg-surface shadow-xl rounded-2xl">
               <div className="relative aspect-w-16 aspect-h-9">
                 <OptimizedImage
                   publicId={photo?.publicId}
@@ -40,7 +40,7 @@ export default function PhotoModal({ photo, isOpen, onClose }: PhotoModalProps) 
                   {photo?.title}
                 </Dialog.Title>
                 <div className="mt-2">
-                  <p className="text-sm text-[var(--color-text)] opacity-80">{photo?.description}</p>
+                  <p className="text-sm text-muted">{photo?.description}</p>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   <div>

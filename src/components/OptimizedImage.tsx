@@ -7,7 +7,7 @@ interface OptimizedImageProps {
   publicId: string;
   alt: string;
   className?: string;
-  onLoad?: () => void;
+  priority?: boolean;
 }
 
 const cld = new Cloudinary({
@@ -16,16 +16,16 @@ const cld = new Cloudinary({
   },
 });
 
-export default function OptimizedImage({ publicId, alt, className, onLoad }: OptimizedImageProps) {
+export default function OptimizedImage({ publicId, alt, className, priority = false }: OptimizedImageProps) {
   const { setDynamicTheme } = useThemeContext();
+  const loading = priority ? 'eager' : 'lazy';
 
   const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    onLoad?.();
     if (e.currentTarget.src) {
       // Extract dominant color and set dynamic theme
       // This would typically be done through a color extraction service
       // For now, we'll use a placeholder implementation
-      setDynamicTheme('#121212');
+      // setDynamicTheme('#121212');
     }
   };
 
@@ -37,7 +37,8 @@ export default function OptimizedImage({ publicId, alt, className, onLoad }: Opt
       plugins={[lazyload(), responsive()]}
       alt={alt}
       className={className}
-      // onLoad={handleLoad}
+      onLoad={handleLoad}
+      loading={loading}
     />
   );
 }

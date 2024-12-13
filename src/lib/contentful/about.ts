@@ -1,5 +1,7 @@
 import { createClient } from 'contentful';
-import type { AboutContent, AboutResponse } from '@ctypes/about';
+import type { AboutContent } from '@ctypes/about';
+import type { ContentfulResponse, AboutFields } from '@ctypes/contentful';
+import { transformAboutContent } from '../transformers/about';
 
 const client = createClient({
   space: import.meta.env.VITE_CONTENTFUL_SPACE_ID,
@@ -8,7 +10,7 @@ const client = createClient({
 
 export async function getAboutContent(): Promise<AboutContent> {
   try {
-    const response = await client.getEntries<AboutContent>({
+    const response = await client.getEntries<AboutFields>({
       content_type: 'about',
       limit: 1,
     });
@@ -17,7 +19,7 @@ export async function getAboutContent(): Promise<AboutContent> {
       throw new Error('No about content found');
     }
 
-    return response.items[0].fields;
+    return transformAboutContent(response);
   } catch (error) {
     console.error('Error fetching about content:', error);
     throw error;

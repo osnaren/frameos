@@ -4,11 +4,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme-aware utility classes */
+@layer utilities {
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+
+  .text-muted {
+    color: var(--color-muted-text);
+  }
+
+  .border-themed {
+    border-color: var(--color-border);
+  }
+
+  .hover-accent:hover {
+    color: var(--color-accent);
+  }
+}
+
 @layer base {
   html {
     font-family: 'Lora', serif;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-primary) var(--color-background);
+    scrollbar-color: var(--color-accent) var(--color-surface);
   }
 
   ::-webkit-scrollbar {
@@ -16,11 +35,11 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--color-background);
+    background: var(--color-surface);
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: var(--color-primary);
+    background-color: var(--color-accent);
     border-radius: 3px;
   }
 

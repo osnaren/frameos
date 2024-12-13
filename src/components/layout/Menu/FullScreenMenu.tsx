@@ -14,17 +14,13 @@ const menuVariants = {
   closed: {
     opacity: 0,
     scale: 0.95,
-    y: '-10%',
-    x: '10%',
   },
   open: {
     opacity: 1,
     scale: 1,
-    y: 0,
-    x: 0,
     transition: {
       duration: 0.6,
-      ease: 'easeOut',
+      ease: [0.43, 0.13, 0.23, 0.96],
       staggerChildren: 0.1,
     },
   },
@@ -42,7 +38,7 @@ export default function FullScreenMenu() {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-60 w-full h-screen flex items-center justify-center bg-[var(--color-background)] backdrop-blur-lg"
+          className="fixed inset-0 z-60 w-full h-screen flex items-center justify-center bg-surface backdrop-blur-lg"
           initial="closed"
           animate="open"
           exit="closed"
@@ -54,7 +50,7 @@ export default function FullScreenMenu() {
                 <Link
                   to={item.href}
                   onClick={closeMenu}
-                  className="text-4xl md:text-6xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors"
+                  className="text-4xl md:text-6xl font-bold text-[var(--color-text)] hover-accent transition-colors"
                 >
                   {item.name}
                 </Link>

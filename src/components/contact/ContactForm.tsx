@@ -44,7 +44,7 @@ export default function ContactForm() {
       <motion.button
         type="submit"
         disabled={loading}
-        className="w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="w-full bg-[var(--color-primary)] text-[var(--color-surface)] py-3 px-4 rounded-md hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >

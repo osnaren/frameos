@@ -1,21 +1,24 @@
+import { Document } from '@contentful/rich-text-types';
+
 export interface AboutContent {
   heroTitle: string;
   journeyTitle: string;
-  journeyContent: any; // Rich text content from Contentful
+  journeyContent: Document;
   approachTitle: string;
-  approachContent: any; // Rich text content from Contentful
+  approachContent: Document;
   images: AboutImage[];
 }
 
 export interface AboutImage {
   id: string;
-  publicId: string; // Cloudinary public ID
-  imageUrl?: string; // Optional URL if needed
+  publicId: string;
+  imageUrl: string;
   description: string;
-}
-
-export interface AboutResponse {
-  items: {
-    fields: AboutContent;
-  }[];
+  metadata: {
+    width: number;
+    height: number;
+    format: string;
+    createdAt: Date;
+    size: number;
+  };
 }

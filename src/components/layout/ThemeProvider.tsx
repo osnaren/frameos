@@ -1,6 +1,7 @@
-import React, { createContext, useContext } from 'react';
-import { useTheme } from '../../hooks/useTheme';
-import type { Theme } from '../../types/theme';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useTheme } from '@hooks/useTheme';
+import type { Theme } from '@ctypes/theme';
+import { cssVariables, applyTheme } from '@styles/colors';
 
 interface ThemeContextType {
   theme: Theme;
@@ -10,30 +11,55 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+/**
+ * ThemeProvider component that provides theme context to its children.
+ *
+ * @param {Object} props - The props object.
+ * @param {React.ReactNode} props.children - The children components.
+ * @returns {JSX.Element} The ThemeProvider component.
+ */
+export function ThemeProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const themeContext = useTheme();
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = cssVariables;
+    document.head.appendChild(style);
+
+    applyTheme(themeContext.theme);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, [themeContext.theme]);
+
+  useEffect(() => {
+    document.documentElement.classList.add('theme-transition');
+    const timeout = setTimeout(() => {
+      requestAnimationFrame(() => {
+        document.documentElement.classList.remove('theme-transition');
+      });
+    }, 800);
+
+    return () => {
+      clearTimeout(timeout);
+      document.documentElement.classList.remove('theme-transition');
+    };
+  }, [themeContext.theme.mode]);
 
   return (
     <ThemeContext.Provider value={themeContext}>
-      <div
-        style={
-          {
-            '--color-background': themeContext.theme.colors.background,
-            '--color-text': themeContext.theme.colors.text,
-            '--color-primary': themeContext.theme.colors.primary,
-            '--color-secondary': themeContext.theme.colors.secondary,
-            '--color-accent': themeContext.theme.colors.accent,
-          } as React.CSSProperties
-        }
-        className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-300 ease-in-out"
-      >
-        {children}
-      </div>
+      <div className="min-h-screen">{children}</div>
     </ThemeContext.Provider>
   );
 }
 
-export function useThemeContext() {
+/**
+ * Custom hook to use the ThemeContext.
+ *
+ * @returns {ThemeContextType} The theme context value.
+ * @throws {Error} If used outside of a ThemeProvider.
+ */
+export function useThemeContext(): ThemeContextType {
   const context = useContext(ThemeContext);
   if (context === undefined) {
     throw new Error('useThemeContext must be used within a ThemeProvider');
