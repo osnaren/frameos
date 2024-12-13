@@ -1,0 +1,55 @@
+/* Grid Layout Styles */
+.grid {
+  --perspective: 1000px;
+  --grid-height: auto;
+  --grid-width: 100%;
+  --grid-columns: 3;
+  --grid-gap: 2rem;
+  --grid-item-ratio: 1;
+  --grid-inner-scale: 0.5;
+
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  width: 100%;
+  perspective: var(--perspective);
+}
+
+.grid-wrap {
+  position: relative;
+  height: var(--grid-height);
+  width: var(--grid-width);
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: var(--grid-gap);
+  transform-style: preserve-3d;
+}
+
+.grid__item {
+  aspect-ratio: var(--grid-item-ratio);
+  width: 100%;
+  height: auto;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.grid__item-inner {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: 50% 50%;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+@media (max-width: 768px) {
+  .grid {
+    --grid-columns: 2;
+    --grid-gap: 1rem;
+    padding: 1rem;
+  }
+}

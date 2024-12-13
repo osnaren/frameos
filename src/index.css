@@ -7,6 +7,21 @@
 @layer base {
   html {
     font-family: 'Lora', serif;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) var(--color-background);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 3px;
   }
 
   h1,
@@ -19,11 +34,34 @@
   }
 }
 
-.infinity-header {
-  background: linear-gradient(
-    180deg,
-    var(--color-background) 0%,
-    var(--color-background) / 80 80%,
-    var(--color-background) / 0 100%
-  );
+/* Layout */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
+
+/* Feature Slider */
+.featured-slider {
+  height: 600px;
+}
+
+.featured-slider-item {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.featured-slider-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
 }

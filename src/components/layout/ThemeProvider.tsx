@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             '--color-accent': themeContext.theme.colors.accent,
           } as React.CSSProperties
         }
-        className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-300"
+        className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-300 ease-in-out"
       >
         {children}
       </div>

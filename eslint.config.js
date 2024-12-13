@@ -1,12 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import react from 'eslint-plugin-react';
+import reactRefresh from 'eslint-plugin-react-refresh';
 import prettier from 'eslint-plugin-prettier';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
 import importPlugin from 'eslint-plugin-import';
-// import jsconfig from './jsconfig.json' assert { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +25,7 @@ export default [
     'plugin:react-hooks/recommended',
     'plugin:prettier/recommended'
   ),
+  reactRefresh.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs,jsx}'],
     plugins: {
@@ -79,6 +80,7 @@ export default [
       'no-console': 'warn',
       'no-unused-vars': 'warn',
       'no-underscore-dangle': ['error', { allow: ['__dirname', '__filename'] }],
+      'sort-imports': '1',
     },
   },
 ];

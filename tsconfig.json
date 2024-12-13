@@ -23,14 +23,14 @@
       "@/*": ["src/*"],
       "@photofolio-src/*": ["./src/*"],
       "@assets/*": ["./src/assets/*"],
-      "@styles/*": ["./src/styles/*"],
       "@components/*": ["./src/components/*"],
+      "@ctypes/*": ["./src/types/*"],
       "@data/*": ["./src/data/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@lib/*": ["./src/lib/*"],
       "@pages/*": ["./src/pages/*"],
-      "@ctypes/*": ["./src/types/*"],
       "@reusables/*": ["./src/reusables/*"],
+      "@styles/*": ["./src/styles/*"],
       "@utils/*": ["./src/utils/*"]
     }
   },

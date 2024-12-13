@@ -17,7 +17,7 @@ export default function Layout({ children }: LayoutProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
+    <div className="flex flex-col min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
       <Header />
       <AnimatePresence mode="wait">
         <motion.main
@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="pt-16"
+          className="flex-grow pt-16"
         >
           {children}
         </motion.main>

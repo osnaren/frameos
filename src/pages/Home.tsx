@@ -1,9 +1,13 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import FeaturedCarousel from '../components/home/FeaturedCarousel';
-import Photographer from '../components/home/Photographer';
+import Hero from '@components/home/Hero';
+import FeaturedSlider from '@components/home/FeaturedSlider';
+import DynamicGrid from '@components/home/DynamicGrid';
+import { useLenis } from '@hooks/useLenis';
 
 export default function Home() {
+  useLenis();
+
   return (
     <>
       <Helmet>
@@ -14,9 +18,10 @@ export default function Home() {
         />
       </Helmet>
 
-      <main>
-        <FeaturedCarousel />
-        <Photographer />
+      <main className="overflow-hidden">
+        <Hero />
+        <FeaturedSlider />
+        <DynamicGrid />
       </main>
     </>
   );

@@ -37,7 +37,7 @@ export default function OptimizedImage({ publicId, alt, className, onLoad }: Opt
       plugins={[lazyload(), responsive()]}
       alt={alt}
       className={className}
-      onLoad={handleLoad}
+      // onLoad={handleLoad}
     />
   );
 }
