@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { getAllPhotos, getFeaturedPhotos, getPhotosByCategory } from '../lib/contentful';
+import { getAllPhotos, getFeaturedPhotos, getPhotoByEntryId, getPhotosByCategory } from '../lib/contentful';
 import type { Photo } from '../types/photo';
 
 export function useAllPhotos() {
@@ -27,6 +27,16 @@ export function usePhotosByCategory(category: string) {
 
   return {
     photos: data || [],
+    isLoading,
+    error,
+  };
+}
+
+export function usePhotoById(id: string) {
+  const { data, error, isLoading } = useSWR<Photo | null>(id, () => getPhotoByEntryId(id));
+
+  return {
+    photo: data,
     isLoading,
     error,
   };

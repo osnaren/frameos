@@ -9,22 +9,30 @@ import Layout from '@components/layout/Layout';
 
 const Home = lazy(() =>
   import('@pages/Home').then((module) => {
-    return new Promise((resolve) => setTimeout(() => resolve(module), 300));
+    return new Promise<{ default: typeof module.default }>((resolve) =>
+      setTimeout(() => resolve({ default: module.default }), 300)
+    );
   })
 );
 const Gallery = lazy(() =>
   import('@pages/Gallery').then((module) => {
-    return new Promise((resolve) => setTimeout(() => resolve(module), 300));
+    return new Promise<{ default: typeof module.default }>((resolve) =>
+      setTimeout(() => resolve({ default: module.default }), 300)
+    );
   })
 );
 const About = lazy(() =>
   import('@pages/About').then((module) => {
-    return new Promise((resolve) => setTimeout(() => resolve(module), 300));
+    return new Promise<{ default: typeof module.default }>((resolve) =>
+      setTimeout(() => resolve({ default: module.default }), 300)
+    );
   })
 );
 const Contact = lazy(() =>
   import('@pages/Contact').then((module) => {
-    return new Promise((resolve) => setTimeout(() => resolve(module), 300));
+    return new Promise<{ default: typeof module.default }>((resolve) =>
+      setTimeout(() => resolve({ default: module.default }), 300)
+    );
   })
 );
 
@@ -35,7 +43,7 @@ function App() {
         <Router>
           <MenuProvider>
             <Routes>
-              <Route element={<Layout />}>
+              <Route element={<Layout children={undefined} />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/about" element={<About />} />

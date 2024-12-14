@@ -20,11 +20,11 @@ export function getOptimizedImageUrl(
     .format(options.format || 'auto')
     .quality(options.quality || 'auto');
 
-  if (options.width) {
-    transformation.width(options.width);
+  if (options?.width) {
+    transformation.resize({ width: options.width });
   }
-  if (options.height) {
-    transformation.height(options.height);
+  if (options?.height) {
+    transformation.resize({ height: options.height });
   }
 
   return transformation.toURL();

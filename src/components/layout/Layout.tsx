@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from './Header';
-import Footer from './Footer';
+import Footer from './Footer/Footer';
 import { useLocation, useOutlet } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import { Suspense } from 'react';

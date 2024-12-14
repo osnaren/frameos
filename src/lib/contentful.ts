@@ -6,6 +6,16 @@ const client = createClient({
   accessToken: import.meta.env.VITE_CONTENTFUL_ACCESS_TOKEN,
 });
 
+export async function getPhotoByEntryId(id: string): Promise<Photo | null> {
+  try {
+    const response = await client.getEntry(id);
+    return mapContentfulPhoto(response);
+  } catch (error) {
+    console.error(`Error fetching photo by id ${id}:`, error);
+    return null;
+  }
+}
+
 export async function getFeaturedPhotos(): Promise<Photo[]> {
   try {
     const response = await client.getEntries({

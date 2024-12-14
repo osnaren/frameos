@@ -1,0 +1,91 @@
+.footer-image {
+  object-position: 0 60%;
+}
+
+.top-fade {
+  width: 50%;
+  float: right;
+  position: absolute;
+  height: 100%;
+  right: 0;
+  top: 0;
+  background: linear-gradient(0deg, transparent 0%, var(--color-background) 100%);
+}
+
+.left-fade {
+  width: 50%;
+  float: right;
+  position: absolute;
+  height: 100%;
+  right: 0;
+  top: 0;
+  background: linear-gradient(270deg, transparent 0%, var(--color-background) 100%);
+}
+
+.tagline-wrapper {
+  position: relative;
+  padding: 1.5em 0; // Increased padding to allow for line movement
+  cursor: pointer;
+  --line-scale: 0;
+  --line-opacity: 0;
+  --line-position: 0;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-text);
+    transform: scaleX(var(--line-scale));
+    opacity: var(--line-opacity);
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &::before {
+    top: calc(50% - var(--line-position));
+  }
+
+  &::after {
+    bottom: calc(50% - var(--line-position));
+  }
+}
+
+@keyframes waveFlag {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(14deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  30% {
+    transform: rotate(14deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.waving-flag {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    animation: waveFlag 2.5s infinite;
+  }
+}
