@@ -1,7 +1,7 @@
 import React from 'react';
 import { AdvancedImage, lazyload, responsive } from '@cloudinary/react';
 import { Cloudinary } from '@cloudinary/url-gen';
-import { useThemeContext } from './layout/ThemeProvider';
+import { useThemeContext } from './theme/ThemeProvider';
 
 interface OptimizedImageProps {
   publicId: string;

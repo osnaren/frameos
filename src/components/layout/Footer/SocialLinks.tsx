@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { iconAnimation } from './animations';
+import { useDrawAnimation } from '@hooks/useDrawAnimation';
 
 const socialLinks = [
   {
@@ -44,24 +45,39 @@ const socialLinks = [
   },
 ];
 
+const Corner = ({ className, isHovered }: { className: string; isHovered: boolean }) => {
+  const cornerRef = useDrawAnimation(isHovered);
+
+  return <div ref={cornerRef} className={`absolute border-[var(--color-primary)] opacity-0 ${className}`} />;
+};
+
 export function SocialLinks() {
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
   return (
     <div className="flex space-x-6">
       {socialLinks.map((item) => (
-        <motion.a
+        <div
           key={item.name}
-          href={item.href}
-          className="text-[var(--color-text)] hover:text-[var(--color-primary)]"
-          variants={iconAnimation}
-          initial="initial"
-          whileHover="hover"
-          whileTap="tap"
-          target="_blank"
-          rel="noopener noreferrer"
+          className="relative"
+          onMouseEnter={() => setHoveredItem(item.name)}
+          onMouseLeave={() => setHoveredItem(null)}
         >
-          <span className="sr-only">{item.name}</span>
-          <item.icon className="h-6 w-6" aria-hidden="true" width={32} height={32} />
-        </motion.a>
+          <Corner className="border-t-2 border-l-2 left-[-4px] top-[-4px]" isHovered={hoveredItem === item.name} />
+          <Corner className="border-b-2 border-r-2 right-[-4px] bottom-[-4px]" isHovered={hoveredItem === item.name} />
+          <motion.a
+            href={item.href}
+            className="text-[var(--color-text)] hover:text-[var(--color-primary)] block"
+            variants={iconAnimation}
+            whileHover="hover"
+            whileTap="tap"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="sr-only">{item.name}</span>
+            <item.icon className="h-6 w-6" aria-hidden="true" width={32} height={32} />
+          </motion.a>
+        </div>
       ))}
     </div>
   );

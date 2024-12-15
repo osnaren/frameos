@@ -5,7 +5,7 @@ import PhotoCard from '../components/PhotoCard';
 import PhotoModal from '../components/PhotoModal';
 import { useAllPhotos } from '../hooks/usePhotos';
 import type { Photo, PhotoCategory } from '../types/photo';
-import { useThemeContext } from '../components/layout/ThemeProvider';
+import { useThemeContext } from '../components/theme/ThemeProvider';
 
 const categories: PhotoCategory[] = ['portraits', 'landscapes', 'candid', 'street', 'nature', 'architecture'];
 

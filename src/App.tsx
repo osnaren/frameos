@@ -3,7 +3,7 @@ import { lazy } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 
-import { ThemeProvider } from '@components/layout/ThemeProvider';
+import { ThemeProvider } from '@components/theme/ThemeProvider';
 import { MenuProvider } from '@components/layout/Menu';
 import Layout from '@components/layout/Layout';
 

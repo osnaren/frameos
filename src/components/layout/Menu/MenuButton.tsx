@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useMenuContext } from './MenuContext';
 
@@ -11,7 +10,7 @@ export default function MenuButton() {
 
   return (
     <motion.button
-      className="z-50 p-2 text-[var(--color-text)]"
+      className="z-50 p-2 text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors"
       onClick={toggleMenu}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}

@@ -1,14 +1,3 @@
-/* Theme transition utilities */
-.theme-transition,
-.theme-transition *,
-.theme-transition *::before,
-.theme-transition *::after {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.43, 0.13, 0.23, 0.96);
-  transition-duration: 800ms;
-}
-
-/* Prevent transition on page load */
 .no-transition,
 .no-transition *,
 .no-transition *::before,

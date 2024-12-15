@@ -25,26 +25,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }): JSX.
     const style = document.createElement('style');
     style.textContent = cssVariables;
     document.head.appendChild(style);
-
     applyTheme(themeContext.theme);
+
     return () => {
       document.head.removeChild(style);
     };
   }, [themeContext.theme]);
-
-  useEffect(() => {
-    document.documentElement.classList.add('theme-transition');
-    const timeout = setTimeout(() => {
-      requestAnimationFrame(() => {
-        document.documentElement.classList.remove('theme-transition');
-      });
-    }, 800);
-
-    return () => {
-      clearTimeout(timeout);
-      document.documentElement.classList.remove('theme-transition');
-    };
-  }, [themeContext.theme.mode]);
 
   return (
     <ThemeContext.Provider value={themeContext}>
