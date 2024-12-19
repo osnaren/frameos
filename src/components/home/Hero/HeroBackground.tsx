@@ -1,32 +1,33 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import { forwardRef } from 'react';
+import type { Photo } from '@ctypes/photo';
 
 interface HeroBackgroundProps {
-  style?: React.CSSProperties;
+  photo: Photo;
 }
 
-export function HeroBackground({ style }: HeroBackgroundProps) {
+const HeroBackground = forwardRef<HTMLDivElement, HeroBackgroundProps>(({ photo }, ref) => {
+  const aspectRatio = photo.width / photo.height;
+  const imageWidth = window.innerHeight * aspectRatio;
+
   return (
-    <motion.div
-      className="absolute inset-0 -z-10"
-      initial={{ scale: 1.1 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 2, ease: 'easeOut' }}
-      style={style}
-    >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/20" />
-      <img src="/hero-bg.jpg" alt="" className="w-full h-full object-cover" />
-      {/* Uncomment for video background
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="w-full h-full object-cover"
-      >
-        <source src="/hero-video.mp4" type="video/mp4" />
-      </video>
-      */}
-    </motion.div>
+    <div
+      ref={ref}
+      className="absolute inset-0"
+      style={{
+        width: `${imageWidth}px`,
+        height: '100%',
+        backgroundImage: `url('${photo.imageUrl}')`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'contain',
+        backgroundPosition: 'left center',
+        transform: 'translate3d(0,0,0)',
+        willChange: 'transform',
+        backfaceVisibility: 'hidden',
+      }}
+    />
   );
-}
+});
+
+HeroBackground.displayName = 'HeroBackground';
+
+export default HeroBackground;

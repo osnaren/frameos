@@ -9,6 +9,8 @@ export interface Photo {
   metadata: PhotoMetadata;
   featured: boolean;
   dateCreated: string;
+  height: number;
+  width: number;
 }
 
 export interface PhotoMetadata {

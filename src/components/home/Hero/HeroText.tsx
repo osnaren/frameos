@@ -1,40 +1,24 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 
-const textVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.2,
-      duration: 0.8,
-      ease: [0.43, 0.13, 0.23, 0.96],
-    },
-  }),
-};
-
-export function HeroText() {
+export default function HeroText() {
   return (
-    <div className="space-y-4">
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
       <motion.h1
-        custom={0}
-        initial="hidden"
-        animate="visible"
-        variants={textVariants}
-        className="text-4xl md:text-6xl lg:text-7xl font-bold text-white"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        className="text-6xl font-bold text-white"
       >
-        Capturing the World
+        Welcome to FrameOS
       </motion.h1>
-      <motion.h2
-        custom={1}
-        initial="hidden"
-        animate="visible"
-        variants={textVariants}
-        className="text-3xl md:text-5xl lg:text-6xl font-bold text-white"
+      <motion.p
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+        className="text-xl text-gray-300 mt-4"
       >
-        Through My Lens
-      </motion.h2>
+        Discover the world through breathtaking photography.
+      </motion.p>
     </div>
   );
 }

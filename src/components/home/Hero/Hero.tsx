@@ -1,40 +1,123 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { useParallax } from '@hooks/useParallax';
-import { HeroBackground } from './HeroBackground';
-import { HeroText } from './HeroText';
+import { useRef, useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import HeroBackground from './HeroBackground';
+import HeroText from './HeroText';
+import { usePhotoById } from '@hooks/usePhotos';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
-  const { ref, parallaxStyle } = useParallax();
+  const { photo } = usePhotoById('4C3xWzdPJyh2QE6RV2meF6');
+  const panoRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!photo) return;
+
+    const panoElement = panoRef.current;
+    const scrollElement = scrollRef.current;
+    const containerElement = containerRef.current;
+
+    if (!panoElement || !scrollElement || !containerElement) return;
+
+    // Calculate dimensions based on viewport and image ratio
+    const aspectRatio = photo.width / photo.height;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Calculate the actual image dimensions when contained in viewport
+    const imageHeight = viewportHeight;
+    const imageWidth = imageHeight * aspectRatio;
+
+    // Calculate total scroll distance needed
+    const totalWidth = Math.max(imageWidth - viewportWidth, 0);
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: scrollElement,
+        start: 'top top',
+        end: () => `+=${totalWidth}`,
+        pin: containerElement,
+        anticipatePin: 1,
+        scrub: 0.8,
+        pinSpacing: true,
+        preventOverlaps: true,
+        fastScrollEnd: true,
+        onUpdate: (self) => {
+          // Smoother transitions for both directions
+          const progress = self.progress;
+          const threshold = 0.85;
+          const fadeRange = 0.15;
+
+          if (progress > threshold) {
+            const fadeProgress = (progress - threshold) / fadeRange;
+            const opacity = gsap.utils.clamp(0, 1, 1 - fadeProgress);
+            gsap.to(containerElement, {
+              opacity: opacity,
+              duration: 0.2,
+              overwrite: true,
+            });
+          } else {
+            gsap.to(containerElement, {
+              opacity: 1,
+              duration: 0.2,
+              overwrite: true,
+            });
+          }
+        },
+        onLeaveBack: () => {
+          gsap.to(containerElement, {
+            opacity: 1,
+            duration: 0.3,
+          });
+        },
+        onEnterBack: () => {
+          ScrollTrigger.refresh();
+        },
+      },
+    });
+
+    timeline.to(panoElement, {
+      x: -totalWidth,
+      ease: 'none',
+      onComplete: () => {
+        scrollElement.style.pointerEvents = 'none';
+      },
+      onReverseComplete: () => {
+        scrollElement.style.pointerEvents = 'auto';
+      },
+    });
+
+    // Add resize handler
+    const handleResize = () => {
+      ScrollTrigger.refresh(true);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      timeline.kill();
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, [photo]);
+
+  if (!photo) return null;
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <HeroBackground style={parallaxStyle} />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <HeroText />
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8 flex flex-wrap justify-center gap-4"
-        >
-          <Link
-            to="/gallery"
-            className="px-8 py-3 bg-[var(--color-primary)] text-white rounded-lg font-medium hover:bg-opacity-90 transition-colors"
-          >
-            Explore My Work
-          </Link>
-          <Link
-            to="/contact"
-            className="px-8 py-3 border-2 border-[var(--color-text)] text-[var(--color-text)] rounded-lg font-medium hover:bg-[var(--color-text)] hover:text-[var(--color-background)] transition-colors"
-          >
-            Get in Touch
-          </Link>
-        </motion.div>
+    <>
+      {/* Scroll container */}
+      <div ref={scrollRef} className="relative">
+        {/* Pin container */}
+        <div ref={containerRef} className="h-screen w-full overflow-hidden">
+          {/* Content container */}
+          <div className="relative h-full w-full">
+            <HeroBackground ref={panoRef} photo={photo} />
+            <HeroText />
+          </div>
+        </div>
       </div>
-    </section>
+    </>
   );
 }

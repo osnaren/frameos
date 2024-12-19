@@ -75,5 +75,7 @@ function mapContentfulPhoto(item: any): Photo {
     metadata: fields.metadata,
     featured: fields.featured || false,
     dateCreated: fields.dateCreated,
+    height: fields.cloudinary[0].height,
+    width: fields.cloudinary[0].width,
   };
 }
