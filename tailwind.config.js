@@ -1,17 +1,19 @@
 /** @type {import('tailwindcss').Config} */
+import aspectRatio from '@tailwindcss/aspect-ratio';
+import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
-        serif: ['Lora', 'serif'],
-      },
-      aspectRatio: {
-        '3/2': '3 / 2',
-        '16/9': '16 / 9',
+        display: ['"Playfair Display"', 'serif'],
+        body: ['Lato', 'sans-serif'],
+        accent: ['Ubuntu', 'sans-serif'],
+        decorative: ['"Tanzania Guides"', 'cursive'],
       },
     },
   },
-  plugins: [require('@tailwindcss/aspect-ratio'), require('@tailwindcss/typography'), require('@tailwindcss/forms')],
+  plugins: [aspectRatio, typography, forms],
 };

@@ -28,6 +28,8 @@ export const cssVariables = `
     --color-button-text: var(--color-text);
     --color-button-hover: var(--color-hover);
     --color-button-active: var(--color-active);
+
+    --color-shadow: var(--theme-shadow);
   }
 `;
 

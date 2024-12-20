@@ -9,6 +9,7 @@ export interface ThemeColors {
   accent: string; // Accent color for highlights
   surface: string; // Background for cards or containers
   border: string; // Border color for UI elements
+  shadow: string; // Shadow color for UI elements
 }
 
 export interface Theme {

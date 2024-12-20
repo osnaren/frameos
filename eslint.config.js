@@ -1,12 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import react from 'eslint-plugin-react';
-import reactRefresh from 'eslint-plugin-react-refresh';
-import prettier from 'eslint-plugin-prettier';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import js from '@eslint/js';
+
 import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
+import prettier from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +34,7 @@ export default [
       react,
       prettier,
       import: importPlugin,
+      'simple-import-sort': simpleImportSort,
     },
 
     languageOptions: {
@@ -80,7 +83,8 @@ export default [
       'no-console': 'warn',
       'no-unused-vars': 'warn',
       'no-underscore-dangle': ['error', { allow: ['__dirname', '__filename'] }],
-      'sort-imports': '1',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
     },
   },
 ];

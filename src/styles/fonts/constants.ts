@@ -1,14 +1,25 @@
-export const FONT_WEIGHTS = {
-  regular: 400,
-  medium: 500,
-  bold: 700,
-} as const;
-
-export const FONT_FAMILIES = {
-  display: '"Playfair Display", serif',
-  body: '"Lato", sans-serif',
-  accent: '"Ubuntu", sans-serif',
-  decorative: '"Tanzania Guides", cursive',
+export const FONTS = {
+  display: {
+    family: 'Playfair Display',
+    weights: [400, 700],
+    googleUrl: 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap',
+  },
+  body: {
+    family: 'Lato',
+    weights: [400, 700],
+    styles: ['normal', 'italic'],
+    googleUrl: 'https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap',
+  },
+  accent: {
+    family: 'Ubuntu',
+    weights: [500, 700],
+    googleUrl: 'https://fonts.googleapis.com/css2?family=Ubuntu:wght@500;700&display=swap',
+  },
+  decorative: {
+    family: 'Tanzania Guides',
+    weights: [400],
+    googleUrl: 'https://fonts.googleapis.com/css2?family=Tanzania+Guides&display=swap',
+  },
 } as const;
 
 export const TYPE_SCALE = {

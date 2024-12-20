@@ -12,6 +12,7 @@ export const lightTheme: Theme = {
     surface: COLORS.surface.light,
     border: COLORS.border.light,
     mutedText: COLORS.mutedText.light,
+    shadow: COLORS.shadow.light,
   },
 };
 
@@ -26,5 +27,6 @@ export const darkTheme: Theme = {
     surface: COLORS.surface.dark,
     border: COLORS.border.dark,
     mutedText: COLORS.mutedText.dark,
+    shadow: COLORS.shadow.dark,
   },
 };
