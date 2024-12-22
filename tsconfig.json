@@ -37,7 +37,7 @@
       "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": ["src", "vite.config.ts", "vite-env.d.ts", "eslint.config.js", "./*"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist", "build", "coverage", "jest", "vite"],
   "references": [
     {

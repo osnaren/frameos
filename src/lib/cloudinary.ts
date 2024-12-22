@@ -1,4 +1,5 @@
 import { Cloudinary } from '@cloudinary/url-gen';
+import { Resize } from '@cloudinary/url-gen/actions/resize';
 
 const cld = new Cloudinary({
   cloud: {
@@ -11,21 +12,24 @@ export function getOptimizedImageUrl(
   options: {
     width?: number;
     height?: number;
-    quality?: number;
+    quality?: string | number;
     format?: string;
   } = {}
 ): string {
-  const transformation = cld
-    .image(publicId)
-    .format(options.format || 'auto')
-    .quality(options.quality || 'auto');
+  const transformation = cld.image(publicId);
 
-  if (options?.width) {
-    transformation.resize({ width: options.width });
-  }
-  if (options?.height) {
-    transformation.resize({ height: options.height });
+  // Apply resizing transformations if width or height is provided
+  if (options.width && options.height) {
+    transformation.resize(Resize.scale().width(options.width).height(options.height));
+  } else if (options.width) {
+    transformation.resize(Resize.scale().width(options.width));
+  } else if (options.height) {
+    transformation.resize(Resize.scale().height(options.height));
   }
 
+  // Apply format and quality transformations
+  transformation.format(options.format || 'auto').quality(options.quality || 'auto');
+
+  // Generate and return the optimized URL
   return transformation.toURL();
 }

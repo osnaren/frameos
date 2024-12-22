@@ -4,7 +4,6 @@ import ImageGrid from '@components/about/ImageGrid';
 import { useAboutContent } from '@hooks/useAboutContent';
 import { useLenis } from '@hooks/useLenis';
 import { motion } from 'framer-motion';
-import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 export default function About() {
