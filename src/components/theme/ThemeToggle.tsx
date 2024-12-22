@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
-import { useThemeContext } from '../theme/ThemeProvider';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useRef, useState } from 'react';
+
+import { useThemeContext } from './ThemeProvider';
 import ThemeTransition from './ThemeTransition';
 
 export default function ThemeToggle() {

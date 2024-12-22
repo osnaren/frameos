@@ -1,0 +1,8 @@
+.featured-slider {
+  perspective: 1000px;
+}
+
+.featured-slider [data-card] {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}

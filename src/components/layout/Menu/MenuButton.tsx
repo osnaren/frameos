@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
+
 import { useMenuContext } from './MenuContext';
 
-const Path = (props: any) => (
-  <motion.path fill="transparent" strokeWidth="2" stroke="currentColor" strokeLinecap="round" {...props} />
-);
+function Path(props: any) {
+  return <motion.path fill="transparent" strokeWidth="2" stroke="currentColor" strokeLinecap="round" {...props} />;
+}
 
 export default function MenuButton() {
   const { isOpen, toggleMenu } = useMenuContext();

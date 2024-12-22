@@ -1,5 +1,6 @@
-import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
+import { useEffect, useRef } from 'react';
+
 import { useThemeContext } from './ThemeProvider';
 
 interface ThemeTransitionProps {
@@ -16,8 +17,9 @@ export default function ThemeTransition({ isAnimating, onAnimationComplete, orig
   useEffect(() => {
     if (!isAnimating || !origin || !svgRef.current || !circleRef.current) return;
 
-    const scrollX = window.scrollX;
-    const scrollY = window.scrollY;
+    const circle = circleRef.current; // Copy circleRef.current to a variable
+    const { scrollX } = window;
+    const { scrollY } = window;
     const maxRadius =
       Math.max(
         Math.hypot(origin.x - scrollX, origin.y - scrollY),
@@ -26,7 +28,7 @@ export default function ThemeTransition({ isAnimating, onAnimationComplete, orig
         Math.hypot(origin.x - (window.innerWidth + scrollX), origin.y - (window.innerHeight + scrollY))
       ) + 100;
 
-    gsap.set(circleRef.current, {
+    gsap.set(circle, {
       attr: { cx: origin.x, cy: origin.y, r: 0 },
       opacity: 0,
     });
@@ -35,16 +37,16 @@ export default function ThemeTransition({ isAnimating, onAnimationComplete, orig
       onComplete: onAnimationComplete,
     });
 
-    tl.to(circleRef.current, {
+    tl.to(circle, {
       opacity: 1,
       duration: 0.2,
     })
-      .to(circleRef.current, {
+      .to(circle, {
         attr: { r: maxRadius },
         duration: 0.4,
         ease: 'power2.inOut',
       })
-      .to(circleRef.current, {
+      .to(circle, {
         attr: { r: 0 },
         duration: 0.3,
         ease: 'power2.in',
@@ -53,8 +55,9 @@ export default function ThemeTransition({ isAnimating, onAnimationComplete, orig
 
     return () => {
       tl.kill();
-      gsap.set(circleRef.current, { opacity: 0 });
+      gsap.set(circle, { opacity: 0 });
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAnimating, origin, onAnimationComplete]);
 
   if (!isAnimating) return null;

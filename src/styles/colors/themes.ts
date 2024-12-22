@@ -1,5 +1,6 @@
-import { COLORS } from './constants';
 import type { Theme } from '@/types/theme';
+
+import { COLORS } from './constants';
 
 export const lightTheme: Theme = {
   mode: 'light',

@@ -7,7 +7,7 @@ interface CurvedArrowProps {
   className?: string;
 }
 
-const CurvedArrow = ({ arrowRef, width, height, className = '' }: CurvedArrowProps) => {
+function CurvedArrow({ arrowRef, width, height, className = '' }: CurvedArrowProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -28,6 +28,6 @@ const CurvedArrow = ({ arrowRef, width, height, className = '' }: CurvedArrowPro
       </g>
     </svg>
   );
-};
+}
 
 export default CurvedArrow;

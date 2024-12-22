@@ -1,5 +1,6 @@
-import type { ContentfulResponse, AboutFields } from '@ctypes/contentful';
 import type { AboutContent } from '@ctypes/about';
+import type { AboutFields, ContentfulResponse } from '@ctypes/contentful';
+
 import { transformCloudinaryImage, validateCloudinaryImage } from './cloudinary';
 
 export function transformAboutContent(response: ContentfulResponse<AboutFields>): AboutContent {
@@ -7,7 +8,7 @@ export function transformAboutContent(response: ContentfulResponse<AboutFields>)
     throw new Error('No about content found');
   }
 
-  const fields = response.items[0].fields;
+  const { fields } = response.items[0];
 
   return {
     heroTitle: fields.heroTitle,

@@ -1,7 +1,8 @@
-import React from 'react';
 import { AdvancedImage, lazyload, responsive } from '@cloudinary/react';
 import { Cloudinary } from '@cloudinary/url-gen';
-import { useThemeContext } from './theme/ThemeProvider';
+import React from 'react';
+
+// import { useThemeContext } from './theme/ThemeProvider';
 
 interface OptimizedImageProps {
   publicId: string;
@@ -17,7 +18,7 @@ const cld = new Cloudinary({
 });
 
 export default function OptimizedImage({ publicId, alt, className, priority = false }: OptimizedImageProps) {
-  const { setDynamicTheme } = useThemeContext();
+  // const { setDynamicTheme } = useThemeContext();
   const loading = priority ? 'eager' : 'lazy';
 
   const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {

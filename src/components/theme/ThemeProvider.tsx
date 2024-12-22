@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect } from 'react';
-import { useTheme } from '@hooks/useTheme';
+/* eslint-disable react-refresh/only-export-components */
 import type { Theme } from '@ctypes/theme';
-import { cssVariables, applyTheme } from '@styles/colors';
+import { useTheme } from '@hooks/useTheme';
+import { applyTheme, cssVariables } from '@styles/colors';
+import React, { createContext, useContext, useEffect } from 'react';
 
 interface ThemeContextType {
   theme: Theme;

@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+
 import { getAllPhotos, getFeaturedPhotos, getPhotoByEntryId, getPhotosByCategory } from '../lib/contentful';
 import type { Photo } from '../types/photo';
 

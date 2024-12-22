@@ -1,3 +1,14 @@
+export type PhotoCategory = 'portraits' | 'landscapes' | 'candid' | 'street' | 'nature' | 'architecture';
+
+export interface PhotoMetadata {
+  iso: number;
+  shutterSpeed: string;
+  aperture: string;
+  location: string;
+  camera: string;
+  lens: string;
+}
+
 export interface Photo {
   id: string;
   title: string;
@@ -12,14 +23,3 @@ export interface Photo {
   height: number;
   width: number;
 }
-
-export interface PhotoMetadata {
-  iso: number;
-  shutterSpeed: string;
-  aperture: string;
-  location: string;
-  camera: string;
-  lens: string;
-}
-
-export type PhotoCategory = 'portraits' | 'landscapes' | 'candid' | 'street' | 'nature' | 'architecture';

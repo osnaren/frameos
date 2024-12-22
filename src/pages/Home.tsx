@@ -1,9 +1,9 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import AboutNumbers from '@components/home/AboutNumbers/AboutNumbers';
+import CTASection from '@components/home/CtaSection/CtaSection';
+import FeaturedSlider from '@components/home/FeaturedSlider/FeaturedSlider';
 import Hero from '@components/home/Hero';
-import FeaturedSlider from '@components/home/FeaturedSlider';
-import DynamicGrid from '@components/home/DynamicGrid';
 import { useLenis } from '@hooks/useLenis';
+import { Helmet } from 'react-helmet-async';
 
 export default function Home() {
   useLenis();
@@ -20,8 +20,9 @@ export default function Home() {
 
       <main className="overflow-hidden">
         <Hero />
+        <AboutNumbers />
         <FeaturedSlider />
-        <DynamicGrid />
+        <CTASection />
       </main>
     </>
   );

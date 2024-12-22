@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 
 export default function Photographer() {
@@ -19,7 +18,7 @@ export default function Photographer() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-4xl font-bold mb-6"
           >
-            Hello, I'm John Doe
+            Hello, I&apos;m John Doe
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -28,9 +27,9 @@ export default function Photographer() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg text-gray-600 mb-6"
           >
-            With over a decade of experience capturing life's most precious moments, I specialize in creating timeless
-            photographs that tell your unique story. My passion lies in finding beauty in the ordinary and transforming
-            fleeting moments into lasting memories.
+            With over a decade of experience capturing life&apos;s most precious moments, I specialize in creating
+            timeless photographs that tell your unique story. My passion lies in finding beauty in the ordinary and
+            transforming fleeting moments into lasting memories.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -1,5 +1,5 @@
-import { forwardRef } from 'react';
 import type { Photo } from '@ctypes/photo';
+import { forwardRef } from 'react';
 
 interface HeroBackgroundProps {
   photo: Photo;

@@ -1,10 +1,15 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+    }),
+  ],
   css: {
     preprocessorOptions: {
       scss: {
@@ -25,6 +30,14 @@ export default defineConfig({
       '@reusables': resolve(__dirname, './src/reusables'),
       '@styles': resolve(__dirname, './src/styles'),
       '@utils': resolve(__dirname, './src/utils'),
+    },
+  },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+      },
     },
   },
 });

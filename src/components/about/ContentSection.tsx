@@ -8,7 +8,7 @@ interface ContentSectionProps {
 }
 
 const renderContent = (data: any) => {
-  console.log(data);
+  // console.log(data);
   if (!Array.isArray(data.content)) {
     return null;
   }

@@ -1,5 +1,7 @@
 import { createClient } from 'contentful';
+
 import type { Photo } from '../types/photo';
+import { mapContentfulPhoto } from './transformers/contentful';
 
 const client = createClient({
   space: import.meta.env.VITE_CONTENTFUL_SPACE_ID,
@@ -60,22 +62,4 @@ export async function getPhotosByCategory(category: string): Promise<Photo[]> {
     console.error(`Error fetching photos for category ${category}:`, error);
     return [];
   }
-}
-
-function mapContentfulPhoto(item: any): Photo {
-  const fields = item.fields;
-  return {
-    id: item.sys.id,
-    title: fields.title,
-    description: fields.description,
-    imageUrl: fields.cloudinary[0].original_url,
-    publicId: fields.cloudinary[0].public_id,
-    category: fields.category,
-    tags: fields.tags || [],
-    metadata: fields.metadata,
-    featured: fields.featured || false,
-    dateCreated: fields.dateCreated,
-    height: fields.cloudinary[0].height,
-    width: fields.cloudinary[0].width,
-  };
 }

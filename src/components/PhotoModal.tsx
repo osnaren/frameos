@@ -1,5 +1,6 @@
 import { Dialog } from '@headlessui/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+
 import type { Photo } from '../types/photo';
 import OptimizedImage from './OptimizedImage';
 

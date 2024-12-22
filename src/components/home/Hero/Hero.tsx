@@ -1,9 +1,10 @@
-import { useRef, useEffect } from 'react';
+import { usePhotoById } from '@hooks/usePhotos';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef } from 'react';
+
 import HeroBackground from './HeroBackground';
 import HeroText from './HeroText';
-import { usePhotoById } from '@hooks/usePhotos';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,7 +48,7 @@ export default function Hero() {
         fastScrollEnd: true,
         onUpdate: (self) => {
           // Smoother transitions for both directions
-          const progress = self.progress;
+          const { progress } = self;
           const threshold = 0.85;
           const fadeRange = 0.15;
 
@@ -55,7 +56,7 @@ export default function Hero() {
             const fadeProgress = (progress - threshold) / fadeRange;
             const opacity = gsap.utils.clamp(0, 1, 1 - fadeProgress);
             gsap.to(containerElement, {
-              opacity: opacity,
+              opacity,
               duration: 0.2,
               overwrite: true,
             });

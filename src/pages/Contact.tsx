@@ -1,6 +1,6 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
+
 import ContactForm from '../components/contact/ContactForm';
 
 export default function Contact() {
@@ -20,8 +20,8 @@ export default function Contact() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Get in Touch</h1>
               <p className="text-gray-600 mb-8">
-                Have a project in mind? I'd love to hear from you. Send me a message and I'll respond as soon as
-                possible.
+                Have a project in mind? I&apos;d love to hear from you. Send me a message and I&apos;ll respond as soon
+                as possible.
               </p>
             </motion.div>
             <ContactForm />

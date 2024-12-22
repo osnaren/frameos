@@ -12,6 +12,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "allowJs": true,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     /* Linting */
     "strict": true,
@@ -34,7 +37,8 @@
       "@utils/*": ["./src/utils/*"]
     }
   },
-  "include": ["src", "vite-env.d.ts"],
+  "include": ["src", "vite.config.ts", "vite-env.d.ts", "eslint.config.js", "./*"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "jest", "vite"],
   "references": [
     {
       "path": "./tsconfig.node.json"

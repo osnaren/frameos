@@ -1,8 +1,8 @@
-import React from 'react';
+import type { AboutImage } from '@ctypes/about';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+
 import OptimizedImage from '../OptimizedImage';
-import type { AboutImage } from '@ctypes/about';
 
 interface ImageGridProps {
   images: AboutImage[];

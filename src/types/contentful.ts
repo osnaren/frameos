@@ -1,4 +1,5 @@
 import { Document } from '@contentful/rich-text-types';
+
 import { CloudinaryImage } from './cloudinary';
 
 export interface ContentfulResponse<T> {

@@ -1,8 +1,8 @@
-import React from 'react';
-import { useForm } from './useForm';
+import { motion } from 'framer-motion';
+
 import FormInput from './FormInput';
 import FormTextArea from './FormTextArea';
-import { motion } from 'framer-motion';
+import { useForm } from './useForm';
 
 export default function ContactForm() {
   const { formData, errors, loading, handleChange, handleSubmit } = useForm();

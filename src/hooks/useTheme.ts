@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { lightTheme, darkTheme } from '@styles/colors/themes';
-import type { ThemeMode, Theme } from '@/types/theme';
+import { darkTheme, lightTheme } from '@styles/colors/themes';
 import { getContrastColor } from '@utils/color';
+import { useEffect, useState } from 'react';
+
+import type { Theme, ThemeMode } from '@/types/theme';
 
 export function useTheme() {
   const [storedTheme, setStoredTheme] = useState<ThemeMode>(() => {

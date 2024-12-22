@@ -1,8 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
 import '@styles/theme.css';
 import './index.css';
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+import App from './App';
 
 // Prevent transitions on page load
 document.documentElement.classList.add('no-transition');

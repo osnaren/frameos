@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import PhotoCard from '../components/PhotoCard';
 import PhotoModal from '../components/PhotoModal';
+import { useThemeContext } from '../components/theme/ThemeProvider';
 import { useAllPhotos } from '../hooks/usePhotos';
 import type { Photo, PhotoCategory } from '../types/photo';
-import { useThemeContext } from '../components/theme/ThemeProvider';
 
 const categories: PhotoCategory[] = ['portraits', 'landscapes', 'candid', 'street', 'nature', 'architecture'];
 
@@ -14,7 +15,7 @@ export default function Gallery() {
   const [selectedCategory, setSelectedCategory] = useState<PhotoCategory | 'all'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
   const { photos, isLoading, error } = useAllPhotos();
-  const { theme } = useThemeContext();
+  useThemeContext();
 
   const filteredPhotos = photos
     .filter((photo) => selectedCategory === 'all' || photo.category === selectedCategory)

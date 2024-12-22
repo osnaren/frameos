@@ -1,6 +1,7 @@
-import { createClient } from 'contentful';
 import type { AboutContent } from '@ctypes/about';
-import type { ContentfulResponse, AboutFields } from '@ctypes/contentful';
+import type { AboutFields } from '@ctypes/contentful';
+import { createClient, EntrySkeletonType } from 'contentful';
+
 import { transformAboutContent } from '../transformers/about';
 
 const client = createClient({
@@ -8,9 +9,17 @@ const client = createClient({
   accessToken: import.meta.env.VITE_CONTENTFUL_ACCESS_TOKEN,
 });
 
+interface AboutSectionFields extends EntrySkeletonType, AboutFields {
+  fields: {
+    title: string;
+    description: string;
+  };
+  contentTypeId: string;
+}
+
 export async function getAboutContent(): Promise<AboutContent> {
   try {
-    const response = await client.getEntries<AboutFields>({
+    const response = await client.getEntries<AboutSectionFields>({
       content_type: 'about',
       limit: 1,
     });
@@ -19,7 +28,7 @@ export async function getAboutContent(): Promise<AboutContent> {
       throw new Error('No about content found');
     }
 
-    return transformAboutContent(response);
+    return transformAboutContent(response as any);
   } catch (error) {
     console.error('Error fetching about content:', error);
     throw error;

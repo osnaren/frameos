@@ -1,8 +1,9 @@
-import CurvedArrow from './CurvedArrow';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+
+import CurvedArrow from './CurvedArrow';
 
 const useArrowAnimation = () => {
   const arrowRef = useRef<SVGPathElement>(null);
@@ -65,7 +66,7 @@ interface NavigationItemProps {
   itemVariants: Record<string, any>;
 }
 
-const NavigationItem = ({ item, onClick, itemVariants }: NavigationItemProps) => {
+function NavigationItem({ item, onClick, itemVariants }: NavigationItemProps) {
   const { arrowRef, handleHover, handleLeave } = useArrowAnimation();
 
   return (
@@ -87,6 +88,6 @@ const NavigationItem = ({ item, onClick, itemVariants }: NavigationItemProps) =>
       </Link>
     </motion.div>
   );
-};
+}
 
 export default NavigationItem;

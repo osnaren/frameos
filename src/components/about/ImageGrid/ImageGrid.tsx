@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import './styles.scss';
+
 import OptimizedImage from '@components/OptimizedImage';
 import type { AboutImage } from '@ctypes/about';
-import './styles.scss';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 interface ImageGridProps {
   images: AboutImage[];

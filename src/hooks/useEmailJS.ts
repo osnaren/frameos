@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import emailjs from '@emailjs/browser';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface EmailData {

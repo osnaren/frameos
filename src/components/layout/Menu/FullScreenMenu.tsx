@@ -1,6 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useMenuContext } from './MenuContext';
+import { AnimatePresence, motion } from 'framer-motion';
+
 import { SocialLinks } from '../Footer/SocialLinks';
+import { useMenuContext } from './MenuContext';
 import NavigationItem from './NavigationItem';
 
 const navigation = [

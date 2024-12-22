@@ -1,11 +1,11 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import ContentSection from '@components/about/ContentSection';
 import Hero from '@components/about/Hero';
 import ImageGrid from '@components/about/ImageGrid';
-import ContentSection from '@components/about/ContentSection';
 import { useAboutContent } from '@hooks/useAboutContent';
-import { motion } from 'framer-motion';
 import { useLenis } from '@hooks/useLenis';
+import { motion } from 'framer-motion';
+import React from 'react';
+import { Helmet } from 'react-helmet-async';
 
 export default function About() {
   useLenis();

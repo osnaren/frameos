@@ -1,17 +1,13 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Header from './Header';
-import Footer from './Footer/Footer';
-import { useLocation, useOutlet } from 'react-router-dom';
-import { useInView } from 'react-intersection-observer';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Suspense } from 'react';
-import Loader from '../loader/Loader';
+import { useInView } from 'react-intersection-observer';
+import { useLocation, useOutlet } from 'react-router-dom';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
+import Loader from '../logo/Loader';
+import Footer from './Footer/Footer';
+import Header from './Header';
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
   const location = useLocation();
   const outlet = useOutlet();
   const { ref: footerRef, inView } = useInView({
@@ -38,7 +34,7 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             }
           >
-            {outlet || children}
+            {outlet}
           </Suspense>
         </motion.main>
       </AnimatePresence>

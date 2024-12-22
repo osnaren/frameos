@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { SocialLinks } from './SocialLinks';
+import './style.scss';
 
 import { usePhotoById } from '@hooks/usePhotos';
+import { gsap } from 'gsap';
+import { useEffect, useRef } from 'react';
 
-import './style.scss';
+import { SocialLinks } from './SocialLinks';
 
 export default function Footer() {
   const { photo } = usePhotoById('46u1YJ2t4XJynzhLAtbcIV');

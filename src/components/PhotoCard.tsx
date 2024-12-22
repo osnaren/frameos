@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
 import type { Photo } from '@ctypes/photo';
 import { usePreventImageDownload } from '@hooks/usePreventImageDownload';
+import { motion } from 'framer-motion';
+
 import OptimizedImage from './OptimizedImage';
 
 interface PhotoCardProps {
