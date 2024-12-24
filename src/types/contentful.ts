@@ -41,3 +41,8 @@ export interface AboutFields {
   approachContent: Document;
   images: CloudinaryImage[];
 }
+
+export interface General {
+  id: string;
+  data: object;
+}

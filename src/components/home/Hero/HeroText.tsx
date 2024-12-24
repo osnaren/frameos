@@ -106,7 +106,7 @@ export default function HeroText() {
   }, []);
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}

@@ -1,4 +1,5 @@
 import type { Photo } from '@ctypes/photo';
+import { Entry, EntrySkeletonType } from 'contentful';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapContentfulPhoto(item: any): Photo {
@@ -16,5 +17,13 @@ export function mapContentfulPhoto(item: any): Photo {
     dateCreated: fields.dateCreated,
     height: fields.cloudinary[0].height,
     width: fields.cloudinary[0].width,
+  };
+}
+
+export function mapContentfulGeneral(item: Entry<EntrySkeletonType, undefined, string>): General {
+  const { fields } = item;
+  return {
+    id: fields.id,
+    data: fields.data,
   };
 }
