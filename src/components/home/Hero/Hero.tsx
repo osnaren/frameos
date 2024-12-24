@@ -9,7 +9,7 @@ import HeroText from './HeroText';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
-  const { photo } = usePhotoById('4C3xWzdPJyh2QE6RV2meF6');
+  const { photo } = usePhotoById('7iwOkCZd9YEcuuT78gG1Ep');
   const panoRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,7 +104,7 @@ export default function Hero() {
     };
   }, [photo]);
 
-  if (!photo) return null;
+  // if (!photo) return null;
 
   return (
     <>
@@ -114,7 +114,7 @@ export default function Hero() {
         <div ref={containerRef} className="h-screen w-full overflow-hidden">
           {/* Content container */}
           <div className="relative h-full w-full">
-            <HeroBackground ref={panoRef} photo={photo} />
+            {photo && <HeroBackground ref={panoRef} photo={photo} />}
             <HeroText />
           </div>
         </div>
