@@ -1,6 +1,7 @@
 import { Document } from '@contentful/rich-text-types';
 
 import { CloudinaryImage } from './cloudinary';
+import { GeneralContentType, GeneralDataType } from './general';
 
 export interface ContentfulResponse<T> {
   sys: {
@@ -42,7 +43,9 @@ export interface AboutFields {
   images: CloudinaryImage[];
 }
 
-export interface General {
-  id: string;
-  data: object;
+export interface ContentfulGeneralFields<T extends GeneralContentType> {
+  id: T;
+  data: GeneralDataType[T];
 }
+
+export type ContentfulGeneralEntry<T extends GeneralContentType> = ContentfulEntry<ContentfulGeneralFields<T>>;

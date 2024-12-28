@@ -1,8 +1,7 @@
-import type { General } from '@ctypes/contentful';
 import { createClient } from 'contentful';
 
 import type { Photo } from '../types/photo';
-import { mapContentfulGeneral, mapContentfulPhoto } from './transformers/contentful';
+import { mapContentfulPhoto } from './transformers/contentful';
 
 const client = createClient({
   space: import.meta.env.VITE_CONTENTFUL_SPACE_ID,
@@ -62,15 +61,5 @@ export async function getPhotosByCategory(category: string): Promise<Photo[]> {
   } catch (error) {
     console.error(`Error fetching photos for category ${category}:`, error);
     return [];
-  }
-}
-
-export async function getGeneralById(id: string): Promise<General | null> {
-  try {
-    const response = await client.getEntry(id);
-    return mapContentfulGeneral(response);
-  } catch (error) {
-    console.error(`Error fetching general by id ${id}:`, error);
-    return null;
   }
 }
