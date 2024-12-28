@@ -1,4 +1,4 @@
-import './HeroText.style.scss';
+import './Hero.style.scss';
 
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
@@ -114,7 +114,7 @@ export default function HeroText() {
         className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white flex items-center justify-center gap-3"
       >
         <span>Welcome to</span>
-        <span ref={containerRef} className="min-w-[200px] inline-flex" style={{ justifyContent: 'flex-start' }} />
+        <span ref={containerRef} className="min-w-[200px] inline-flex justify-start" />
       </motion.h1>
       <motion.p
         initial={{ opacity: 0, y: 50 }}

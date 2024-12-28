@@ -64,7 +64,7 @@ export default [
       react: {
         version: 'detect',
       },
-      'import/resolver': {
+      'import/resolvers': {
         alias: {
           map: [
             ['@photofolio-src', './src'],
@@ -82,6 +82,7 @@ export default [
           extensions: ['.js', '.jsx', '.ts', '.tsx'],
         },
         typescript: {
+          alwaysTryTypes: true,
           project: './tsconfig.json',
         },
       },
@@ -103,7 +104,7 @@ export default [
       'simple-import-sort/exports': 'error',
       'import/first': 'error',
       'import/newline-after-import': 'error',
-      'import/no-duplicates': 'error',
+      'import/no-duplicates': ['error', { 'prefer-inline': true }],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'import/extensions': [

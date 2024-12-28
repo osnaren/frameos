@@ -1,3 +1,5 @@
+import type { ContentfulGeneralFields } from '@ctypes/contentful';
+import { General, GeneralContentType } from '@ctypes/general';
 import type { Photo } from '@ctypes/photo';
 import { Entry, EntrySkeletonType } from 'contentful';
 
@@ -20,8 +22,12 @@ export function mapContentfulPhoto(item: any): Photo {
   };
 }
 
-export function mapContentfulGeneral(item: Entry<EntrySkeletonType, undefined, string>): General {
-  const { fields } = item;
+export function mapContentfulGeneral<T extends GeneralContentType>(entry: Entry<EntrySkeletonType>): General<T> {
+  if (!entry?.fields?.data || !entry?.fields?.id) {
+    throw new Error(`Invalid general content structure for ${entry?.sys?.id}`);
+  }
+  const fields = entry.fields as unknown as ContentfulGeneralFields<T>;
+
   return {
     id: fields.id,
     data: fields.data,

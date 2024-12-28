@@ -13,9 +13,12 @@ export function usePageTransition() {
       const images = document.querySelectorAll('img[data-src]');
       images.forEach((img) => {
         if (img instanceof HTMLImageElement) {
-          const src = img.getAttribute('data-src');
-          if (src) {
-            img.src = src;
+          const dataSrc = img.dataset.src;
+          if (dataSrc) {
+            // Safely set the src attribute using native DOM method
+            img.setAttribute('src', dataSrc);
+            // Remove the data-src attribute after setting
+            img.removeAttribute('data-src');
           }
         }
       });
