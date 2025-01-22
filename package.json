@@ -39,7 +39,7 @@
     "react-intersection-observer": "^9.5.3",
     "react-router-dom": "^6.21.0",
     "swr": "^2.2.4",
-    "vite": "^5.0.8"
+    "vite": "^5.4.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
