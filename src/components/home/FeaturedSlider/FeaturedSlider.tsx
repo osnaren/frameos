@@ -14,15 +14,15 @@ export default function FeaturedSlider() {
 
   return (
     <section
-      className="py-24 bg-[var(--color-background)]"
+      className="bg-[var(--color-background)] py-24"
       onMouseEnter={pause}
       onMouseLeave={resume}
       onTouchStart={pause}
       onTouchEnd={resume}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.h2
-          className="text-3xl font-bold mb-12"
+          className="mb-12 text-3xl font-bold"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -44,7 +44,7 @@ export default function FeaturedSlider() {
           ))}
         </motion.h2>
 
-        <div className="relative h-[600px] w-full max-w-2xl mx-auto">
+        <div className="relative mx-auto h-[600px] w-full max-w-2xl">
           <AnimatePresence>
             {[...Array(5)].map((_, i) => {
               const photoIndex = (currentIndex + i) % photos.length;
@@ -64,11 +64,11 @@ export default function FeaturedSlider() {
             })}
           </AnimatePresence>
 
-          <div className="absolute bottom-[-60px] left-1/2 transform -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-[-60px] left-1/2 flex -translate-x-1/2 transform gap-2">
             {photos.map((_, idx) => (
               <div
                 key={idx}
-                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                className={`h-2 w-2 rounded-full transition-colors duration-300 ${
                   idx === currentIndex ? 'bg-primary' : 'bg-gray-300'
                 }`}
               />
@@ -77,7 +77,7 @@ export default function FeaturedSlider() {
 
           <motion.button
             onClick={prev}
-            className="absolute left-[-60px] top-1/2 -translate-y-1/2 p-4 rounded-full hover:bg-[var(--color-shadow)]"
+            className="absolute top-1/2 left-[-60px] -translate-y-1/2 rounded-full p-4 hover:bg-[var(--color-shadow)]"
             initial={{ scale: 1, x: 0 }}
             whileHover={{ scale: 1.1, x: -2 }}
             whileTap={{ scale: 0.9 }}
@@ -96,7 +96,7 @@ export default function FeaturedSlider() {
           </motion.button>
           <motion.button
             onClick={next}
-            className="absolute right-[-60px] top-1/2 -translate-y-1/2 p-4 rounded-full hover:bg-[var(--color-shadow)]"
+            className="absolute top-1/2 right-[-60px] -translate-y-1/2 rounded-full p-4 hover:bg-[var(--color-shadow)]"
             initial={{ scale: 1, x: 0 }}
             whileHover={{ scale: 1.1, x: 2 }}
             whileTap={{ scale: 0.9 }}

@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 
 export const useDrawAnimation = (isHovered: boolean) => {
   const cornerRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<GSAPTimeline>();
+  const timelineRef = useRef<GSAPTimeline | null>(null);
 
   useEffect(() => {
     if (!cornerRef.current) return;

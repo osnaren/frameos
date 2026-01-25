@@ -1,7 +1,7 @@
 import './styles.scss';
 
+import type { AboutImage } from '@/types/about';
 import OptimizedImage from '@components/OptimizedImage';
-import type { AboutImage } from '@ctypes/about';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';

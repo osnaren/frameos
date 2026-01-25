@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useEffectEvent, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 interface MenuContextType {
@@ -22,8 +22,12 @@ export function MenuProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
+  const changeMenuState = useEffectEvent((state: boolean) => {
+    setIsOpen(state);
+  });
+
   useEffect(() => {
-    setIsOpen(false);
+    changeMenuState(false);
   }, [location]);
 
   useEffect(() => {

@@ -32,7 +32,7 @@ export default function ThemeToggle() {
       <motion.button
         ref={buttonRef}
         onClick={handleClick}
-        className={`p-2 rounded-full ${
+        className={`rounded-full p-2 ${
           isAnimating ? 'cursor-not-allowed opacity-50' : 'hover:bg-[var(--color-accent)]'
         }`}
         whileHover={{ scale: 1.1 }}
@@ -47,7 +47,7 @@ export default function ThemeToggle() {
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 0.5, opacity: 0, rotate: 180 }}
             transition={{ duration: 0.3 }}
-            className="w-6 h-6"
+            className="h-6 w-6"
           >
             {theme.mode === 'dark' ? <SunIcon /> : <MoonIcon />}
           </motion.div>

@@ -1,4 +1,4 @@
-import { General, GeneralContentType } from '@ctypes/general';
+import { General, GeneralContentType } from '@/types/general';
 import { getGeneralById } from '@lib/contentful/general';
 import useSWR from 'swr';
 

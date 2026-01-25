@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import gsap from 'gsap';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import CurvedArrow from './CurvedArrow';
 
 const useArrowAnimation = () => {
-  const arrowRef = useRef<SVGPathElement>(null);
+  const arrowRef = useRef<SVGPathElement | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const useArrowAnimation = () => {
 interface NavigationItemProps {
   item: { name: string; href: string };
   onClick: () => void;
-  itemVariants: Record<string, any>;
+  itemVariants: Variants;
 }
 
 function NavigationItem({ item, onClick, itemVariants }: NavigationItemProps) {
@@ -76,13 +76,13 @@ function NavigationItem({ item, onClick, itemVariants }: NavigationItemProps) {
         onClick={onClick}
         onMouseEnter={handleHover}
         onMouseLeave={handleLeave}
-        className="relative group items-center text-4xl md:text-6xl font-bold text-[var(--color-text)] hover-accent transition-colors"
+        className="group hover-accent relative items-center text-4xl font-bold text-[var(--color-text)] transition-colors md:text-6xl"
       >
         <CurvedArrow
           arrowRef={arrowRef}
           width={100}
           height={100}
-          className="absolute top-0 -left-5 w-24 h-24 transform -translate-x-12 -translate-y-8 group-hover:text-accent transition-transform duration-300"
+          className="group-hover:text-accent absolute top-0 -left-5 h-24 w-24 -translate-x-12 -translate-y-8 transform transition-transform duration-300"
         />
         {item.name}
       </Link>

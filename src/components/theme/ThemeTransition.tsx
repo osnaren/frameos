@@ -65,7 +65,7 @@ export default function ThemeTransition({ isAnimating, onAnimationComplete, orig
   return (
     <svg
       ref={svgRef}
-      className="fixed inset-0 w-screen h-screen pointer-events-none z-[100]"
+      className="pointer-events-none fixed inset-0 z-[100] h-screen w-screen"
       style={{
         mixBlendMode: 'difference',
         margin: 0,

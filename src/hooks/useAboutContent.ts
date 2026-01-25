@@ -1,4 +1,4 @@
-import type { AboutContent } from '@ctypes/about';
+import type { AboutContent } from '@/types/about';
 import { getAboutContent } from '@lib/contentful/about';
 import useSWR from 'swr';
 

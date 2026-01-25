@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 
 import { SocialLinks } from '../Footer/SocialLinks';
 import { useMenuContext } from './MenuContext';
@@ -11,13 +11,13 @@ const navigation = [
   { name: 'Contact', href: '/contact' },
 ];
 
-const menuVariants = {
+const menuVariants: Variants = {
   closed: {
     opacity: 0,
     scale: 0.95,
     transition: {
       duration: 0.4,
-      ease: [0.43, 0.13, 0.23, 0.96],
+      ease: [0.43, 0.13, 0.23, 0.96] as const,
     },
   },
   open: {
@@ -25,7 +25,7 @@ const menuVariants = {
     scale: 1,
     transition: {
       duration: 0.6,
-      ease: [0.43, 0.13, 0.23, 0.96],
+      ease: [0.43, 0.13, 0.23, 0.96] as const,
       staggerChildren: 0.1,
     },
   },
@@ -44,7 +44,7 @@ export default function FullScreenMenu() {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-60 w-full h-screen flex items-center justify-center bg-surface backdrop-blur-lg"
+          className="bg-surface fixed inset-0 z-60 flex h-screen w-full items-center justify-center backdrop-blur-lg"
           initial="closed"
           animate="open"
           exit="closed"

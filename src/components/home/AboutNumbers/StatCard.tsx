@@ -21,12 +21,11 @@ export default function StatCard({ number, label, icon, delay = 0 }: StatCardPro
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay }}
-      className="group p-6 rounded-2xl backdrop-blur-md transition-all duration-300 hover:scale-105 
-         text-[var(--color-shadow)] hover:shadow-current hover:shadow-md"
+      className="group rounded-2xl p-6 text-[var(--color-shadow)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:shadow-md hover:shadow-current"
     >
-      <div className="flex flex-col items-center text-center space-y-2">
-        {icon && <span className="text-4xl mb-2">{icon}</span>}
-        <div className="text-5xl md:text-6xl font-bold text-[var(--color-primary)]">
+      <div className="flex flex-col items-center space-y-2 text-center">
+        {icon && <span className="mb-2 text-4xl">{icon}</span>}
+        <div className="text-5xl font-bold text-[var(--color-primary)] md:text-6xl">
           <CountUp end={number} duration={2} start={0} enableScrollSpy scrollSpyOnce />
         </div>
         <span className="text-lg text-[var(--color-text)] opacity-80">{label}</span>

@@ -7,8 +7,8 @@ import { useEffect, useRef } from 'react';
 import FrameOS from './FrameOS';
 
 function Logo() {
-  const frameRef = useRef<SVGPathElement>(null);
-  const textGroupRef = useRef<SVGGElement>(null);
+  const frameRef = useRef<SVGPathElement | null>(null);
+  const textGroupRef = useRef<SVGGElement | null>(null);
 
   useEffect(() => {
     if (frameRef.current) {
@@ -85,7 +85,7 @@ function Logo() {
         height={80}
         frameRef={frameRef}
         textGroupRef={textGroupRef}
-        className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors duration-300"
+        className="text-[var(--color-text)] transition-colors duration-300 hover:text-[var(--color-accent)]"
       />
     </motion.div>
   );

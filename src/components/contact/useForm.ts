@@ -80,7 +80,7 @@ export function useForm() {
 
       toast.success('Message sent successfully!');
       setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
+    } catch {
       toast.error('Failed to send message. Please try again.');
     } finally {
       setLoading(false);

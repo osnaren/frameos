@@ -1,4 +1,4 @@
-import type { AboutImage } from '@ctypes/about';
+import type { AboutImage } from '@/types/about';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -34,7 +34,7 @@ export default function ImageGrid({ images }: ImageGridProps) {
   return (
     <motion.div
       ref={ref}
-      className="grid grid-cols-2 md:grid-cols-3 gap-4 my-12"
+      className="my-12 grid grid-cols-2 gap-4 md:grid-cols-3"
       variants={containerVariants}
       initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
@@ -52,7 +52,7 @@ export default function ImageGrid({ images }: ImageGridProps) {
           }}
           style={{ perspective: '1000px' }}
         >
-          <OptimizedImage publicId={image.publicId} alt={image.description} className="w-full h-full object-cover" />
+          <OptimizedImage publicId={image.publicId} alt={image.description} className="h-full w-full object-cover" />
         </motion.div>
       ))}
     </motion.div>

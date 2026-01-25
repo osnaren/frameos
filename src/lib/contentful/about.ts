@@ -1,5 +1,5 @@
-import type { AboutContent } from '@ctypes/about';
-import type { AboutFields } from '@ctypes/contentful';
+import type { AboutContent } from '@/types/about';
+import type { AboutFields } from '@/types/contentful';
 import { createClient, EntrySkeletonType } from 'contentful';
 
 import { transformAboutContent } from '../transformers/about';
@@ -28,7 +28,7 @@ export async function getAboutContent(): Promise<AboutContent> {
       throw new Error('No about content found');
     }
 
-    return transformAboutContent(response as any);
+    return transformAboutContent(response);
   } catch (error) {
     console.error('Error fetching about content:', error);
     throw error;

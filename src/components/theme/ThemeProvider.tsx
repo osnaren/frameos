@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import type { Theme } from '@ctypes/theme';
+import type { Theme } from '@/types/theme';
 import { useTheme } from '@hooks/useTheme';
 import { applyTheme, cssVariables } from '@styles/colors';
 import React, { createContext, useContext, useEffect } from 'react';
@@ -19,7 +19,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
  * @param {React.ReactNode} props.children - The children components.
  * @returns {JSX.Element} The ThemeProvider component.
  */
-export function ThemeProvider({ children }: { children: React.ReactNode }): JSX.Element {
+export function ThemeProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   const themeContext = useTheme();
 
   useEffect(() => {

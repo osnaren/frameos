@@ -1,4 +1,4 @@
-import { General, GeneralContentType } from '@ctypes/general';
+import { General, GeneralContentType } from '@/types/general';
 import { createClient, EntrySkeletonType } from 'contentful';
 
 import { mapContentfulGeneral } from '../transformers/contentful';

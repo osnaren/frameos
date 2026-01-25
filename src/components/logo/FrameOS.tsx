@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface FrameOSProps {
-  frameRef: React.RefObject<SVGPathElement>;
-  textGroupRef?: React.RefObject<SVGGElement>;
+  frameRef: React.RefObject<SVGPathElement | null>;
+  textGroupRef?: React.RefObject<SVGGElement | null>;
   width?: number;
   height?: number;
   className?: string;
@@ -32,7 +32,7 @@ const FrameOS: React.FC<FrameOSProps> = ({
       <path
         id="Frame-Box"
         d="M430,265.28v-10.01h0V70H70v360h360v-92.95"
-        className="fill-none stroke-current frame-box"
+        className="frame-box fill-none stroke-current"
         style={{ strokeMiterlimit: 10, strokeWidth: '7px' }}
         ref={frameRef}
       />
@@ -40,7 +40,7 @@ const FrameOS: React.FC<FrameOSProps> = ({
         <text
           id="Text-Frame"
           transform="translate(84 327) scale(.93 1)"
-          className="font-lato font-black tracking-[.14em] fill-[var(--color-text)] text-frame"
+          className="font-lato text-frame fill-[var(--color-text)] font-black tracking-[.14em]"
           style={{ fontSize: `${fontSize}px` }}
         >
           <tspan x="0" y="0">
@@ -50,7 +50,7 @@ const FrameOS: React.FC<FrameOSProps> = ({
         <text
           id="Text-OS"
           transform="translate(365.05 327)"
-          className="font-lato font-extrabold tracking-[.14em] stroke-[var(--color-text)] stroke-[4] fill-none text-os "
+          className="font-lato text-os fill-none stroke-[var(--color-text)] stroke-[4] font-extrabold tracking-[.14em]"
           style={{ fontSize: `${fontSize}px`, strokeMiterlimit: 10 }}
         >
           <tspan x="0" y="0">

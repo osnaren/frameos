@@ -27,13 +27,13 @@ export default function PhotoModal({ photo, isOpen, onClose }: PhotoModalProps) 
           className="fixed inset-0 z-50 overflow-y-auto"
         >
           <div className="min-h-screen px-4 text-center">
-            <Dialog.Overlay className="fixed inset-0 bg-[var(--color-text)] opacity-30" />
-            <div className="inline-block w-full max-w-4xl p-6 my-8 text-left align-middle transition-all transform bg-surface shadow-xl rounded-2xl">
-              <div className="relative aspect-w-16 aspect-h-9">
+            <div className="fixed inset-0 bg-[var(--color-text)] opacity-30" aria-hidden />
+            <div className="bg-surface my-8 inline-block w-full max-w-4xl transform rounded-2xl p-6 text-left align-middle shadow-xl transition-all">
+              <div className="aspect-w-16 aspect-h-9 relative">
                 <OptimizedImage
                   publicId={photo?.publicId}
                   alt={photo?.title}
-                  className="object-contain w-full h-full"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <div className="mt-4">
@@ -41,7 +41,7 @@ export default function PhotoModal({ photo, isOpen, onClose }: PhotoModalProps) 
                   {photo?.title}
                 </Dialog.Title>
                 <div className="mt-2">
-                  <p className="text-sm text-muted">{photo?.description}</p>
+                  <p className="text-muted text-sm">{photo?.description}</p>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -63,7 +63,7 @@ export default function PhotoModal({ photo, isOpen, onClose }: PhotoModalProps) 
                         {photo?.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="inline-block px-2 py-1 text-xs rounded-full bg-[var(--color-accent)] text-[var(--color-text)]"
+                            className="inline-block rounded-full bg-[var(--color-accent)] px-2 py-1 text-xs text-[var(--color-text)]"
                           >
                             {tag}
                           </span>

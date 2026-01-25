@@ -1,5 +1,3 @@
-import './Hero.style.scss';
-
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { useEffect, useRef } from 'react';
@@ -106,21 +104,21 @@ export default function HeroText() {
   }, []);
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white flex items-center justify-center gap-3"
+        className="flex items-center justify-center gap-3 text-4xl font-bold text-white sm:text-5xl md:text-6xl lg:text-7xl"
       >
         <span>Welcome to</span>
-        <span ref={containerRef} className="min-w-[200px] inline-flex justify-start" />
+        <span ref={containerRef} className="inline-flex min-w-[200px] justify-start" />
       </motion.h1>
       <motion.p
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
-        className="text-lg sm:text-xl md:text-2xl text-gray-300 mt-4 glass-background"
+        className="mt-4 rounded-[10px] border border-white/20 bg-white/10 px-5 py-2.5 text-lg text-gray-300 backdrop-blur-[10px] sm:text-xl md:text-2xl"
       >
         Discover the world through breathtaking photography.
       </motion.p>

@@ -81,13 +81,13 @@ export default function Footer() {
     <footer className="relative bg-[var(--color-background)]">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img src={photo?.imageUrl} alt="" className="footer-image w-1/2 h-full object-cover float-right" />
+        <img src={photo?.imageUrl} alt="" className="footer-image float-right h-full w-1/2 object-cover" />
         <div className="top-fade" />
         <div className="left-fade" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center space-y-8">
           {/* Tagline */}
           <div ref={wrapperRef} className="tagline-wrapper cursor-default">
@@ -100,7 +100,7 @@ export default function Footer() {
           <SocialLinks />
 
           {/* Copyright and Credits */}
-          <div className="flex flex-col items-center space-y-2 text-sm text-[var(--color-text)]/80 cursor-default">
+          <div className="flex cursor-default flex-col items-center space-y-2 text-sm text-[var(--color-text)]/80">
             <p>&copy; 2024 OSLabs. </p>
             <p>
               Made with ❤️ in <span className="waving-flag">🇮🇳</span>

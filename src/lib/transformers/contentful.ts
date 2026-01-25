@@ -1,6 +1,6 @@
-import type { ContentfulGeneralFields } from '@ctypes/contentful';
-import { General, GeneralContentType } from '@ctypes/general';
-import type { Photo } from '@ctypes/photo';
+import type { ContentfulGeneralFields } from '@/types/contentful';
+import { General, GeneralContentType } from '@/types/general';
+import type { Photo } from '@/types/photo';
 import { Entry, EntrySkeletonType } from 'contentful';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

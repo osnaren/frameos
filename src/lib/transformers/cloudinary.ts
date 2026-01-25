@@ -1,5 +1,5 @@
-import type { AboutImage } from '@ctypes/about';
-import type { CloudinaryImage } from '@ctypes/cloudinary';
+import type { AboutImage } from '@/types/about';
+import type { CloudinaryImage } from '@/types/cloudinary';
 
 export function transformCloudinaryImage(image: CloudinaryImage): AboutImage {
   return {

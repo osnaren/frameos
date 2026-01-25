@@ -1,4 +1,4 @@
-import type { Photo } from '@ctypes/photo';
+import type { Photo } from '@/types/photo';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 

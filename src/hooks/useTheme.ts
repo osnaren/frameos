@@ -1,6 +1,6 @@
 import { darkTheme, lightTheme } from '@styles/colors/themes';
 import { getContrastColor } from '@utils/color';
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 
 import type { Theme, ThemeMode } from '@/types/theme';
 
@@ -17,6 +17,10 @@ export function useTheme() {
   const [theme, setTheme] = useState<Theme>(storedTheme === 'dark' ? darkTheme : lightTheme);
   const [dominantColor, setDominantColor] = useState<string | null>(null);
 
+  const changeTheme = useEffectEvent((newTheme: Theme) => {
+    setTheme(newTheme);
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem('theme', storedTheme);
@@ -25,7 +29,7 @@ export function useTheme() {
     }
 
     if (storedTheme === 'dynamic' && dominantColor) {
-      setTheme({
+      changeTheme({
         mode: 'dynamic',
         colors: {
           ...lightTheme.colors,
@@ -34,7 +38,7 @@ export function useTheme() {
         },
       });
     } else {
-      setTheme(storedTheme === 'dark' ? darkTheme : lightTheme);
+      changeTheme(storedTheme === 'dark' ? darkTheme : lightTheme);
     }
   }, [storedTheme, dominantColor]);
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface CurvedArrowProps {
-  arrowRef: React.RefObject<SVGPathElement>;
+  arrowRef: React.RefObject<SVGPathElement | null>;
   width: number;
   height: number;
   className?: string;

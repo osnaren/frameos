@@ -64,11 +64,11 @@ export function SocialLinks() {
           onMouseEnter={() => setHoveredItem(item.name)}
           onMouseLeave={() => setHoveredItem(null)}
         >
-          <Corner className="border-t-2 border-l-2 left-[-4px] top-[-4px]" isHovered={hoveredItem === item.name} />
-          <Corner className="border-b-2 border-r-2 right-[-4px] bottom-[-4px]" isHovered={hoveredItem === item.name} />
+          <Corner className="top-[-4px] left-[-4px] border-t-2 border-l-2" isHovered={hoveredItem === item.name} />
+          <Corner className="right-[-4px] bottom-[-4px] border-r-2 border-b-2" isHovered={hoveredItem === item.name} />
           <motion.a
             href={item.href}
-            className="text-[var(--color-text)] hover:text-[var(--color-primary)] block"
+            className="block text-[var(--color-text)] hover:text-[var(--color-primary)]"
             variants={iconAnimation}
             whileHover="hover"
             whileTap="tap"

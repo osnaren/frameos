@@ -7,8 +7,8 @@ import { useEffect, useRef } from 'react';
 import FrameOS from './FrameOS';
 
 function Loader() {
-  const frameRef = useRef<SVGPathElement>(null);
-  const textGroupRef = useRef<SVGGElement>(null);
+  const frameRef = useRef<SVGPathElement | null>(null);
+  const textGroupRef = useRef<SVGGElement | null>(null);
 
   useEffect(() => {
     if (frameRef.current && textGroupRef.current) {
@@ -59,7 +59,7 @@ function Loader() {
 
   return (
     <motion.div
-      className="flex items-center justify-center relative loader-container"
+      className="loader-container relative flex items-center justify-center"
       role="alert"
       aria-label="Loading animation"
       initial={{ scale: 0, opacity: 0 }}
@@ -72,7 +72,7 @@ function Loader() {
         height={loaderSize}
         frameRef={frameRef}
         textGroupRef={textGroupRef}
-        className="text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors duration-300 loader-logo"
+        className="loader-logo text-[var(--color-text)] transition-colors duration-300 hover:text-[var(--color-accent)]"
       />
     </motion.div>
   );

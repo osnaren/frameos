@@ -30,7 +30,7 @@ export interface ContentfulEntry<T> {
   };
   fields: T;
   metadata: {
-    tags: any[];
+    tags: unknown[];
   };
 }
 

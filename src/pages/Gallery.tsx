@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
 import PhotoCard from '../components/PhotoCard';
 import PhotoModal from '../components/PhotoModal';
@@ -28,7 +27,7 @@ export default function Gallery() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-red-500">Failed to load photos. Please try again later.</p>
       </div>
     );
@@ -36,22 +35,21 @@ export default function Gallery() {
 
   return (
     <>
-      <Helmet>
-        <title>Gallery | PhotoFolio</title>
-        <meta name="description" content="Browse through my photography collection" />
-      </Helmet>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <title>Gallery | PhotoFolio</title>
+      <meta name="description" content="Browse through my photography collection" />
+
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <div className="flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex gap-2 overflow-x-auto pb-2">
               {['all', ...categories].map((category) => (
                 <motion.button
                   key={category}
                   onClick={() => setSelectedCategory(category as PhotoCategory | 'all')}
-                  className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
+                  className={`rounded-full px-4 py-2 text-sm whitespace-nowrap ${
                     selectedCategory === category
                       ? 'bg-[var(--color-primary)] text-white'
-                      : 'bg-[var(--color-accent)] text-[var(--color-text)] hover:bg-opacity-80'
+                      : 'hover:bg-opacity-80 bg-[var(--color-accent)] text-[var(--color-text)]'
                   }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -67,7 +65,7 @@ export default function Gallery() {
               id="sort-by"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
-              className="px-4 py-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-background)] text-[var(--color-text)]"
+              className="rounded-lg border border-[var(--color-accent)] bg-[var(--color-background)] px-4 py-2 text-[var(--color-text)]"
             >
               <option value="date">Sort by Date</option>
               <option value="title">Sort by Title</option>
@@ -81,12 +79,12 @@ export default function Gallery() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex justify-center items-center min-h-[400px]"
+              className="flex min-h-[400px] items-center justify-center"
             >
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--color-primary)] border-t-transparent" />
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
             </motion.div>
           ) : (
-            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div layout className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredPhotos.map((photo) => (
                 <PhotoCard key={photo.id} photo={photo} onClick={() => setSelectedPhoto(photo)} />
               ))}

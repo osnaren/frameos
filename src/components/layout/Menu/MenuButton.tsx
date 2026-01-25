@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
+import type { ComponentProps } from 'react';
 
 import { useMenuContext } from './MenuContext';
 
-function Path(props: any) {
+type PathProps = ComponentProps<typeof motion.path>;
+
+function Path(props: PathProps) {
   return <motion.path fill="transparent" strokeWidth="2" stroke="currentColor" strokeLinecap="round" {...props} />;
 }
 
@@ -11,7 +14,7 @@ export default function MenuButton() {
 
   return (
     <motion.button
-      className="z-50 p-2 text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors"
+      className="z-50 p-2 text-[var(--color-text)] transition-colors hover:text-[var(--color-accent)]"
       onClick={toggleMenu}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}

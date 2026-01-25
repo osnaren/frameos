@@ -16,7 +16,7 @@ export default function Layout() {
   });
 
   return (
-    <div className="flex flex-col min-h-screen bg-surface text-[var(--color-text)]">
+    <div className="bg-surface flex min-h-screen flex-col text-[var(--color-text)]">
       <Header />
       <AnimatePresence mode="wait">
         <motion.main
@@ -25,11 +25,11 @@ export default function Layout() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 20 }}
           transition={{ duration: 0.4, ease: 'easeInOut' }}
-          className="flex-grow pt-16 bg-[var(--color-background)]"
+          className="flex-grow bg-[var(--color-background)] pt-16"
         >
           <Suspense
             fallback={
-              <div className="min-h-[60vh] flex items-center justify-center">
+              <div className="flex min-h-[60vh] items-center justify-center">
                 <Loader />
               </div>
             }
