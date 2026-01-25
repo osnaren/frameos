@@ -4,16 +4,14 @@ import { fileURLToPath } from 'node:url';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
 import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import globals from 'globals';
 
-// eslint-disable-next-line no-underscore-dangle
 const fileName = fileURLToPath(import.meta.url);
-// eslint-disable-next-line no-underscore-dangle
 const dirName = path.dirname(fileName);
 const compat = new FlatCompat({
   baseDirectory: dirName,
@@ -24,15 +22,10 @@ const compat = new FlatCompat({
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   ...compat.extends(
-    // 'airbnb',
-    'airbnb-typescript',
-    'airbnb/hooks',
-    'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/typescript',
-    'plugin:prettier/recommended',
     'plugin:react/jsx-runtime'
   ),
   {
@@ -43,82 +36,39 @@ export default [
       react,
       prettier,
       import: importPlugin,
-      'simple-import-sort': simpleImportSort,
       'react-refresh': reactRefresh,
+      'react-hooks': reactHooks,
     },
-
     languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      parser: tsParser,
+      ecmaVersion: 2020,
+      globals: globals.browser,
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-        project: './tsconfig.eslint.json',
         tsconfigRootDir: dirName,
       },
     },
-
     settings: {
       react: {
         version: 'detect',
       },
-      'import/resolvers': {
-        alias: {
-          map: [
-            ['@photofolio-src', './src'],
-            ['@assets', './src/assets'],
-            ['@styles', './src/styles'],
-            ['@components', './src/components'],
-            ['@data', './src/data'],
-            ['@hooks', './src/hooks'],
-            ['@lib', './src/lib'],
-            ['@pages', './src/pages'],
-            ['@ctypes', './src/types'],
-            ['@reusables', './src/reusables'],
-            ['@utils', './src/utils'],
-          ],
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        },
-        typescript: {
-          alwaysTryTypes: true,
-          project: './tsconfig.json',
-        },
-      },
     },
 
     rules: {
-      'react-refresh/only-export-components': 'error',
-      'prettier/prettier': 'error',
+      ...reactHooks.configs.recommended.rules,
+      ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
-      'react/jsx-props-no-spreading': 'off',
-      'react/require-default-props': 'off',
-      'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
-      // 'react/function-component-definition': ['error', { namedComponents: 'arrow-function' }],
-      'import/prefer-default-export': 'off',
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
-      '@typescript-eslint/no-unused-vars': ['warn'],
-      'no-underscore-dangle': ['error', { allow: ['__filename'] }],
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
-      'import/first': 'error',
-      'import/newline-after-import': 'error',
-      'import/no-duplicates': ['error', { 'prefer-inline': true }],
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      'import/extensions': [
-        'error',
-        'ignorePackages',
+      'react/jsx-uses-react': 'off',
+      'react/no-unknown-property': 'error',
+      'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
         {
-          js: 'never',
-          jsx: 'never',
-          ts: 'never',
-          tsx: 'never',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
-      'react/jsx-uses-react': 'off',
-      'import/no-extraneous-dependencies': 'off',
     },
   },
 ];
