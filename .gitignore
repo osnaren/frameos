@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.nitro
+.output
+.tanstack
+.codex-temp
+legacy-src/
 
 # Environment files
 .env

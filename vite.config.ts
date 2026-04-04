@@ -1,39 +1,18 @@
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
-import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite'
+import { devtools } from '@tanstack/devtools-vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import viteReact from '@vitejs/plugin-react'
+import { nitro } from 'nitro/vite'
+import { defineConfig } from 'vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react({
-      jsxRuntime: 'automatic',
-      jsxImportSource: 'react',
-    }),
+    devtools(),
+    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+    tsconfigPaths({ projects: ['./tsconfig.json'] }),
     tailwindcss(),
+    tanstackStart(),
+    viteReact(),
   ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
-      '@photofolio-src': resolve(__dirname, './src'),
-      '@assets': resolve(__dirname, './src/assets'),
-      '@components': resolve(__dirname, './src/components'),
-      '@ctypes': resolve(__dirname, './src/types'),
-      '@data': resolve(__dirname, './src/data'),
-      '@hooks': resolve(__dirname, './src/hooks'),
-      '@lib': resolve(__dirname, './src/lib'),
-      '@pages': resolve(__dirname, './src/pages'),
-      '@reusables': resolve(__dirname, './src/reusables'),
-      '@styles': resolve(__dirname, './src/styles'),
-      '@utils': resolve(__dirname, './src/utils'),
-    },
-  },
-  build: {
-    sourcemap: true,
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html'),
-      },
-    },
-  },
-});
+})

@@ -1,10 +1,6 @@
 export default {
-  plugins: ['prettier-plugin-organize-imports', 'prettier-plugin-tailwindcss'],
-  semi: true,
+  semi: false,
   singleQuote: true,
   trailingComma: 'es5',
-  tabWidth: 2,
-  printWidth: 120,
-  bracketSpacing: true,
-  endOfLine: 'lf',
-};
+  printWidth: 100,
+}
