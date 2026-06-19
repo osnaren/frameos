@@ -1,0 +1,38 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_CLOUDINARY_CLOUD_NAME?: string
+  readonly VITE_SITE_URL?: string
+  readonly DEV?: boolean
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      readonly CLOUDINARY_API_KEY?: string
+      readonly CLOUDINARY_API_SECRET?: string
+      readonly CLOUDINARY_CLOUD_NAME?: string
+      readonly CLOUDINARY_FOLDER?: string
+      readonly SANITY_PROJECT_ID?: string
+      readonly SANITY_DATASET?: string
+      readonly SANITY_API_TOKEN?: string
+      readonly SANITY_API_VERSION?: string
+      readonly SANITY_STUDIO_PROJECT_TITLE?: string
+      readonly SANITY_WEBHOOK_SECRET?: string
+      readonly UPSTASH_REDIS_REST_URL?: string
+      readonly UPSTASH_REDIS_REST_TOKEN?: string
+      readonly VERCEL_API_TOKEN?: string
+      readonly VERCEL_PROJECT_ID?: string
+      readonly VERCEL_TEAM_ID?: string
+      readonly RECONCILE_SECRET?: string
+      readonly CRON_SECRET?: string
+      readonly SENTRY_DSN?: string
+    }
+  }
+}
+
+export {}
