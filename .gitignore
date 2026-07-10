@@ -31,3 +31,6 @@ legacy-src/
 *.njsproj
 *.sln
 *.sw?
+
+# Source photography originals (not served, not committed)
+photo-source/
