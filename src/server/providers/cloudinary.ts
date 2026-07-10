@@ -33,8 +33,13 @@ function ensureConfigured() {
   isConfigured = true
 }
 
-function isDevelopmentFixtureMode() {
-  return process.env.NODE_ENV !== 'production' && !hasCloudinaryConfig()
+/**
+ * Without Cloudinary credentials the provider serves the bundled curated
+ * launch archive (real photos, local delivery) in any environment. Once
+ * credentials exist, Cloudinary becomes canonical again.
+ */
+function isLocalArchiveMode() {
+  return !hasCloudinaryConfig()
 }
 
 function toStatus(value: unknown): PhotoStatus {
@@ -236,12 +241,8 @@ async function executeSearch(expression: string) {
 }
 
 async function getAllPhotos() {
-  if (isDevelopmentFixtureMode()) {
+  if (isLocalArchiveMode()) {
     return fixturePhotos
-  }
-
-  if (!hasCloudinaryConfig()) {
-    throw new Error('Cloudinary configuration is missing.')
   }
 
   ensureConfigured()
@@ -308,12 +309,8 @@ export function createCloudinaryProvider(): CloudinaryProvider {
         return null
       }
 
-      if (isDevelopmentFixtureMode()) {
+      if (isLocalArchiveMode()) {
         return fixturePhotos.find((photo) => photo.publicId === publicId) ?? null
-      }
-
-      if (!hasCloudinaryConfig()) {
-        return null
       }
 
       ensureConfigured()

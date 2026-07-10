@@ -86,8 +86,9 @@ function getSanityClient() {
   return sanityClient
 }
 
-function isDevelopmentFixtureMode() {
-  return process.env.NODE_ENV !== 'production' && !hasSanityConfig()
+/** Without Sanity credentials the provider serves bundled editorial copy in any environment. */
+function isLocalArchiveMode() {
+  return !hasSanityConfig()
 }
 
 function mapAssetRefs(values: SanityAssetRefValue[] | undefined): CloudinaryAssetRef[] {
@@ -113,7 +114,7 @@ function normalizeSeo(
 }
 
 async function fetchSanityDocument<T>(query: string, params?: Record<string, unknown>) {
-  if (isDevelopmentFixtureMode()) {
+  if (isLocalArchiveMode()) {
     return null as T | null
   }
 
@@ -211,7 +212,7 @@ const contactPageQuery = `*[_type == "contactPage"][0]{
 export function createSanityProvider(): SanityProvider {
   return {
     async getSiteSettings() {
-      if (isDevelopmentFixtureMode()) {
+      if (isLocalArchiveMode()) {
         return fixtureSiteSettings
       }
 
@@ -232,7 +233,7 @@ export function createSanityProvider(): SanityProvider {
       }
     },
     async getHomePage() {
-      if (isDevelopmentFixtureMode()) {
+      if (isLocalArchiveMode()) {
         return fixtureHomePage
       }
 
@@ -261,7 +262,7 @@ export function createSanityProvider(): SanityProvider {
       } satisfies HomePageContent
     },
     async getAboutPage() {
-      if (isDevelopmentFixtureMode()) {
+      if (isLocalArchiveMode()) {
         return fixtureAboutPage
       }
 
@@ -282,7 +283,7 @@ export function createSanityProvider(): SanityProvider {
       } satisfies AboutPageContent
     },
     async getContactPage() {
-      if (isDevelopmentFixtureMode()) {
+      if (isLocalArchiveMode()) {
         return fixtureContactPage
       }
 
@@ -322,7 +323,7 @@ export function createSanityProvider(): SanityProvider {
       }
     },
     async listChangedDocuments(sinceIso) {
-      if (isDevelopmentFixtureMode()) {
+      if (isLocalArchiveMode()) {
         return ['siteSettings', 'homePage', 'aboutPage', 'contactPage']
       }
 
