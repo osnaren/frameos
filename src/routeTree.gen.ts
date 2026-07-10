@@ -9,15 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignalRouteImport } from './routes/signal'
+import { Route as NotesRouteImport } from './routes/notes'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorldsWorldRouteImport } from './routes/worlds.$world'
 import { Route as PhotosSlugRouteImport } from './routes/photos.$slug'
 import { Route as ApiWebhooksSanityRouteImport } from './routes/api/webhooks/sanity'
 import { Route as ApiWebhooksCloudinaryRouteImport } from './routes/api/webhooks/cloudinary'
 import { Route as ApiReconcileContentRouteImport } from './routes/api/reconcile/content'
 
+const SignalRoute = SignalRouteImport.update({
+  id: '/signal',
+  path: '/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesRoute = NotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -28,6 +42,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArchiveRoute = ArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -36,6 +55,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorldsWorldRoute = WorldsWorldRouteImport.update({
+  id: '/worlds/$world',
+  path: '/worlds/$world',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PhotosSlugRoute = PhotosSlugRouteImport.update({
@@ -62,9 +86,13 @@ const ApiReconcileContentRoute = ApiReconcileContentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/archive': typeof ArchiveRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/notes': typeof NotesRoute
+  '/signal': typeof SignalRoute
   '/photos/$slug': typeof PhotosSlugRoute
+  '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
   '/api/webhooks/cloudinary': typeof ApiWebhooksCloudinaryRoute
   '/api/webhooks/sanity': typeof ApiWebhooksSanityRoute
@@ -72,9 +100,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/archive': typeof ArchiveRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/notes': typeof NotesRoute
+  '/signal': typeof SignalRoute
   '/photos/$slug': typeof PhotosSlugRoute
+  '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
   '/api/webhooks/cloudinary': typeof ApiWebhooksCloudinaryRoute
   '/api/webhooks/sanity': typeof ApiWebhooksSanityRoute
@@ -83,9 +115,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/archive': typeof ArchiveRoute
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
+  '/notes': typeof NotesRoute
+  '/signal': typeof SignalRoute
   '/photos/$slug': typeof PhotosSlugRoute
+  '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
   '/api/webhooks/cloudinary': typeof ApiWebhooksCloudinaryRoute
   '/api/webhooks/sanity': typeof ApiWebhooksSanityRoute
@@ -95,9 +131,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/archive'
     | '/contact'
     | '/gallery'
+    | '/notes'
+    | '/signal'
     | '/photos/$slug'
+    | '/worlds/$world'
     | '/api/reconcile/content'
     | '/api/webhooks/cloudinary'
     | '/api/webhooks/sanity'
@@ -105,9 +145,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/archive'
     | '/contact'
     | '/gallery'
+    | '/notes'
+    | '/signal'
     | '/photos/$slug'
+    | '/worlds/$world'
     | '/api/reconcile/content'
     | '/api/webhooks/cloudinary'
     | '/api/webhooks/sanity'
@@ -115,9 +159,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/archive'
     | '/contact'
     | '/gallery'
+    | '/notes'
+    | '/signal'
     | '/photos/$slug'
+    | '/worlds/$world'
     | '/api/reconcile/content'
     | '/api/webhooks/cloudinary'
     | '/api/webhooks/sanity'
@@ -126,9 +174,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ArchiveRoute: typeof ArchiveRoute
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
+  NotesRoute: typeof NotesRoute
+  SignalRoute: typeof SignalRoute
   PhotosSlugRoute: typeof PhotosSlugRoute
+  WorldsWorldRoute: typeof WorldsWorldRoute
   ApiReconcileContentRoute: typeof ApiReconcileContentRoute
   ApiWebhooksCloudinaryRoute: typeof ApiWebhooksCloudinaryRoute
   ApiWebhooksSanityRoute: typeof ApiWebhooksSanityRoute
@@ -136,6 +188,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signal': {
+      id: '/signal'
+      path: '/signal'
+      fullPath: '/signal'
+      preLoaderRoute: typeof SignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes': {
+      id: '/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery': {
       id: '/gallery'
       path: '/gallery'
@@ -150,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/archive': {
+      id: '/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof ArchiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -162,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/worlds/$world': {
+      id: '/worlds/$world'
+      path: '/worlds/$world'
+      fullPath: '/worlds/$world'
+      preLoaderRoute: typeof WorldsWorldRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/photos/$slug': {
@@ -198,9 +278,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ArchiveRoute: ArchiveRoute,
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
+  NotesRoute: NotesRoute,
+  SignalRoute: SignalRoute,
   PhotosSlugRoute: PhotosSlugRoute,
+  WorldsWorldRoute: WorldsWorldRoute,
   ApiReconcileContentRoute: ApiReconcileContentRoute,
   ApiWebhooksCloudinaryRoute: ApiWebhooksCloudinaryRoute,
   ApiWebhooksSanityRoute: ApiWebhooksSanityRoute,

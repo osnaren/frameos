@@ -5,57 +5,53 @@ import ThemeToggle from './ThemeToggle'
 export default function Header() {
   return (
     <header className="site-header px-4">
-      <nav className="page-shell flex flex-wrap items-center gap-4 py-4">
-        <h2 className="m-0 flex-shrink-0">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-3 rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-[var(--ink)] no-underline shadow-[0_18px_40px_rgba(18,18,18,0.08)]"
+      <nav aria-label="Primary" className="page-shell flex flex-wrap items-center gap-4 py-4">
+        <Link to="/" className="flex shrink-0 items-center gap-3 no-underline">
+          <span
+            aria-hidden="true"
+            className="flex h-9 w-7 items-center justify-center rounded-[5px] border-[1.5px] border-[var(--ink)] text-[0.6rem] font-semibold tracking-widest"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--ink)] text-xs font-semibold text-[var(--bg)]">
-              FR
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="text-sm font-semibold tracking-[0.24em] uppercase">FrameOS</span>
-              <span className="mt-1 text-[0.72rem] tracking-[0.18em] uppercase text-[var(--muted)]">
-                Photography
-              </span>
-            </span>
-          </Link>
-        </h2>
+            FO
+          </span>
+          <span className="flex flex-col leading-none">
+            <span className="text-sm font-semibold tracking-[0.22em] uppercase">FrameOS</span>
+            <span className="mono-label mt-1 !text-[0.6rem]">Pocket Worlds</span>
+          </span>
+        </Link>
 
-        <div className="order-3 flex w-full flex-wrap gap-4 text-xs font-semibold tracking-[0.2em] uppercase text-[var(--muted)] sm:order-2 sm:ml-auto sm:w-auto">
+        <div className="order-3 flex w-full flex-wrap gap-x-5 gap-y-2 text-xs font-semibold tracking-[0.18em] uppercase sm:order-2 sm:ml-auto sm:w-auto">
           <Link
             to="/"
             className="site-nav-link"
+            activeOptions={{ exact: true }}
             activeProps={{ className: 'site-nav-link is-active' }}
           >
-            Home
+            Worlds
           </Link>
           <Link
-            to="/gallery"
-            search={{ limit: 24 }}
+            to="/archive"
             className="site-nav-link"
             activeProps={{ className: 'site-nav-link is-active' }}
           >
-            Gallery
+            Index
           </Link>
           <Link
-            to="/about"
+            to="/notes"
             className="site-nav-link"
             activeProps={{ className: 'site-nav-link is-active' }}
           >
-            About
+            Field Notes
           </Link>
           <Link
-            to="/contact"
+            to="/signal"
             className="site-nav-link"
             activeProps={{ className: 'site-nav-link is-active' }}
           >
-            Contact
+            Signal
           </Link>
         </div>
 
-        <div className="ml-auto flex items-center gap-2 sm:ml-0">
+        <div className="ml-auto flex items-center gap-2 sm:ml-0 sm:order-3">
           <ThemeToggle />
         </div>
       </nav>
