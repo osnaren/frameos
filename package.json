@@ -13,6 +13,8 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "check": "prettier --write . && eslint --fix .",
+    "spellcheck": "cspell lint .",
+    "spellcheck:fix": "cspell lint . --words-only --no-summary",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "ui:add": "shadcn add",

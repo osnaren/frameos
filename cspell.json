@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./.cspell/project-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["project-words"],
+  "ignorePaths": [
+    "node_modules",
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "*.json",
+    "*.webp",
+    "*.png",
+    "*.jpg",
+    "*.ico",
+    "*.svg",
+    "legacy-src/**",
+    "public/photos/**",
+    "src/content/photo-manifest.json",
+    "src/routeTree.gen.ts",
+    ".tanstack/**",
+    ".nitro/**",
+    ".output/**",
+    "dist/**"
+  ],
+  "files": [
+    "**/*.{ts,tsx,js,jsx,md,css,html,yaml,yml}"
+  ],
+  "minWordLength": 4,
+  "allowCompoundWords": false,
+  "caseSensitive": false,
+  "patterns": [
+    {
+      "name": "css-variables",
+      "pattern": "/--[-\\w]+/"
+    },
+    {
+      "name": "import-paths",
+      "pattern": "/from\\s+['\"][^'\"]+['\"]/"
+    }
+  ],
+  "ignoreRegExpList": ["css-variables", "import-paths"]
+}

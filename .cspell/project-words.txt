@@ -1,0 +1,100 @@
+# Project-specific words for cspell
+# Add custom words, one per line
+
+# Framework & tools
+TanStack
+Vite
+framer
+Lenis
+sanity
+Cloudinary
+shadcn
+Vitest
+jsdom
+cspell
+eslint
+prettier
+postcss
+tailwindcss
+lucide
+zod
+
+# Three.js / R3F
+R3F
+WebGL
+anisotropy
+frameloop
+meshline
+unlit
+
+# Photography & portfolio
+viewfinder
+viewfinder
+photostream
+contactsheet
+
+# Technical terms
+canonicalize
+canonicalized
+memoizable
+revalidation
+reconcilable
+webhook
+webhooks
+idempotency
+idempotent
+refetch
+revalidate
+
+# UI / design terms
+parallax
+viewfinder
+placard
+constellation
+vignette
+
+# Project specific
+FrameOS
+frameos
+photoSlug
+publicId
+blurhash
+Blurhash
+
+# Common code words
+async
+await
+readonly
+typeof
+instanceof
+nullish
+truthy
+falsy
+
+# People / names
+Obuli
+Naren
+Sai
+
+# Words found by cspell lint
+apologise
+autoplay
+behaviour
+Contentful
+esbuild
+exif
+Fraunces
+gopuram
+GROQ
+GSAP
+lerp
+maxage
+noninteractive
+opsz
+paneer
+Photofolio
+smol
+traceparent
+underfilled
+unrs
+visibilitychange
