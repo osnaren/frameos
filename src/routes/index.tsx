@@ -1,12 +1,17 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
+import { Suspense, lazy, useState } from 'react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
-import { PocketOpening } from '@/components/worlds/PocketOpening'
+import { OpeningHeadline, PocketOpeningVisuals } from '@/components/worlds/PocketOpening'
 import { WorldPortal } from '@/components/worlds/WorldPortal'
 import { getPublicWorlds } from '@/content/worlds'
+import { useExperienceTier } from '@/lib/capability'
 import { contactSheet, revealVariants } from '@/lib/motion'
 import { getGalleryFeedServer, getHomeViewServer } from '@/server/server-functions/portfolio'
+
+/** The WebGL runtime loads only on capable desktop devices, and only when this chunk is requested. */
+const SpatialOpening = lazy(() => import('@/components/worlds/spatial/SpatialOpening'))
 
 export const Route = createFileRoute('/')({
   loader: async () => {
@@ -34,12 +39,37 @@ export const Route = createFileRoute('/')({
 function HomeRoute() {
   const { home, feed } = Route.useLoaderData()
   const reducedMotion = useReducedMotion()
+  const tier = useExperienceTier()
+  const navigate = useNavigate()
+  const [inFlight, setInFlight] = useState(false)
   const photos = feed.items.map((item) => item.photo)
   const worlds = getPublicWorlds()
 
   return (
     <main>
-      <PocketOpening photos={photos} />
+      <motion.section
+        aria-label="Pocket Worlds opening"
+        className="relative flex min-h-[92svh] flex-col justify-end overflow-hidden px-4 pb-14"
+        initial="hidden"
+        animate="visible"
+        variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
+      >
+        {tier === 'spatial' ? (
+          <Suspense fallback={null}>
+            <SpatialOpening
+              onEnterWorld={(slug) => {
+                void navigate({ to: '/worlds/$world', params: { world: slug } })
+              }}
+              onFlightChange={setInFlight}
+            />
+          </Suspense>
+        ) : (
+          <PocketOpeningVisuals photos={photos} />
+        )}
+        <div className="transition-opacity duration-500" style={{ opacity: inFlight ? 0 : 1 }}>
+          <OpeningHeadline />
+        </div>
+      </motion.section>
 
       {feed.isDegraded || home?.isDegraded ? (
         <div className="page-shell px-4 pt-6">
@@ -58,7 +88,10 @@ function HomeRoute() {
                 Pick a world to step into.
               </h2>
             </div>
-            <Link to="/archive" className="text-sm font-semibold text-[var(--muted-strong)]">
+            <Link
+              to="/archive"
+              className="px-2 py-2 text-sm font-semibold text-[var(--muted-strong)]"
+            >
               Or see every frame at once →
             </Link>
           </div>
@@ -111,8 +144,8 @@ function HomeRoute() {
             “A world noticed through a pocket-sized frame.”
           </p>
           <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
-            Every photograph in this archive was made with a phone — the camera that happens to be
-            there when something is worth keeping.{' '}
+            The archive is small on purpose — eighteen frames across five worlds, each kept only
+            because it was worth keeping.{' '}
             <Link to="/notes" className="font-semibold">
               Read the field notes
             </Link>{' '}

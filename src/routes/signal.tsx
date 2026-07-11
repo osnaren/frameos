@@ -54,7 +54,11 @@ function SignalRoute() {
   const email = data.page.email
 
   return (
-    <main className="flex min-h-[70svh] items-center px-4 py-16">
+    <main
+      className="flex min-h-[70svh] items-center px-4 py-16"
+      /* Signal borrows the leaf's measured green so the pulse feels photographic */
+      style={{ '--world-accent': '#4d7a38' } as React.CSSProperties}
+    >
       <motion.div
         className="page-shell max-w-3xl"
         initial="hidden"
@@ -89,7 +93,7 @@ function SignalRoute() {
           >
             <a
               href={`mailto:${email}`}
-              className="rounded-full bg-[var(--ink)] px-7 py-3.5 text-sm font-semibold text-[var(--bg)] no-underline hover:-translate-y-0.5"
+              className="signal-pulse rounded-full bg-[var(--ink)] px-7 py-3.5 text-sm font-semibold text-[var(--bg)] no-underline hover:-translate-y-0.5"
             >
               Write to {email}
             </a>

@@ -1,4 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
@@ -68,6 +69,9 @@ function CopyLinkButton({ canonicalUrl }: { canonicalUrl: string }) {
 function PhotoDetailRoute() {
   const { detail, siblings, position } = Route.useLoaderData()
   const navigate = useNavigate()
+  const reducedMotion = useReducedMotion()
+  /* The photograph settles first; words arrive second. */
+  const settleDelay = reducedMotion ? 0 : 0.38
   const photo = detail.photo
   const world = photo.category ? getWorld(photo.category) : null
   const previousSlug = position > 0 ? siblings[position - 1] : null
@@ -151,7 +155,12 @@ function PhotoDetailRoute() {
             />
           </div>
 
-          <figcaption className="mx-auto mt-8 max-w-2xl text-center">
+          <motion.figcaption
+            className="mx-auto mt-8 max-w-2xl text-center"
+            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: settleDelay, ease: [0.16, 1, 0.3, 1] }}
+          >
             <h1 className="display-font text-3xl leading-tight font-light text-[var(--ink)] sm:text-4xl">
               {photo.title}
             </h1>
@@ -184,12 +193,15 @@ function PhotoDetailRoute() {
                 <dd>A phone</dd>
               </div>
             </dl>
-          </figcaption>
+          </motion.figcaption>
         </figure>
 
-        <nav
+        <motion.nav
           aria-label="Previous and next photographs"
           className="mt-10 flex items-center justify-between gap-4 border-t border-[var(--line)] pt-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: settleDelay + 0.12 }}
         >
           {previousSlug ? (
             <Link
@@ -214,7 +226,7 @@ function PhotoDetailRoute() {
           ) : (
             <span aria-hidden="true" />
           )}
-        </nav>
+        </motion.nav>
 
         {detail.isDegraded ? (
           <div className="mt-8">

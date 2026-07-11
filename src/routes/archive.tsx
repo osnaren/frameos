@@ -88,33 +88,39 @@ function ArchiveRoute() {
           </Link>
         </header>
 
-        <nav aria-label="Filter by world" className="mt-6 flex flex-wrap gap-2">
+        <nav aria-label="Filter by world" className="mt-6 flex flex-wrap gap-2.5">
           <Link
             to="/archive"
             search={{}}
-            className={`mono-label rounded-full border px-4 py-2 no-underline ${
+            aria-current={!activeWorld ? 'true' : undefined}
+            className={`rounded-full border px-5 py-2.5 font-mono text-[0.78rem] tracking-[0.12em] uppercase no-underline transition-colors ${
               !activeWorld
-                ? 'border-[var(--ink)] !text-[var(--ink)]'
-                : 'border-[var(--line)] hover:border-[var(--ink)]'
+                ? 'border-[var(--ink)] bg-[var(--ink)] !text-[var(--bg)]'
+                : 'border-[var(--line)] text-[var(--muted-strong)] hover:border-[var(--ink)]'
             }`}
           >
             All
           </Link>
-          {worlds.map((world) => (
-            <Link
-              key={world.slug}
-              to="/archive"
-              search={{ world: world.slug }}
-              className={`mono-label rounded-full border px-4 py-2 no-underline ${
-                activeWorld?.slug === world.slug
-                  ? 'border-[var(--ink)] !text-[var(--ink)]'
-                  : 'border-[var(--line)] hover:border-[var(--ink)]'
-              }`}
-              style={{ color: activeWorld?.slug === world.slug ? undefined : world.mood.accent }}
-            >
-              {world.name}
-            </Link>
-          ))}
+          {worlds.map((world) => {
+            const isActive = activeWorld?.slug === world.slug
+
+            return (
+              <Link
+                key={world.slug}
+                to="/archive"
+                search={{ world: world.slug }}
+                aria-current={isActive ? 'true' : undefined}
+                className={`rounded-full border px-5 py-2.5 font-mono text-[0.78rem] tracking-[0.12em] uppercase no-underline transition-colors ${
+                  isActive
+                    ? 'border-[var(--ink)] bg-[var(--ink)] !text-[var(--bg)]'
+                    : 'border-[var(--line)] hover:border-[var(--ink)]'
+                }`}
+                style={{ color: isActive ? undefined : world.mood.accent }}
+              >
+                {world.name}
+              </Link>
+            )
+          })}
         </nav>
 
         {feed.isDegraded ? (
@@ -179,9 +185,7 @@ function ArchiveRoute() {
           })}
         </ul>
 
-        <p className="mono-label mt-10">
-          Arrow keys move between frames · every frame was photographed on a phone
-        </p>
+        <p className="mono-label mt-10">Arrow keys move between frames</p>
       </div>
     </main>
   )
