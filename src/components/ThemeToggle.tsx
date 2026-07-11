@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react'
 
 type ThemeMode = 'light' | 'dark' | 'auto'
 
+const ORDER: ThemeMode[] = ['light', 'dark', 'auto']
+
+/** Pocket Worlds defaults to the bright experience; dark is a choice. */
 function getInitialMode(): ThemeMode {
   if (typeof window === 'undefined') {
-    return 'auto'
+    return 'light'
   }
 
   const stored = window.localStorage.getItem('theme')
@@ -12,27 +15,36 @@ function getInitialMode(): ThemeMode {
     return stored
   }
 
-  return 'auto'
+  return 'light'
+}
+
+function resolveMode(mode: ThemeMode) {
+  if (mode !== 'auto') {
+    return mode
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 function applyThemeMode(mode: ThemeMode) {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  const resolved = mode === 'auto' ? (prefersDark ? 'dark' : 'light') : mode
+  const resolved = resolveMode(mode)
+  const root = document.documentElement
 
-  document.documentElement.classList.remove('light', 'dark')
-  document.documentElement.classList.add(resolved)
+  root.classList.remove('light', 'dark')
+  root.classList.add(resolved)
+  root.setAttribute('data-theme', resolved)
 
   if (mode === 'auto') {
-    document.documentElement.removeAttribute('data-theme')
+    root.setAttribute('data-theme-mode', 'auto')
   } else {
-    document.documentElement.setAttribute('data-theme', mode)
+    root.removeAttribute('data-theme-mode')
   }
 
-  document.documentElement.style.colorScheme = resolved
+  root.style.colorScheme = resolved
 }
 
 export default function ThemeToggle() {
-  const [mode, setMode] = useState<ThemeMode>('auto')
+  const [mode, setMode] = useState<ThemeMode>('light')
 
   useEffect(() => {
     const initialMode = getInitialMode()
@@ -54,26 +66,29 @@ export default function ThemeToggle() {
     }
   }, [mode])
 
-  function toggleMode() {
-    const nextMode: ThemeMode = mode === 'light' ? 'dark' : mode === 'dark' ? 'auto' : 'light'
+  function cycleMode() {
+    const nextMode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length]
     setMode(nextMode)
     applyThemeMode(nextMode)
     window.localStorage.setItem('theme', nextMode)
   }
 
-  const label =
-    mode === 'auto'
-      ? 'Theme mode: auto (system). Click to switch to light mode.'
-      : `Theme mode: ${mode}. Click to switch mode.`
+  const nextMode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length]
+  const stateLabel = mode === 'auto' ? 'Auto (follows your system)' : mode
+  const label = `Theme: ${stateLabel}. Click to switch to ${nextMode}.`
+  const glyph = mode === 'light' ? '○' : mode === 'dark' ? '●' : '◐'
 
   return (
     <button
       type="button"
-      onClick={toggleMode}
+      onClick={cycleMode}
       aria-label={label}
       title={label}
-      className="rounded-full border border-[var(--line)] bg-[var(--panel)] px-3 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-[var(--ink)] shadow-[0_14px_30px_var(--shadow)] transition hover:-translate-y-0.5"
+      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 py-2.5 text-[0.72rem] font-semibold tracking-[0.16em] uppercase text-[var(--ink)] shadow-[0_14px_30px_var(--shadow)] transition hover:-translate-y-0.5"
     >
+      <span aria-hidden="true" className="text-[0.6rem]">
+        {glyph}
+      </span>
       {mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}
     </button>
   )
