@@ -11,10 +11,11 @@ import type { Photo } from '@/types/photo'
 import type { MotionValue } from 'framer-motion'
 
 /**
- * Opening constellation: one sharp anchor frame in the middle, five
- * out-of-focus fragments drifting at different depths around it. Each
- * fragment is an entrance to its world; pointer movement shifts the depth
- * field, hover/focus pulls a fragment into focus.
+ * DOM opening layer, used two ways:
+ * - `OpeningHeadline` is the identity block shared by every tier.
+ * - `PocketOpeningVisuals` is the 2.5D fallback constellation (blurred
+ *   fragments + sharp anchor) shown when the WebGL tier is unavailable:
+ *   mobile, coarse pointers, reduced motion, low memory, or no WebGL.
  */
 const FRAGMENTS: Array<{
   photoId: string
@@ -117,7 +118,7 @@ function Fragment({
   )
 }
 
-export function PocketOpening({ photos }: { photos: Photo[] }) {
+export function PocketOpeningVisuals({ photos }: { photos: Photo[] }) {
   const reducedMotion = useReducedMotion()
   const pointer = usePointerParallax()
   const anchor = photos.find((photo) => photo.slug === ANCHOR_ID)
@@ -125,13 +126,7 @@ export function PocketOpening({ photos }: { photos: Photo[] }) {
   const anchorY = useTransform(pointer.y, (v) => v * 10)
 
   return (
-    <motion.section
-      aria-label="Pocket Worlds opening"
-      className="relative flex min-h-[86svh] flex-col justify-end overflow-hidden px-4 pb-14"
-      initial="hidden"
-      animate="visible"
-      variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
-    >
+    <>
       {FRAGMENTS.map((fragment) => {
         const photo = photos.find((p) => p.slug === fragment.photoId)
         return photo ? (
@@ -168,8 +163,16 @@ export function PocketOpening({ photos }: { photos: Photo[] }) {
           </p>
         </motion.div>
       ) : null}
+    </>
+  )
+}
 
-      <div className="page-shell relative z-30 max-w-3xl">
+export function OpeningHeadline() {
+  const reducedMotion = useReducedMotion()
+
+  return (
+    <div className="page-shell pointer-events-none relative z-30">
+      <div className="max-w-xl">
         <motion.p className="section-label" variants={revealVariants(reducedMotion)}>
           FrameOS — Pocket Worlds
         </motion.p>
@@ -185,24 +188,26 @@ export function PocketOpening({ photos }: { photos: Photo[] }) {
           className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)]"
           variants={revealVariants(reducedMotion)}
         >
-          No studio. No heavy gear. Each photograph is a small world — five of them are drifting
-          around this page.
+          Each photograph is a small world. Five of them are hanging just ahead.
         </motion.p>
         <motion.div
-          className="mt-8 flex flex-wrap items-center gap-4"
+          className="pointer-events-auto mt-8 flex flex-wrap items-center gap-4"
           variants={revealVariants(reducedMotion)}
         >
           <a
             href="#worlds"
-            className="rounded-full bg-[var(--ink)] px-6 py-3 text-sm font-semibold text-[var(--bg)] no-underline hover:-translate-y-0.5"
+            className="rounded-full bg-[var(--ink)] px-6 py-3.5 text-sm font-semibold text-[var(--bg)] no-underline hover:-translate-y-0.5"
           >
             Explore the worlds ↓
           </a>
-          <Link to="/archive" className="text-sm font-semibold text-[var(--muted-strong)]">
+          <Link
+            to="/archive"
+            className="px-2 py-2 text-sm font-semibold text-[var(--muted-strong)]"
+          >
             Skip to the Index →
           </Link>
         </motion.div>
       </div>
-    </motion.section>
+    </div>
   )
 }

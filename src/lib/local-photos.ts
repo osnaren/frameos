@@ -42,6 +42,24 @@ function toAsset(id: string, entry: ManifestEntry): LocalPhotoAsset | null {
   }
 }
 
+/**
+ * URL of the smallest local variant at or above `preferredWidth` (falls back
+ * to the largest). Used by the WebGL layer to load texture-sized files
+ * instead of full-resolution variants.
+ */
+export function getLocalVariantUrl(publicId: string, preferredWidth: number): string | null {
+  const id = localPhotoId(publicId)
+  const entry = id ? getManifestEntry(id) : null
+
+  if (!id || !entry || entry.hidden || entry.widths.length === 0) {
+    return null
+  }
+
+  const widths = [...entry.widths].sort((a, b) => a - b)
+  const width = widths.find((value) => value >= preferredWidth) ?? widths.at(-1)!
+  return variantUrl(id, width)
+}
+
 /** Returns delivery data for a local publicId, or null for Cloudinary/hidden photos. */
 export function getLocalPhotoAsset(publicId: string): LocalPhotoAsset | null {
   const id = localPhotoId(publicId)
