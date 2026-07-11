@@ -68,7 +68,7 @@ export const fixtureAboutPage: AboutPageContent = {
     'Most of these frames were not planned. A leaf held rain a little longer than expected. A tower stood still under a moving sky. A cat decided, briefly, to trust. The photographs exist because the noticing came first.',
     'The archive is grouped into small worlds — travel, temples, close things, living things, food — because that is roughly how the noticing happens too.',
   ],
-  photoHighlights: refsForIds(['leaf-after-rain', 'tower-and-sky', 'parakeet']),
+  photoHighlights: refsForIds(['cosmos', 'white-tower', 'the-cat', 'rain-on-the-street']),
   seo: {
     title: 'Field Notes — FrameOS',
     description:
@@ -81,7 +81,7 @@ export const fixtureContactPage: ContactPageContent = {
   headline: 'Found something familiar? Send a signal.',
   body: [
     'If one of these frames reminded you of a place, a meal, or an afternoon — that is the best possible outcome. Write and say so.',
-    'Questions about prints, publications, or the photographs themselves are welcome too.',
+    'Questions about the photographs are welcome too.',
   ],
   email: '66naren@gmail.com',
   socials: fixtureSiteSettings.socials,
