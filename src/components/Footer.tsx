@@ -9,10 +9,10 @@ export default function Footer() {
         <div>
           <p className="mono-label">FrameOS — Pocket Worlds</p>
           <p className="display-italic mt-3 max-w-md text-xl leading-8 text-[var(--muted-strong)] sm:text-2xl">
-            No studio. No heavy gear. Just a phone, a moment, and the instinct to notice.
+            An archive of noticing.
           </p>
         </div>
-        <div className="space-y-3 text-sm leading-7 lg:justify-self-end lg:text-right">
+        <div className="space-y-3 text-[0.95rem] leading-7 lg:justify-self-end lg:text-right">
           <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-1 lg:justify-end">
             <Link to="/" hash="worlds" className="no-underline hover:text-[var(--ink)]">
               Worlds
@@ -27,7 +27,7 @@ export default function Footer() {
               Signal
             </Link>
           </nav>
-          <p className="m-0 mono-label">Photographed entirely on a phone · © {year} FrameOS</p>
+          <p className="m-0 mono-label">© {year} FrameOS</p>
         </div>
       </div>
     </footer>
