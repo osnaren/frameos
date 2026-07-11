@@ -4,6 +4,58 @@ Design and implementation reference for the public experience introduced in July
 For the data/caching architecture underneath it, see [new-arch.md](./new-arch.md) — that
 layer is unchanged by this redesign.
 
+## Experience tiers (capability, not screen width)
+
+`src/lib/capability.ts` selects the tier from real signals:
+
+| Tier       | Who gets it                                                                                    | What it is                                                                        |
+| ---------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `animated` | SSR default, mobile, coarse pointers, reduced motion, low memory, save-data, no WebGL          | The complete DOM experience (2.5D opening, world scenes, Index, view transitions) |
+| `spatial`  | Fine pointer + ≥1024px + WebGL + no reduced-motion/save-data + ≥4GB device memory (when known) | Adds the WebGL opening constellation on `/`                                       |
+
+The canvas is always an enhancement: it is lazily chunked (~900 KB raw, loaded only
+at this tier), wrapped in an error boundary that renders nothing on failure, and
+`aria-hidden` — keyboard/screen-reader world selection is the DOM portal grid below
+the fold. If the canvas never mounts, the page is complete.
+
+## The spatial opening (`src/components/worlds/spatial/SpatialOpening.tsx`)
+
+One continuous ~4s timeline, never blocking the DOM (headline and actions render
+immediately; the canvas fades in when its six textures are ready):
+
+1. Six torn fragments of “Leaf, After Rain” hang scattered in depth.
+2. They align into the complete photograph, which separates into subtle depth
+   layers answering the pointer.
+3. The camera pulls back; the assembled leaf travels into place as the Small
+   Wonders entrance while the other four world photographs arrive from depth —
+   a constellation of mounted prints (each has an ivory matte plane behind it).
+4. Focusing a world tints the scene background and fog toward that world's
+   measured mood (wash in light theme, deep in dark), advances the print, dims
+   the others, and drifts the camera; a DOM placard names the world.
+5. Clicking flies the camera into the photograph, fades the headline, then the
+   route changes to that world (whose header carries the same wash → continuity).
+
+Composition rules: lower-left is reserved negative space for the DOM headline;
+the sea horizon runs low across center; towers rise right; the parakeet hangs
+deepest in the upper shade at slightly reduced opacity.
+
+Engineering guarantees:
+
+- intro plays once per session (module flag); back-navigation resumes directly
+  in the constellation with the camera already pulled back;
+- `frameloop` switches to `never` via IntersectionObserver + visibilitychange
+  when the section is offscreen or the tab is hidden;
+- textures are 768px local WebP variants (`getLocalVariantUrl`), sRGB, anisotropy 4;
+- DPR capped at 1.75; no post-processing, no lights (photos are unlit basic materials);
+- tile geometries are custom-UV planes over ONE shared texture (no duplicated uploads),
+  disposed on unmount; R3F auto-disposes the rest;
+- a focus-reticle cursor exists only inside the canvas section on fine pointers
+  (native cursor hidden there only), and never replaces DOM focus states.
+
+Measured on the dev build (Chromium, Intel Arc, 1360×850): the constellation
+renders with a frame budget far below 16ms (~240 rAF/s uncapped), JS heap ~44 MB.
+The spatial chunk is not requested at all on mobile/reduced-motion/fallback tiers.
+
 ## Creative intent
 
 **"Things I noticed, photographed on a phone."**
@@ -116,7 +168,11 @@ links to the Index, and all content is reachable by keyboard.
 ## Visual system
 
 - Base: bright warm ivory (`#f8f5ee`) with a pale mist cast; charcoal ink; restrained
-  grain overlay; dark theme supported throughout.
+  grain overlay. **The default theme is light** — the bright adaptive-surreal
+  direction is the artwork's home key. Dark is an explicit visitor choice (or
+  stored auto mode); the toggle shows current state (○ Light / ● Dark / ◐ Auto)
+  with the next action in its label. Darkness also appears deliberately inside
+  the experience (Living Things' forest passage, dark-theme night gallery).
 - World moods (`--world-wash/--world-deep/--world-accent`) tint scenes; wash strength
   is theme-aware (`--wash-strength`: 80% light, 16% dark) so pale washes never fight
   dark-mode text.
