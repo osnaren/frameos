@@ -1,22 +1,8 @@
-import { setResponseHeader } from '@tanstack/react-start/server'
 import { invalidateByTag } from '@vercel/functions'
 
-import { getCacheHeaders, joinCacheTags, type CacheProfile } from '@/server/cache/policy'
 import { getServerEnv } from '@/server/env'
 import { captureException } from '@/server/observability/error-tracker'
 import { logInfo, logWarn } from '@/server/observability/logger'
-
-export function applyCacheResponse(profile: CacheProfile, tags: string[]) {
-  const headers = getCacheHeaders(profile)
-
-  Object.entries(headers).forEach(([name, value]) => {
-    setResponseHeader(name, value)
-  })
-
-  if (tags.length > 0) {
-    setResponseHeader('Vercel-Cache-Tag', joinCacheTags(tags))
-  }
-}
 
 export async function invalidateCacheTags(tags: string[]) {
   const sanitizedTags = tags.filter(Boolean)

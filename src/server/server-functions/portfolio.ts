@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import { DEFAULT_GALLERY_LIMIT, MAX_GALLERY_LIMIT } from '@/lib/gallery-search'
 import { getPageTags, getPhotoTags, getGalleryTags } from '@/server/cache/tags'
-import { applyCacheResponse } from '@/server/cache/vercel'
+import { applyCacheResponse } from '@/server/cache/vercel-headers'
 import { ServiceUnavailableError, createPortfolioRepository } from '@/server/repository/portfolio'
 
 const repository = createPortfolioRepository()
@@ -72,7 +72,7 @@ export const getContactViewServer = createServerFn({ method: 'GET' }).handler(as
 })
 
 export const getGalleryFeedServer = createServerFn({ method: 'GET' })
-  .inputValidator(galleryInputSchema)
+  .validator(galleryInputSchema)
   .handler(async ({ data }) => {
     const baseUrl = getBaseUrlFromRequest()
     const feed = await repository.getGalleryFeed(data, { baseUrl })
@@ -81,7 +81,7 @@ export const getGalleryFeedServer = createServerFn({ method: 'GET' })
   })
 
 export const getPhotoDetailServer = createServerFn({ method: 'GET' })
-  .inputValidator(
+  .validator(
     z.object({
       slug: z.string().trim().min(1),
     })
