@@ -1,8 +1,7 @@
 import { setResponseHeader } from '@tanstack/react-start/server'
 import { invalidateByTag } from '@vercel/functions'
 
-import { getCacheHeaders, joinCacheTags } from '@/server/cache/policy'
-import type { CacheProfile } from '@/server/cache/policy'
+import { getCacheHeaders, joinCacheTags, type CacheProfile } from '@/server/cache/policy'
 import { getServerEnv } from '@/server/env'
 import { captureException } from '@/server/observability/error-tracker'
 import { logInfo, logWarn } from '@/server/observability/logger'

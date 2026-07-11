@@ -34,6 +34,7 @@ function write(level: LogLevel, event: string, payload: LogPayload) {
     return
   }
 
+  // eslint-disable-next-line no-console
   console.log(line)
 }
 

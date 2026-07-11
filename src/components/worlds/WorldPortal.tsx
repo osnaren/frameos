@@ -2,8 +2,9 @@ import { Link } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import type { WorldDefinition } from '@/content/worlds'
 import { revealVariants } from '@/lib/motion'
+
+import type { WorldDefinition } from '@/content/worlds'
 import type { Photo } from '@/types/photo'
 
 export function WorldPortal({

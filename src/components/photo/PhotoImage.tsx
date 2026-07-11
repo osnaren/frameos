@@ -3,8 +3,8 @@ import {
   buildCloudinaryPlaceholder,
   buildCloudinarySrcSet,
   getImagePresetDefinition,
+  type ImagePreset,
 } from '@/lib/image-policy'
-import type { ImagePreset } from '@/lib/image-policy'
 import { getLocalPhotoAsset } from '@/lib/local-photos'
 
 import type { CSSProperties } from 'react'

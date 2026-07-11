@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
 import { CloudinaryImage } from '@/components/photo/CloudinaryImage'
+
 import type { PhotoCardView } from '@/types/photo'
 
 export function PhotoCard({ item, priority = false }: { item: PhotoCardView; priority?: boolean }) {

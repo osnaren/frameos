@@ -1,4 +1,5 @@
 import { PhotoCard } from '@/components/photo/PhotoCard'
+
 import type { PhotoCardView } from '@/types/photo'
 
 export function PhotoMasonry({ items }: { items: PhotoCardView[] }) {

@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react'
+
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'

@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
+
 import type { ImagePreset } from '@/lib/image-policy'
 import type { Photo } from '@/types/photo'
 

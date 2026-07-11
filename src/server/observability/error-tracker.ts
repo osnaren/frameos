@@ -1,6 +1,5 @@
 import { getServerEnv } from '@/server/env'
-import { logError, logWarn } from '@/server/observability/logger'
-import type { LogPayload } from '@/server/observability/logger'
+import { logError, logWarn, type LogPayload } from '@/server/observability/logger'
 
 export function captureException(error: unknown, context: LogPayload = {}) {
   const env = getServerEnv()

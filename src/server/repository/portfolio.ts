@@ -4,11 +4,12 @@ import { buildCanonicalUrl } from '@/lib/url'
 import { readSnapshot, rememberSnapshot } from '@/server/cache/snapshots'
 import { getPageTags, getPhotoTags } from '@/server/cache/tags'
 import { invalidateCacheTags } from '@/server/cache/vercel'
-import type { PortfolioRepository } from '@/server/contracts'
 import { captureException } from '@/server/observability/error-tracker'
 import { logInfo, logWarn, recordMetric } from '@/server/observability/logger'
 import { createCloudinaryProvider } from '@/server/providers/cloudinary'
 import { createSanityProvider } from '@/server/providers/sanity'
+
+import type { PortfolioRepository } from '@/server/contracts'
 import type {
   AboutView,
   ContactView,

@@ -3,8 +3,8 @@ import {
   buildCloudinaryPlaceholder,
   buildCloudinarySrcSet,
   getImagePresetDefinition,
+  type ImagePreset,
 } from '@/lib/image-policy'
-import type { ImagePreset } from '@/lib/image-policy'
 
 function getCloudName() {
   return import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || (import.meta.env.DEV ? 'demo' : '')

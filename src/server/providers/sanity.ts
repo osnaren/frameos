@@ -2,7 +2,6 @@ import { createClient } from '@sanity/client'
 import { SIGNATURE_HEADER_NAME, isValidSignature } from '@sanity/webhook'
 
 import { createPhotoSlug } from '@/lib/photo-slug'
-import type { SanityProvider } from '@/server/contracts'
 import { getServerEnv, hasSanityConfig } from '@/server/env'
 import { captureException, emitAlert } from '@/server/observability/error-tracker'
 import { logWarn, recordMetric } from '@/server/observability/logger'
@@ -12,6 +11,8 @@ import {
   fixtureHomePage,
   fixtureSiteSettings,
 } from '@/server/providers/mock-data'
+
+import type { SanityProvider } from '@/server/contracts'
 import type {
   AboutPageContent,
   CloudinaryAssetRef,

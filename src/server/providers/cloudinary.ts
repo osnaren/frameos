@@ -1,13 +1,15 @@
 import { v2 as cloudinary } from 'cloudinary'
 
 import { decodePhotoSlug, createPhotoSlug } from '@/lib/photo-slug'
-import type { CloudinaryProvider } from '@/server/contracts'
 import { getServerEnv, hasCloudinaryConfig } from '@/server/env'
 import { captureException, emitAlert } from '@/server/observability/error-tracker'
 import { recordMetric } from '@/server/observability/logger'
 import { fixturePhotos } from '@/server/providers/mock-data'
+
+import type { CloudinaryProvider } from '@/server/contracts'
 import type { Photo, PhotoFilters, PhotoStatus } from '@/types/photo'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CloudinaryAsset = Record<string, any>
 
 const PAGE_FETCH_SIZE = 100

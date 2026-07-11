@@ -1,5 +1,6 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
 import { useRef } from 'react'
+
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
@@ -132,6 +133,7 @@ function ArchiveRoute() {
         ) : null}
 
         {/* Justified contact-sheet rows: each frame keeps its true aspect ratio */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <ul
           ref={sheetRef}
           onKeyDown={handleSheetKeyDown}

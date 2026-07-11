@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly DEV?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }

@@ -1,13 +1,13 @@
-import { Link } from '@tanstack/react-router'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 
-import { PhotoFrame } from '@/components/photo/PhotoFrame'
-import type { WorldDefinition } from '@/content/worlds'
-import { contactSheet, revealVariants, settleSlow } from '@/lib/motion'
-import type { Photo } from '@/types/photo'
+import { Link } from '@tanstack/react-router'
+import { motion, useReducedMotion, useScroll, useTransform, type Variants } from 'framer-motion'
 
-import type { Variants } from 'framer-motion'
+import { PhotoFrame } from '@/components/photo/PhotoFrame'
+import { contactSheet, revealVariants, settleSlow } from '@/lib/motion'
+
+import type { WorldDefinition } from '@/content/worlds'
+import type { Photo } from '@/types/photo'
 
 interface SceneProps {
   world: WorldDefinition

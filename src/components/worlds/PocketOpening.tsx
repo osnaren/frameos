@@ -1,14 +1,12 @@
 import { Link } from '@tanstack/react-router'
-import { motion, useReducedMotion, useTransform } from 'framer-motion'
+import { motion, useReducedMotion, useTransform, type MotionValue } from 'framer-motion'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { getWorld } from '@/content/worlds'
-import type { WorldSlug } from '@/content/worlds'
+import { getWorld, type WorldSlug } from '@/content/worlds'
 import { usePointerParallax } from '@/hooks/use-pointer-parallax'
 import { revealVariants } from '@/lib/motion'
-import type { Photo } from '@/types/photo'
 
-import type { MotionValue } from 'framer-motion'
+import type { Photo } from '@/types/photo'
 
 /**
  * DOM opening layer, used two ways:

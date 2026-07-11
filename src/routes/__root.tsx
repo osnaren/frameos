@@ -1,5 +1,10 @@
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Scripts,
+  createRootRoute,
+  type ErrorComponentProps,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 import { ServiceState } from '@/components/content/ServiceState'
@@ -7,8 +12,6 @@ import { ServiceState } from '@/components/content/ServiceState'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import appCss from '../styles.css?url'
-
-import type { ErrorComponentProps } from '@tanstack/react-router'
 
 /* Pocket Worlds opens bright by default; dark is an explicit choice (or stored auto). */
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'light';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);root.setAttribute('data-theme',resolved);if(mode==='auto'){root.setAttribute('data-theme-mode','auto')}root.style.colorScheme=resolved;}catch(e){}})();`

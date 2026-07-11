@@ -12,17 +12,12 @@
  * photograph. Locations, dates, and equipment are intentionally absent
  * unless supplied — nothing here is invented.
  */
-import type { Photo } from '@/types/photo'
-
 import manifest from './photo-manifest.json'
 
+import type { Photo } from '@/types/photo'
+
 export type WorldSlug =
-  | 'wander'
-  | 'sacred-geometry'
-  | 'small-wonders'
-  | 'living-things'
-  | 'at-the-table'
-  | 'people'
+  'wander' | 'sacred-geometry' | 'small-wonders' | 'living-things' | 'at-the-table' | 'people'
 
 /**
  * Each world's motion signature, used by the world scene engine:

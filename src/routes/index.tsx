@@ -1,6 +1,7 @@
+import { Suspense, lazy, useState } from 'react'
+
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Suspense, lazy, useState } from 'react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { OpeningHeadline, PocketOpeningVisuals } from '@/components/worlds/PocketOpening'

@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react'
+
 import { createFileRoute } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { contactSheet, revealVariants } from '@/lib/motion'

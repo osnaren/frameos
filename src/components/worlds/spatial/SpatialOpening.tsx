@@ -1,13 +1,11 @@
+import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Component, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
-import { getManifestEntry, getPublicWorlds, getWorld } from '@/content/worlds'
-import type { WorldSlug } from '@/content/worlds'
+import { getManifestEntry, getPublicWorlds, getWorld, type WorldSlug } from '@/content/worlds'
 import { getLocalVariantUrl } from '@/lib/local-photos'
-
-import type { ReactNode } from 'react'
 
 /**
  * The spatial opening: a WebGL constellation layered under the DOM headline.

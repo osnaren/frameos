@@ -55,6 +55,7 @@ async function main() {
     }
   })
 
+  // eslint-disable-next-line no-console
   console.log(
     JSON.stringify(
       {
@@ -69,6 +70,7 @@ async function main() {
   )
 
   if (!writeMode) {
+    // eslint-disable-next-line no-console
     console.log(
       'Dry run only. Re-run with --write after Cloudinary structured metadata fields exist.'
     )

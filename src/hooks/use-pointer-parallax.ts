@@ -1,5 +1,6 @@
-import { useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { useEffect, useMemo } from 'react'
+
+import { useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 
 /**
  * Normalized pointer position (-0.5 … 0.5 on both axes) as smoothed motion

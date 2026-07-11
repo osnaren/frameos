@@ -7,6 +7,7 @@
  * switches to live data automatically and this module is ignored.
  */
 import { curatedPhotos, getPublicWorlds } from '@/content/worlds'
+
 import type {
   AboutPageContent,
   ContactPageContent,
