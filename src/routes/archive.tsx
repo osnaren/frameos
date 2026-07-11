@@ -74,17 +74,17 @@ function ArchiveRoute() {
   return (
     <main className="px-4 pt-10 pb-16">
       <div className="page-shell">
-        <header className="flex flex-wrap items-end justify-between gap-6 border-b border-[var(--line)] pb-6">
+        <header className="flex flex-wrap items-end justify-between gap-6 border-b border-(--line) pb-6">
           <div>
             <p className="mono-label">
               Index · {String(feed.items.length).padStart(2, '0')} frames
               {activeWorld ? ` · ${activeWorld.name}` : ' · all worlds'}
             </p>
-            <h1 className="display-font mt-3 text-4xl font-light text-[var(--ink)] sm:text-5xl">
+            <h1 className="display-font mt-3 text-4xl font-light text-(--ink) sm:text-5xl">
               Every frame, on one sheet.
             </h1>
           </div>
-          <Link to="/" hash="worlds" className="text-sm font-semibold text-[var(--muted-strong)]">
+          <Link to="/" hash="worlds" className="text-sm font-semibold text-(--muted-strong)">
             Back to the worlds →
           </Link>
         </header>
@@ -96,8 +96,8 @@ function ArchiveRoute() {
             aria-current={!activeWorld ? 'true' : undefined}
             className={`rounded-full border px-5 py-2.5 font-mono text-[0.78rem] tracking-[0.12em] uppercase no-underline transition-colors ${
               !activeWorld
-                ? 'border-[var(--ink)] bg-[var(--ink)] !text-[var(--bg)]'
-                : 'border-[var(--line)] text-[var(--muted-strong)] hover:border-[var(--ink)]'
+                ? 'border-(--ink) bg-(--ink) text-(--bg)!'
+                : 'border-(--line) text-(--muted-strong) hover:border-(--ink)'
             }`}
           >
             All
@@ -113,8 +113,8 @@ function ArchiveRoute() {
                 aria-current={isActive ? 'true' : undefined}
                 className={`rounded-full border px-5 py-2.5 font-mono text-[0.78rem] tracking-[0.12em] uppercase no-underline transition-colors ${
                   isActive
-                    ? 'border-[var(--ink)] bg-[var(--ink)] !text-[var(--bg)]'
-                    : 'border-[var(--line)] hover:border-[var(--ink)]'
+                    ? 'border-(--ink) bg-(--ink) text-(--bg)!'
+                    : 'border-(--line) hover:border-(--ink)'
                 }`}
                 style={{ color: isActive ? undefined : world.mood.accent }}
               >
@@ -174,10 +174,10 @@ function ArchiveRoute() {
                   <span aria-hidden="true" className="frame-corners" />
                   <span
                     aria-hidden="true"
-                    className="absolute inset-x-0 bottom-0 flex items-baseline justify-between gap-2 bg-gradient-to-t from-black/55 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    className="absolute inset-x-0 bottom-0 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/55 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
                   >
                     <span className="truncate text-xs font-medium text-white">{photo.title}</span>
-                    <span className="mono-label shrink-0 !text-white/80">
+                    <span className="mono-label shrink-0 text-white/80!">
                       {world ? world.name : ''}
                     </span>
                   </span>

@@ -10,7 +10,7 @@ export function PhotoCard({ item, priority = false }: { item: PhotoCardView; pri
       <Link
         to="/photos/$slug"
         params={{ slug: item.photo.slug }}
-        className="overflow-hidden rounded-[1.75rem] bg-[var(--panel-strong)] no-underline"
+        className="overflow-hidden rounded-[1.75rem] bg-(--panel-strong) no-underline"
       >
         <CloudinaryImage
           publicId={item.photo.publicId}
@@ -22,12 +22,12 @@ export function PhotoCard({ item, priority = false }: { item: PhotoCardView; pri
       </Link>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="m-0 text-[0.7rem] font-semibold tracking-[0.22em] uppercase text-[var(--accent)]">
+          <p className="m-0 text-[0.7rem] font-semibold tracking-[0.22em] uppercase text-(--accent)">
             {item.photo.category ?? 'Portfolio'}
           </p>
-          <h3 className="display-font mt-2 text-2xl text-[var(--ink)]">{item.photo.title}</h3>
+          <h3 className="display-font mt-2 text-2xl text-(--ink)">{item.photo.title}</h3>
         </div>
-        <div className="pt-2 text-right text-sm text-[var(--muted)]">
+        <div className="pt-2 text-right text-sm text-(--muted)">
           <p className="m-0">{item.photo.locationLabel ?? 'Selected work'}</p>
           <p className="m-0">{item.photo.captureDate?.slice(0, 10) ?? 'Undated'}</p>
         </div>

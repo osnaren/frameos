@@ -4,12 +4,7 @@ import { getPageTags, getPhotoTags } from '@/server/cache/tags'
 
 describe('cache tag helpers', () => {
   it('returns all site-level page tags for site settings changes', () => {
-    expect(getPageTags('siteSettings')).toEqual([
-      'site',
-      'page:home',
-      'page:about',
-      'page:contact',
-    ])
+    expect(getPageTags('siteSettings')).toEqual(['site', 'page:home', 'page:about', 'page:contact'])
   })
 
   it('builds gallery and detail tags from a photo record', () => {

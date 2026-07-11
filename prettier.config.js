@@ -3,4 +3,5 @@ export default {
   singleQuote: true,
   trailingComma: 'es5',
   printWidth: 100,
+  plugins: ['prettier-plugin-tailwindcss', 'prettier-plugin-tailwindcss-canonical-classes'],
 }

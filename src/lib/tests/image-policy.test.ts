@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  buildCloudinaryImageUrl,
-  buildCloudinarySrcSet,
-  imagePresetMap,
-} from '@/lib/image-policy'
+import { buildCloudinaryImageUrl, buildCloudinarySrcSet, imagePresetMap } from '@/lib/image-policy'
 
 describe('image policy helpers', () => {
   it('builds transformed delivery URLs for the requested preset', () => {

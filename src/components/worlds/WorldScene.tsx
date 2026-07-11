@@ -61,7 +61,7 @@ function DriftScene({ hero, rest, frameNumber }: SceneProps) {
               photo={photo}
               frameNumber={frameNumber(photo)}
               sizes="(max-width: 768px) 92vw, 44vw"
-              className="w-full max-w-[520px]"
+              className="w-full max-w-130"
             />
           </motion.div>
         ))}
@@ -86,7 +86,7 @@ function RiseScene({ hero, rest, frameNumber }: SceneProps) {
         className="absolute inset-y-0 left-1/2 hidden w-px -translate-x-1/2 sm:block"
         style={{ background: 'color-mix(in srgb, var(--world-accent) 34%, transparent)' }}
       />
-      <div className="relative mx-auto flex w-full max-w-[620px] flex-col items-center gap-28 px-4">
+      <div className="relative mx-auto flex w-full max-w-155 flex-col items-center gap-28 px-4">
         {photos.map((photo, index) => (
           <motion.div
             key={photo.slug}
@@ -125,7 +125,7 @@ function MacroScene({ hero, rest, frameNumber }: SceneProps) {
     <div className="page-shell">
       {hero ? (
         <motion.div
-          className="mx-auto w-full max-w-[640px]"
+          className="mx-auto w-full max-w-160"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
@@ -154,7 +154,7 @@ function MacroScene({ hero, rest, frameNumber }: SceneProps) {
               photo={photo}
               frameNumber={frameNumber(photo)}
               sizes="(max-width: 768px) 92vw, 44vw"
-              className={index % 3 === 2 ? 'mx-auto w-full max-w-[380px]' : ''}
+              className={index % 3 === 2 ? 'mx-auto w-full max-w-95' : ''}
             />
           </motion.div>
         ))}
@@ -180,7 +180,7 @@ function QuietScene({ hero, rest, frameNumber }: SceneProps) {
         background: `linear-gradient(180deg, transparent, var(--world-deep) 12%, var(--world-deep) 88%, transparent)`,
       }}
     >
-      <div className="mx-auto flex w-full max-w-[680px] flex-col gap-36">
+      <div className="mx-auto flex w-full max-w-170 flex-col gap-36">
         {photos.map((photo, index) => (
           <motion.div
             key={photo.slug}
@@ -194,7 +194,7 @@ function QuietScene({ hero, rest, frameNumber }: SceneProps) {
               frameNumber={frameNumber(photo)}
               priority={index === 0}
               sizes="(max-width: 768px) 92vw, 680px"
-              className="[&_figcaption_.display-italic]:!text-white/75 [&_figcaption_.mono-label]:!text-white/55"
+              className="[&_figcaption_.display-italic]:text-white/75! [&_figcaption_.mono-label]:text-white/55!"
             />
           </motion.div>
         ))}
@@ -212,7 +212,7 @@ function GatherScene({ hero, rest, frameNumber }: SceneProps) {
     <div className="page-shell">
       {hero ? (
         <motion.div
-          className="mx-auto w-full max-w-[880px]"
+          className="mx-auto w-full max-w-220"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
@@ -314,13 +314,13 @@ export function WorldScene({
           / {world.name} · {String(photos.length).padStart(2, '0')} frames
         </motion.p>
         <motion.h1
-          className="display-font mt-5 text-[clamp(2.8rem,8vw,5.6rem)] leading-none font-light text-[var(--ink)]"
+          className="display-font mt-5 text-[clamp(2.8rem,8vw,5.6rem)] leading-none font-light text-(--ink)"
           variants={revealVariants(reducedMotion)}
         >
           {world.name}
         </motion.h1>
         <motion.p
-          className="display-italic mt-4 text-lg text-[var(--muted-strong)] sm:text-xl"
+          className="display-italic mt-4 text-lg text-(--muted-strong) sm:text-xl"
           variants={revealVariants(reducedMotion)}
         >
           {world.line}
@@ -331,12 +331,12 @@ export function WorldScene({
 
       <nav
         aria-label="World navigation"
-        className="page-shell mt-28 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--line)] px-4 py-10"
+        className="page-shell mt-28 flex flex-wrap items-center justify-between gap-4 border-t border-(--line) px-4 py-10"
       >
         <Link
           to="/worlds/$world"
           params={{ world: previousWorld.slug }}
-          className="text-sm font-semibold text-[var(--muted-strong)] no-underline hover:text-[var(--ink)]"
+          className="text-sm font-semibold text-(--muted-strong) no-underline hover:text-(--ink)"
         >
           ← {previousWorld.name}
         </Link>
@@ -346,7 +346,7 @@ export function WorldScene({
         <Link
           to="/worlds/$world"
           params={{ world: nextWorld.slug }}
-          className="text-sm font-semibold text-[var(--muted-strong)] no-underline hover:text-[var(--ink)]"
+          className="text-sm font-semibold text-(--muted-strong) no-underline hover:text-(--ink)"
         >
           {nextWorld.name} →
         </Link>

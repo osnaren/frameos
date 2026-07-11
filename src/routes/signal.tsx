@@ -42,7 +42,7 @@ function CopyEmailButton({ email }: { email: string }) {
       onClick={() => {
         void navigator.clipboard.writeText(email).then(() => setCopied(true))
       }}
-      className="mono-label cursor-pointer rounded-full border border-[var(--line)] bg-[var(--panel)] px-5 py-3 hover:border-[var(--accent)]"
+      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-5 py-3 hover:border-(--accent)"
     >
       {copied ? 'Address copied' : 'Copy address'}
     </button>
@@ -70,14 +70,14 @@ function SignalRoute() {
           Signal
         </motion.p>
         <motion.h1
-          className="display-font mt-4 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1.04] font-light text-[var(--ink)]"
+          className="display-font mt-4 text-[clamp(2.4rem,6vw,4.4rem)] leading-[1.04] font-light text-(--ink)"
           variants={revealVariants(reducedMotion)}
         >
           {data.page.headline}
         </motion.h1>
 
         <motion.div
-          className="mt-6 space-y-4 text-base leading-8 text-[var(--muted-strong)]"
+          className="mt-6 space-y-4 text-base leading-8 text-(--muted-strong)"
           variants={revealVariants(reducedMotion)}
         >
           {data.page.body.map((paragraph) => (
@@ -94,7 +94,7 @@ function SignalRoute() {
           >
             <a
               href={`mailto:${email}`}
-              className="signal-pulse rounded-full bg-[var(--ink)] px-7 py-3.5 text-sm font-semibold text-[var(--bg)] no-underline hover:-translate-y-0.5"
+              className="signal-pulse rounded-full bg-(--ink) px-7 py-3.5 text-sm font-semibold text-(--bg) no-underline hover:-translate-y-0.5"
             >
               Write to {email}
             </a>
@@ -104,7 +104,7 @@ function SignalRoute() {
 
         {data.page.socials.length > 0 ? (
           <motion.ul
-            className="mt-10 flex list-none flex-wrap gap-5 border-t border-[var(--line)] p-0 pt-6"
+            className="mt-10 flex list-none flex-wrap gap-5 border-t border-(--line) p-0 pt-6"
             variants={revealVariants(reducedMotion)}
           >
             {data.page.socials

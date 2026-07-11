@@ -1,6 +1,7 @@
 # Project Guidelines
 
 ## Architecture
+
 - Active application code lives in `src/` (frontend + routes), `src/server/` (BFF/server logic), and `src/sanity/` (Sanity schemas).
 - Treat `legacy-src/` as **visual/reference material only** while migration continues.
 - TanStack file-based routing is authoritative: page routes in `src/routes/*.tsx`, API handlers in `src/routes/api/**`.
@@ -9,6 +10,7 @@
 - Do not hand-edit generated route artifacts such as `src/routeTree.gen.ts`.
 
 ## Build and Test
+
 - Use Node `>=24.12.0` (see `package.json` engines).
 - Primary commands:
   - `npm run dev`
@@ -22,6 +24,7 @@
 - `legacy-src/**` is excluded from tests/lint in current config and should not receive routine feature changes.
 
 ## Code Style and Imports
+
 - TypeScript strict mode is enabled; prefer explicit typing and avoid `any`.
 - Prefer `@/*` imports (and preserve existing `#/*` imports where present).
 - Keep import ordering and grouping compatible with `eslint.config.js` (`import/order` is enforced).
@@ -32,6 +35,7 @@
   - Route params follow TanStack route naming (e.g., `photos.$slug.tsx`)
 
 ## Data and Runtime Conventions
+
 - Environment parsing is centralized in `src/server/env.ts`; add new server env vars there with zod validation.
 - Provider fallbacks to fixtures can happen in development when config is missing; do not rely on that behavior for production logic.
 - Gallery filtering/search normalization must use `src/lib/gallery-search.ts`.
@@ -39,14 +43,16 @@
 - Keep caching and invalidation behavior consistent with `src/server/cache/*` and repository reconciliation flows.
 
 ## API, Webhook, and Reconciliation Rules
+
 - Webhook endpoints (`src/routes/api/webhooks/*.ts`) must preserve:
   - signature verification
   - idempotency checks
   - stale-event protection
-  before reconciliation.
+    before reconciliation.
 - Reconcile endpoint (`src/routes/api/reconcile/content.ts`) requires token auth behavior compatible with `RECONCILE_SECRET` / `CRON_SECRET`.
 
 ## UI Guidance During Migration (legacy-src reference)
+
 - New work should be implemented in `src/`, but visual direction can reference `legacy-src/` patterns:
   - warm editorial palette and typography
   - rounded, soft panel/card surfaces
@@ -55,6 +61,7 @@
 - Prefer adapting patterns over reusing legacy modules directly.
 
 ## Key References (link, don’t embed)
+
 - `README.md`
 - `package.json`
 - `eslint.config.js`

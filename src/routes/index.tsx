@@ -85,14 +85,11 @@ function HomeRoute() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="mono-label">Five worlds · {photos.length} frames</p>
-              <h2 className="display-font mt-3 text-4xl font-light text-[var(--ink)] sm:text-5xl">
+              <h2 className="display-font mt-3 text-4xl font-light text-(--ink) sm:text-5xl">
                 Pick a world to step into.
               </h2>
             </div>
-            <Link
-              to="/archive"
-              className="px-2 py-2 text-sm font-semibold text-[var(--muted-strong)]"
-            >
+            <Link to="/archive" className="px-2 py-2 text-sm font-semibold text-(--muted-strong)">
               Or see every frame at once →
             </Link>
           </div>
@@ -141,10 +138,10 @@ function HomeRoute() {
           viewport={{ once: true, amount: 0.4 }}
           variants={revealVariants(reducedMotion)}
         >
-          <p className="display-italic text-xl leading-9 text-[var(--muted-strong)] sm:text-2xl">
+          <p className="display-italic text-xl leading-9 text-(--muted-strong) sm:text-2xl">
             “A world noticed through a pocket-sized frame.”
           </p>
-          <p className="mt-4 text-sm leading-7 text-[var(--muted)]">
+          <p className="mt-4 text-sm leading-7 text-(--muted)">
             The archive is small on purpose — eighteen frames across five worlds, each kept only
             because it was worth keeping.{' '}
             <Link to="/notes" className="font-semibold">

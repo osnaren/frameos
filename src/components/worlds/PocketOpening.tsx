@@ -175,7 +175,7 @@ export function OpeningHeadline() {
           FrameOS — Pocket Worlds
         </motion.p>
         <motion.h1
-          className="display-font mt-4 text-[clamp(2.4rem,6.5vw,4.9rem)] leading-[1.02] font-light text-[var(--ink)]"
+          className="display-font mt-4 text-[clamp(2.4rem,6.5vw,4.9rem)] leading-[1.02] font-light text-(--ink)"
           variants={revealVariants(reducedMotion)}
         >
           Things I noticed,
@@ -183,7 +183,7 @@ export function OpeningHeadline() {
           <em className="display-italic font-normal">photographed on a phone.</em>
         </motion.h1>
         <motion.p
-          className="mt-5 max-w-xl text-base leading-7 text-[var(--muted)]"
+          className="mt-5 max-w-xl text-base leading-7 text-(--muted)"
           variants={revealVariants(reducedMotion)}
         >
           Each photograph is a small world. Five of them are hanging just ahead.
@@ -194,14 +194,11 @@ export function OpeningHeadline() {
         >
           <a
             href="#worlds"
-            className="rounded-full bg-[var(--ink)] px-6 py-3.5 text-sm font-semibold text-[var(--bg)] no-underline hover:-translate-y-0.5"
+            className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline hover:-translate-y-0.5"
           >
             Explore the worlds ↓
           </a>
-          <Link
-            to="/archive"
-            className="px-2 py-2 text-sm font-semibold text-[var(--muted-strong)]"
-          >
+          <Link to="/archive" className="px-2 py-2 text-sm font-semibold text-(--muted-strong)">
             Skip to the Index →
           </Link>
         </motion.div>

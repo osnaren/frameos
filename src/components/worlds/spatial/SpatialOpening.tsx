@@ -535,7 +535,7 @@ export default function SpatialOpening({
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 [cursor:none]"
+      className="absolute inset-0 cursor-none"
       style={{ opacity: ready ? 1 : 0, transition: 'opacity 700ms ease' }}
     >
       <CanvasErrorBoundary>
@@ -570,7 +570,7 @@ export default function SpatialOpening({
       <FocusReticle containerRef={containerRef} engaged={focused !== null} />
 
       {/* World placard: the DOM voice of the canvas */}
-      <div className="pointer-events-none absolute right-8 bottom-16 z-10 hidden min-h-[92px] w-72 rounded-2xl bg-[color-mix(in_srgb,var(--bg)_58%,transparent)] p-4 text-right backdrop-blur-md lg:block">
+      <div className="pointer-events-none absolute right-8 bottom-16 z-10 hidden min-h-23 w-72 rounded-2xl bg-[color-mix(in_srgb,var(--bg)_58%,transparent)] p-4 text-right backdrop-blur-md lg:block">
         <AnimatePresence mode="wait">
           {focusedWorld ? (
             <motion.div
@@ -586,10 +586,10 @@ export default function SpatialOpening({
                 ).padStart(2, '0')}{' '}
                 / 05
               </p>
-              <p className="display-font m-0 mt-1 text-3xl font-light text-[var(--ink)]">
+              <p className="display-font m-0 mt-1 text-3xl font-light text-(--ink)">
                 {focusedWorld.name}
               </p>
-              <p className="display-italic m-0 mt-1 text-sm text-[var(--muted-strong)]">
+              <p className="display-italic m-0 mt-1 text-sm text-(--muted-strong)">
                 {focusedWorld.line}
               </p>
               <p className="mono-label m-0 mt-2">{flying ? 'entering…' : 'click to enter'}</p>

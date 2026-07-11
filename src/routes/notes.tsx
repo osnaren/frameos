@@ -71,7 +71,7 @@ function FieldNotesRoute() {
           Field Notes
         </motion.p>
         <motion.h1
-          className="display-font mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.05] font-light text-[var(--ink)]"
+          className="display-font mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.05] font-light text-(--ink)"
           variants={revealVariants(reducedMotion)}
         >
           {data.page.headline}
@@ -85,7 +85,7 @@ function FieldNotesRoute() {
           {crossing ? (
             <motion.div
               aria-hidden="true"
-              className="pointer-events-none absolute top-[14%] -left-16 -z-10 hidden w-[300px] opacity-[0.16] lg:block"
+              className="pointer-events-none absolute top-[14%] -left-16 -z-10 hidden w-75 opacity-[0.16] lg:block"
               style={reducedMotion ? undefined : { y: crossingY }}
             >
               <PhotoImage
@@ -99,25 +99,25 @@ function FieldNotesRoute() {
           ) : null}
 
           <motion.div variants={revealVariants(reducedMotion)}>
-            <div className="space-y-6 text-base leading-8 text-[var(--muted-strong)] lg:sticky lg:top-28">
+            <div className="space-y-6 text-base leading-8 text-(--muted-strong) lg:sticky lg:top-28">
               {data.page.body.map((paragraph) => (
                 <p key={paragraph.slice(0, 32)} className="m-0 max-w-prose">
                   {paragraph}
                 </p>
               ))}
 
-              <div className="border-t border-[var(--line)] pt-6">
+              <div className="border-t border-(--line) pt-6">
                 <p className="mono-label m-0">What tends to get noticed</p>
                 <ul className="mt-4 list-none space-y-2 p-0">
                   {NOTICING.map((item) => (
-                    <li key={item} className="display-italic text-lg text-[var(--muted-strong)]">
+                    <li key={item} className="display-italic text-lg text-(--muted-strong)">
                       — {item}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <p className="m-0 border-t border-[var(--line)] pt-6 text-sm leading-7 text-[var(--muted)]">
+              <p className="m-0 border-t border-(--line) pt-6 text-sm leading-7 text-(--muted)">
                 The archive runs on a small pipeline: photographs stay canonical in one place,
                 editorial words in another, and this site reads both. Portraits of people stay
                 unpublished until each person has said yes.
@@ -151,7 +151,7 @@ function FieldNotesRoute() {
                     <span className="mono-label shrink-0">
                       note {String(index + 1).padStart(2, '0')}
                     </span>
-                    <span className="display-italic text-base text-[var(--muted-strong)]">
+                    <span className="display-italic text-base text-(--muted-strong)">
                       {item.title}
                     </span>
                   </figcaption>
@@ -163,7 +163,7 @@ function FieldNotesRoute() {
 
         {/* Chapter close: a strip from the contact sheet */}
         <motion.div
-          className="mt-24 border-t border-[var(--line)] pt-8"
+          className="mt-24 border-t border-(--line) pt-8"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
@@ -171,10 +171,7 @@ function FieldNotesRoute() {
         >
           <div className="flex flex-wrap items-end justify-between gap-4">
             <p className="mono-label m-0">Contact sheet</p>
-            <Link
-              to="/archive"
-              className="px-2 py-2 text-sm font-semibold text-[var(--muted-strong)]"
-            >
+            <Link to="/archive" className="px-2 py-2 text-sm font-semibold text-(--muted-strong)">
               See every frame →
             </Link>
           </div>
@@ -210,13 +207,13 @@ function FieldNotesRoute() {
           <Link
             to="/"
             hash="worlds"
-            className="rounded-full bg-[var(--ink)] px-6 py-3.5 text-sm font-semibold text-[var(--bg)] no-underline"
+            className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline"
           >
             Step into the worlds
           </Link>
           <Link
             to="/signal"
-            className="rounded-full border border-[var(--line)] bg-[var(--panel)] px-6 py-3.5 text-sm font-semibold text-[var(--ink)] no-underline"
+            className="rounded-full border border-(--line) bg-(--panel) px-6 py-3.5 text-sm font-semibold text-(--ink) no-underline"
           >
             Send a signal
           </Link>

@@ -60,7 +60,7 @@ function CopyLinkButton({ canonicalUrl }: { canonicalUrl: string }) {
       onClick={() => {
         void navigator.clipboard.writeText(canonicalUrl).then(() => setCopied(true))
       }}
-      className="mono-label cursor-pointer rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 py-2 hover:border-[var(--accent)]"
+      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-4 py-2 hover:border-(--accent)"
     >
       {copied ? 'Link copied' : 'Copy link'}
     </button>
@@ -125,12 +125,12 @@ function PhotoDetailRoute() {
             <Link
               to="/worlds/$world"
               params={{ world: world.slug }}
-              className="mono-label no-underline hover:text-[var(--ink)]"
+              className="mono-label no-underline hover:text-(--ink)"
             >
               ← {world.name}
             </Link>
           ) : null}
-          <Link to="/archive" className="mono-label no-underline hover:text-[var(--ink)]">
+          <Link to="/archive" className="mono-label no-underline hover:text-(--ink)">
             Index
           </Link>
           {position >= 0 ? (
@@ -162,11 +162,11 @@ function PhotoDetailRoute() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: settleDelay, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="display-font text-3xl leading-tight font-light text-[var(--ink)] sm:text-4xl">
+            <h1 className="display-font text-3xl leading-tight font-light text-(--ink) sm:text-4xl">
               {photo.title}
             </h1>
             {photo.caption ? (
-              <p className="display-italic mt-3 text-lg leading-8 text-[var(--muted-strong)]">
+              <p className="display-italic mt-3 text-lg leading-8 text-(--muted-strong)">
                 {photo.caption}
               </p>
             ) : null}
@@ -199,7 +199,7 @@ function PhotoDetailRoute() {
 
         <motion.nav
           aria-label="Previous and next photographs"
-          className="mt-10 flex items-center justify-between gap-4 border-t border-[var(--line)] pt-6"
+          className="mt-10 flex items-center justify-between gap-4 border-t border-(--line) pt-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: settleDelay + 0.12 }}
@@ -208,7 +208,7 @@ function PhotoDetailRoute() {
             <Link
               to="/photos/$slug"
               params={{ slug: previousSlug }}
-              className="text-sm font-semibold text-[var(--muted-strong)] no-underline hover:text-[var(--ink)]"
+              className="text-sm font-semibold text-(--muted-strong) no-underline hover:text-(--ink)"
             >
               ← Previous
             </Link>
@@ -220,7 +220,7 @@ function PhotoDetailRoute() {
             <Link
               to="/photos/$slug"
               params={{ slug: nextSlug }}
-              className="text-sm font-semibold text-[var(--muted-strong)] no-underline hover:text-[var(--ink)]"
+              className="text-sm font-semibold text-(--muted-strong) no-underline hover:text-(--ink)"
             >
               Next →
             </Link>

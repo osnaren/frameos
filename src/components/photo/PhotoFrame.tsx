@@ -56,7 +56,7 @@ export function PhotoFrame({
           {frameNumber !== undefined ? (
             <span className="mono-label shrink-0">№ {String(frameNumber).padStart(2, '0')}</span>
           ) : null}
-          <span className="display-italic text-[1.05rem] leading-6 text-[var(--muted-strong)]">
+          <span className="display-italic text-[1.05rem] leading-6 text-(--muted-strong)">
             {photo.title}
           </span>
         </figcaption>

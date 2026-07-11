@@ -27,7 +27,7 @@ export function WorldPortal({
       <Link
         to="/worlds/$world"
         params={{ world: world.slug }}
-        className="pocket-frame group relative block h-full min-h-[280px] no-underline"
+        className="pocket-frame group relative block h-full min-h-70 no-underline"
         aria-label={`Enter ${world.name} — ${count} frames`}
       >
         {hero ? (
@@ -54,7 +54,7 @@ export function WorldPortal({
             </span>
             <span className="display-italic mt-1 text-sm text-white/80">{world.line}</span>
           </span>
-          <span className="mono-label shrink-0 !text-white/85">
+          <span className="mono-label shrink-0 text-white/85!">
             {String(count).padStart(2, '0')} frames
           </span>
         </span>

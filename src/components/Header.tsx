@@ -9,13 +9,13 @@ export default function Header() {
         <Link to="/" className="flex shrink-0 items-center gap-3 no-underline">
           <span
             aria-hidden="true"
-            className="flex h-9 w-7 items-center justify-center rounded-[5px] border-[1.5px] border-[var(--ink)] text-[0.6rem] font-semibold tracking-widest"
+            className="flex h-9 w-7 items-center justify-center rounded-[5px] border-[1.5px] border-(--ink) text-[0.6rem] font-semibold tracking-widest"
           >
             FO
           </span>
           <span className="flex flex-col leading-none">
             <span className="text-sm font-semibold tracking-[0.22em] uppercase">FrameOS</span>
-            <span className="mono-label mt-1 !text-[0.6rem]">Pocket Worlds</span>
+            <span className="mono-label mt-1 text-[0.6rem]!">Pocket Worlds</span>
           </span>
         </Link>
 
