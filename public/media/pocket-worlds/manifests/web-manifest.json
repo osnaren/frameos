@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "ready": false,
+  "architecture": "B",
+  "generatedAt": null,
+  "model": null,
+  "sections": [
+    {
+      "id": "wander",
+      "desktop": "/media/pocket-worlds/master/wander.mp4",
+      "mobile": "/media/pocket-worlds/mobile/wander.mp4",
+      "poster": "/media/pocket-worlds/posters/wander.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/wander-mobile.webp",
+      "still": "/media/pocket-worlds/stills/wander.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "sacred-geometry",
+      "desktop": "/media/pocket-worlds/master/sacred-geometry.mp4",
+      "mobile": "/media/pocket-worlds/mobile/sacred-geometry.mp4",
+      "poster": "/media/pocket-worlds/posters/sacred-geometry.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/sacred-geometry-mobile.webp",
+      "still": "/media/pocket-worlds/stills/sacred-geometry.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "small-wonders",
+      "desktop": "/media/pocket-worlds/master/small-wonders.mp4",
+      "mobile": "/media/pocket-worlds/mobile/small-wonders.mp4",
+      "poster": "/media/pocket-worlds/posters/small-wonders.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/small-wonders-mobile.webp",
+      "still": "/media/pocket-worlds/stills/small-wonders.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "living-things",
+      "desktop": "/media/pocket-worlds/master/living-things.mp4",
+      "mobile": "/media/pocket-worlds/mobile/living-things.mp4",
+      "poster": "/media/pocket-worlds/posters/living-things.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/living-things-mobile.webp",
+      "still": "/media/pocket-worlds/stills/living-things.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "table-notes",
+      "desktop": "/media/pocket-worlds/master/table-notes.mp4",
+      "mobile": "/media/pocket-worlds/mobile/table-notes.mp4",
+      "poster": "/media/pocket-worlds/posters/table-notes.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/table-notes-mobile.webp",
+      "still": "/media/pocket-worlds/stills/table-notes.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    }
+  ],
+  "connectors": [
+    {
+      "id": "wander-to-sacred-geometry",
+      "desktop": "/media/pocket-worlds/master/wander-to-sacred-geometry.mp4",
+      "mobile": "/media/pocket-worlds/mobile/wander-to-sacred-geometry.mp4",
+      "poster": "/media/pocket-worlds/posters/wander-to-sacred-geometry.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/wander-to-sacred-geometry-mobile.webp",
+      "still": "/media/pocket-worlds/stills/sacred-geometry.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "sacred-geometry-to-small-wonders",
+      "desktop": "/media/pocket-worlds/master/sacred-geometry-to-small-wonders.mp4",
+      "mobile": "/media/pocket-worlds/mobile/sacred-geometry-to-small-wonders.mp4",
+      "poster": "/media/pocket-worlds/posters/sacred-geometry-to-small-wonders.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/sacred-geometry-to-small-wonders-mobile.webp",
+      "still": "/media/pocket-worlds/stills/small-wonders.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "small-wonders-to-living-things",
+      "desktop": "/media/pocket-worlds/master/small-wonders-to-living-things.mp4",
+      "mobile": "/media/pocket-worlds/mobile/small-wonders-to-living-things.mp4",
+      "poster": "/media/pocket-worlds/posters/small-wonders-to-living-things.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/small-wonders-to-living-things-mobile.webp",
+      "still": "/media/pocket-worlds/stills/living-things.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    },
+    {
+      "id": "living-things-to-table-notes",
+      "desktop": "/media/pocket-worlds/master/living-things-to-table-notes.mp4",
+      "mobile": "/media/pocket-worlds/mobile/living-things-to-table-notes.mp4",
+      "poster": "/media/pocket-worlds/posters/living-things-to-table-notes.webp",
+      "mobilePoster": "/media/pocket-worlds/posters/living-things-to-table-notes-mobile.webp",
+      "still": "/media/pocket-worlds/stills/table-notes.webp",
+      "duration": null,
+      "desktopBytes": null,
+      "mobileBytes": null
+    }
+  ]
+}

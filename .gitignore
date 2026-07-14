@@ -15,6 +15,8 @@ dist-ssr
 .output
 .tanstack
 .codex-temp
+.playwright-cli/
+output/playwright/
 legacy-src/
 
 # Environment files
@@ -34,6 +36,6 @@ legacy-src/
 
 # Source photography originals (not served, not committed)
 photo-source/
+artifacts/pocket-worlds/
 w*.jpeg
-
 
