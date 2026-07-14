@@ -165,7 +165,7 @@ export function PocketOpeningVisuals({ photos }: { photos: Photo[] }) {
   )
 }
 
-export function OpeningHeadline() {
+export function OpeningHeadline({ onBegin }: { onBegin?: () => void }) {
   const reducedMotion = useReducedMotion()
 
   return (
@@ -186,18 +186,30 @@ export function OpeningHeadline() {
           className="mt-5 max-w-xl text-base leading-7 text-(--muted)"
           variants={revealVariants(reducedMotion)}
         >
-          Each photograph is a small world. Five of them are hanging just ahead.
+          {onBegin
+            ? 'Each photograph is a small world. The light begins at Wander — follow it.'
+            : 'Each photograph is a small world. Five of them are hanging just ahead.'}
         </motion.p>
         <motion.div
           className="pointer-events-auto mt-8 flex flex-wrap items-center gap-4"
           variants={revealVariants(reducedMotion)}
         >
-          <a
-            href="#worlds"
-            className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline hover:-translate-y-0.5"
-          >
-            Explore the worlds ↓
-          </a>
+          {onBegin ? (
+            <button
+              type="button"
+              onClick={onBegin}
+              className="cursor-pointer rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) hover:-translate-y-0.5"
+            >
+              Follow the light ↓
+            </button>
+          ) : (
+            <a
+              href="#worlds"
+              className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline hover:-translate-y-0.5"
+            >
+              Explore the worlds ↓
+            </a>
+          )}
           <Link to="/archive" className="px-2 py-2 text-sm font-semibold text-(--muted-strong)">
             Skip to the Index →
           </Link>

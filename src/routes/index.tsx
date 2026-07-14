@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useCallback, useRef } from 'react'
 
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -11,8 +11,8 @@ import { useExperienceTier } from '@/lib/capability'
 import { contactSheet, revealVariants } from '@/lib/motion'
 import { getGalleryFeedServer, getHomeViewServer } from '@/server/server-functions/portfolio'
 
-/** The WebGL runtime loads only on capable desktop devices, and only when this chunk is requested. */
-const SpatialOpening = lazy(() => import('@/components/worlds/spatial/SpatialOpening'))
+/** The WebGL journey loads only on capable devices, and only when this chunk is requested. */
+const WanderScene = lazy(() => import('@/components/worlds/spatial/wander/WanderScene'))
 
 export const Route = createFileRoute('/')({
   loader: async () => {
@@ -42,35 +42,61 @@ function HomeRoute() {
   const reducedMotion = useReducedMotion()
   const tier = useExperienceTier()
   const navigate = useNavigate()
-  const [inFlight, setInFlight] = useState(false)
+  const journeyRef = useRef<HTMLDivElement>(null)
   const photos = feed.items.map((item) => item.photo)
   const worlds = getPublicWorlds()
 
+  const enterWander = useCallback(() => {
+    void navigate({ to: '/worlds/$world', params: { world: 'wander' } })
+  }, [navigate])
+
+  const beginJourney = useCallback(() => {
+    const container = journeyRef.current
+    if (!container) {
+      return
+    }
+    const rect = container.getBoundingClientRect()
+    const containerTop = window.scrollY + rect.top
+    const scrollable = container.offsetHeight - window.innerHeight
+    window.scrollTo({ top: containerTop + scrollable * 0.78, behavior: 'smooth' })
+  }, [])
+
   return (
     <main>
-      <motion.section
-        aria-label="Pocket Worlds opening"
-        className="relative flex min-h-[92svh] flex-col justify-end overflow-hidden px-4 pb-14"
-        initial="hidden"
-        animate="visible"
-        variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
-      >
-        {tier === 'spatial' ? (
-          <Suspense fallback={null}>
-            <SpatialOpening
-              onEnterWorld={(slug) => {
-                void navigate({ to: '/worlds/$world', params: { world: slug } })
-              }}
-              onFlightChange={setInFlight}
-            />
-          </Suspense>
-        ) : (
+      {tier === 'animated' ? (
+        <motion.section
+          aria-label="Pocket Worlds opening"
+          className="relative flex min-h-[92svh] flex-col justify-end overflow-hidden px-4 pb-14"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
+        >
           <PocketOpeningVisuals photos={photos} />
-        )}
-        <div className="transition-opacity duration-500" style={{ opacity: inFlight ? 0 : 1 }}>
           <OpeningHeadline />
-        </div>
-      </motion.section>
+        </motion.section>
+      ) : (
+        <section aria-label="Pocket Worlds journey — follow the light">
+          <div ref={journeyRef} className="relative" style={{ height: '340svh' }}>
+            <div className="sticky top-0 h-svh overflow-hidden">
+              <Suspense fallback={null}>
+                <WanderScene
+                  containerRef={journeyRef}
+                  quality={tier === 'spatial' ? 'full' : 'lite'}
+                  onEnterWorld={enterWander}
+                >
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
+                  >
+                    <OpeningHeadline onBegin={beginJourney} />
+                  </motion.div>
+                </WanderScene>
+              </Suspense>
+            </div>
+          </div>
+        </section>
+      )}
 
       {feed.isDegraded || home?.isDegraded ? (
         <div className="page-shell px-4 pt-6">
@@ -80,13 +106,13 @@ function HomeRoute() {
         </div>
       ) : null}
 
-      <section id="worlds" aria-label="The worlds" className="px-4 pt-20 pb-10 sm:pt-28">
+      <section id="worlds" aria-label="The worlds" className="px-4 pt-20 pb-10 sm:pt-24">
         <div className="page-shell">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="mono-label">Five worlds · {photos.length} frames</p>
               <h2 className="display-font mt-3 text-4xl font-light text-(--ink) sm:text-5xl">
-                Pick a world to step into.
+                {tier === 'animated' ? 'Pick a world to step into.' : 'Or step straight in.'}
               </h2>
             </div>
             <Link to="/archive" className="px-2 py-2 text-sm font-semibold text-(--muted-strong)">
