@@ -1,271 +1,268 @@
 # FrameOS — Pocket Worlds
 
-Design and implementation reference for the public experience introduced in July 2026.
-For the data/caching architecture underneath it, see [new-arch.md](./new-arch.md) — that
-layer is unchanged by this redesign.
+Production reference for the video-based Pocket Worlds homepage introduced in July 2026.
+The server, cache, Sanity, Cloudinary, and publication architecture is unchanged; see
+[new-arch.md](./new-arch.md). The approved creative and generation brief remains in
+[video-pocket-worlds.md](./video-pocket-worlds.md).
 
-## Experience tiers (capability, not screen width)
+## Current status
 
-`src/lib/capability.ts` selects the tier from real signals:
+The TanStack Start integration, semantic fallback, stills journey, media manifest,
+scroll controller, and browser fallbacks are implemented. The public media manifest is
+intentionally marked `ready: false` until the paid generation gates are approved and the
+encoded production assets pass seam checks.
 
-| Tier       | Who gets it                                                                                    | What it is                                                                        |
-| ---------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `animated` | SSR default, mobile, coarse pointers, reduced motion, low memory, save-data, no WebGL          | The complete DOM experience (2.5D opening, world scenes, Index, view transitions) |
-| `spatial`  | Fine pointer + ≥1024px + WebGL + no reduced-motion/save-data + ≥4GB device memory (when known) | Adds the WebGL opening constellation on `/`                                       |
+The former WebGL homepage is no longer routed. Its source and Three/R3F dependencies are
+temporarily retained until the production video chain is generated and visually approved;
+they can then be removed without risking the working editorial fallback.
 
-The canvas is always an enhancement: it is lazily chunked (~900 KB raw, loaded only
-at this tier), wrapped in an error boundary that renders nothing on failure, and
-`aria-hidden` — keyboard/screen-reader world selection is the DOM portal grid below
-the fold. If the canvas never mounts, the page is complete.
+No placeholder video is shipped. When the production manifest is not ready, visitors get
+the authored stills journey made from the original FrameOS photography.
 
-## The homepage journey — FOLLOW THE LIGHT (July 2026 direction)
+## Creative identity
 
-The homepage is a scroll-driven WebGL fly-through of miniature Pocket Worlds
-connected by a thread of captured light. The current build is the **Wander
-vertical slice** (`src/components/worlds/spatial/wander/`): one
-production-quality world that establishes the visual language and the
-technical system before the remaining four worlds are built with the same
-vocabulary.
+**FrameOS — Pocket Worlds**
 
-**The diorama** (`WanderWorld.tsx` + `terrain.ts`) is authored, not random:
-a sculpted heightfield island with vertex-colored sand/grass/rock (strata
-bands on the cliff walls), a lagoon bay biting into the front edge with foam
-rolling toward the beach, an elevated plateau with a waterfall falling into a
-mist-puffed pool, blob-canopy trees that sway in the wind (kept clear of the
-route by the scatter algorithm), drifting clouds, hazy distant landforms, and
-one restrained aircraft pass. The **light route** is a tube shader embedded
-in the terrain — lit up to the camera's progress, a faint promise beyond —
-ending at a small weathered stone portal on the headland where the sea
-photograph waits inside the arch. Photographs enter the world as portal
-surfaces; the world stands without them.
+> Things I noticed, photographed on a phone.
 
-**Scroll & camera** (`WanderScene.tsx`): one scroll value drives a keyframed
-camera spline — wide establishing view (DOM identity block in the mist to the
-left), an approach along the coast, a held composition at the portal (the
-accessible DOM placard appears with a real Enter link), then a gentle pull
-away that hands off to the world grid below. Camera parameter and DOM state
-are damped per frame; there is no scroll snapping. Entering the world flies
-the camera through the arch into the photograph, then routes to
-`/worlds/wander`, whose full-bleed sea hero continues the image.
+The homepage is one journey through five worlds connected by captured light. The light is
+sunlight made navigable: photographic exposure, visitor progress, and continuity between
+different acts of noticing. It must never look like a neon laser or generic interface glow.
 
-**Tiers** (`capability.ts`): `spatial` (desktop: shadows, DPR ≤1.75, full
-scatter) → `spatial-lite` (touch/moderate devices: no shadows, DPR ≤1.5,
-fewer trees/clouds, its own top-down-leaning camera keyframes and a
-full-width touch panel) → `animated` (reduced-motion/save-data/no-WebGL/low
-memory: the complete DOM opening). The ~900 KB three.js runtime is one lazy
-chunk loaded only on spatial tiers; rendering pauses via IntersectionObserver
-and visibilitychange; procedural textures/geometries are disposed on unmount.
+This remains a personal mobile-photography archive, not a photography-services website.
+Copy is minimal, observational, and honest. Locations, dates, equipment, and stories are
+never invented.
 
-Extending to the remaining four worlds = new `terrain.ts` landmark sets +
-diorama props per world, same scene shell, camera-key, and portal system.
+## Journey order
 
-## The former spatial opening (superseded)
+| Order | World           | Public route              | Homepage line                            |
+| ----- | --------------- | ------------------------- | ---------------------------------------- |
+| 01    | Wander          | `/worlds/wander`          | Places passed through, horizons kept.    |
+| 02    | Sacred Geometry | `/worlds/sacred-geometry` | Stone, sky, ritual, and repetition.      |
+| 03    | Small Wonders   | `/worlds/small-wonders`   | The closer you look, the larger it gets. |
+| 04    | Living Things   | `/worlds/living-things`   | Company that chooses its own distance.   |
+| 05    | Table Notes     | `/worlds/at-the-table`    | Meals worth interrupting.                |
 
-One continuous ~4s timeline, never blocking the DOM (headline and actions render
-immediately; the canvas fades in when its six textures are ready):
+`at-the-table` remains the internal route slug for compatibility; the public name is
+**Table Notes**. The hidden People world is excluded from every public journey and remains
+draft-only until consent is confirmed.
 
-1. Six torn fragments of “Leaf, After Rain” hang scattered in depth.
-2. They align into the complete photograph, which separates into subtle depth
-   layers answering the pointer.
-3. The camera pulls back; the assembled leaf travels into place as the Small
-   Wonders entrance while the other four world photographs arrive from depth —
-   a constellation of mounted prints (each has an ivory matte plane behind it).
-4. Focusing a world tints the scene background and fog toward that world's
-   measured mood (wash in light theme, deep in dark), advances the print, dims
-   the others, and drifts the camera; a DOM placard names the world.
-5. Clicking flies the camera into the photograph, fades the headline, then the
-   route changes to that world (whose header carries the same wash → continuity).
+## Visual generation language
 
-Composition rules: lower-left is reserved negative space for the DOM headline;
-the sea horizon runs low across center; towers rise right; the parakeet hangs
-deepest in the upper shade at slightly reduced opacity.
+The following style preamble is reused byte-for-byte for every world still:
 
-Engineering guarantees:
+> An ultra-detailed cinematic miniature diorama belonging to one continuous dreamlike
+> Pocket Worlds landscape. Handcrafted architectural scale-model realism with organic
+> terrain, realistic water, refined vegetation, tactile natural materials, premium
+> tilt-shift depth, soft atmospheric perspective, warm sunlight diffused through pale
+> ivory mist, delicate clouds, soft long shadows, editorial photography quality, poetic
+> and believable rather than toy-like. Cohesive palette of warm ivory #F5F0E6, mist blue
+> #BCD6E7, ocean teal #4F9EA8, leaf green #4F6F45, temple terracotta #9A553C, charcoal
+> #192432, and captured-light gold #FFD58A. No text, no letters, no captions, no logos,
+> no picture frames, no floating photo billboards, no generic low-poly clay look, no
+> glossy plastic toy look, no neon science-fiction styling.
 
-- intro plays once per session (module flag); back-navigation resumes directly
-  in the constellation with the camera already pulled back;
-- `frameloop` switches to `never` via IntersectionObserver + visibilitychange
-  when the section is offscreen or the tab is hidden;
-- textures are 768px local WebP variants (`getLocalVariantUrl`), sRGB, anisotropy 4;
-- DPR capped at 1.75; no post-processing, no lights (photos are unlit basic materials);
-- tile geometries are custom-UV planes over ONE shared texture (no duplicated uploads),
-  disposed on unmount; R3F auto-disposes the rest;
-- a focus-reticle cursor exists only inside the canvas section on fine pointers
-  (native cursor hidden there only), and never replaces DOM focus states.
+Every composition is full, terrain-led, centre-safe, and built for `object-fit: cover`.
+The five worlds share material language, light direction, world scale, and atmosphere but
+remain locally distinct.
 
-Measured on the dev build (Chromium, Intel Arc, 1360×850): the constellation
-renders with a frame budget far below 16ms (~240 rAF/s uncapped), JS heap ~44 MB.
-The spatial chunk is not requested at all on mobile/reduced-motion/fallback tiers.
+## Source photography
 
-## Creative intent
+Only the bundled FrameOS photography is used as the artistic source:
 
-**"Things I noticed, photographed on a phone."**
+- Wander: `the-sea`, `the-waterfall`, `passing-overhead`;
+- Sacred Geometry: `tower-and-sky`, `white-tower`, `the-chariot`;
+- Small Wonders: `leaf-after-rain`, `rain-on-the-street`, `yellow-flowers`, `cosmos`,
+  `tomatoes-on-the-vine`;
+- Living Things: `parakeet`, `the-cat`, `grazing`;
+- Table Notes: `banana-leaf-meal`, `paneer-skewers`, `toasted`, `small-plate`.
 
-The portfolio is a personal artistic space, not a client-acquisition site. Mobile-only
-photography is the premise, never an apology: the phone is the camera that is present
-when something worth noticing happens. Each photograph is treated as a small world the
-visitor can step into; the site is the act of noticing, made navigable.
+Source photographs remain photographs in the collection routes. Generated media is only
+the homepage's cinematic connective tissue.
 
-The recurring signature element is the **pocket frame** — a small rounded viewfinder
-frame (`.pocket-frame` + `.frame-corners` focus marks) that carries every photograph:
-the opening anchor, the drifting fragments, world portals, contact-sheet cells, and the
-detail view. Ambient color always derives from the photographs themselves (measured
-palettes in the manifest, world moods chosen from them), never from decoration.
+## Camera architecture
 
-Copy rules: minimal, poetic, honest. No invented locations, dates, equipment, or
-stories. Photography clichés ("capturing timeless moments" etc.) are banned.
+Architecture B is the first production target because this is a god's-eye miniature world:
 
-## World structure
+1. one dive clip per world;
+2. one connector between each neighbouring pair;
+3. connector start = the preceding dive's actual rendered last frame;
+4. connector end = the following dive's actual rendered first frame;
+5. a small crossfade is used only as encoding insurance.
 
-Six worlds, defined in `src/content/worlds.ts`:
+The low-cost frame-locked previz must be approved before final rendering. If the aerial
+pull-out creates rewind-like velocity reversal, production switches to architecture A:
+five forward legs, each beginning on the previous leg's actual final frame and ending in a
+slow forward drift. The web manifest supports both architectures.
 
-| World           | Slug              | Signature | Frames | Hero                         |
-| --------------- | ----------------- | --------- | ------ | ---------------------------- |
-| Wander          | `wander`          | `drift`   | 3      | Where the Sea Keeps Going    |
-| Sacred Geometry | `sacred-geometry` | `rise`    | 3      | Tower Against a Restless Sky |
-| Small Wonders   | `small-wonders`   | `macro`   | 5      | Leaf, After Rain             |
-| Living Things   | `living-things`   | `quiet`   | 3      | Parakeet in the Dark Canopy  |
-| At the Table    | `at-the-table`    | `gather`  | 4      | On a Banana Leaf             |
-| People          | `people`          | `quiet`   | 2      | — hidden                     |
+Planned model stack:
 
-Worlds are deliberately small (3–5 frames): a short strong vignette instead of an
-underfilled gallery. **People is hidden**: its photos are `status: 'draft'` in the
-content module, so the repository's existing fail-closed publication guards exclude
-them from every feed, route, and sitemap surface. The asset pipeline additionally
-generates **no public image files** for hidden photos, so nothing is fetchable even by
-URL guessing. To publish later: flip `hidden` in `scripts/build-photo-assets.mjs` and
-`src/content/worlds.ts`, re-run the pipeline, and confirm permission first.
+- stills: `gpt_image_2`, 2K, high quality, 16:9;
+- previz: `seedance_2_0_mini`, 720p, audio disabled;
+- final: `seedance_2_0`, standard mode, 1080p high-bitrate, audio disabled;
+- isolated fallback only: `kling3_0`, when filtering blocks a required clip.
 
-## Motion principles
+## Generation runbook and approval gates
 
-One vocabulary, defined in `src/lib/motion.ts`, drawn from photographic behaviour:
+The generator is deliberately unable to spend through a missing approval switch. The
+current live estimate is 725 credits for one clean pass: 35 for five 2K stills, 150 for
+the complete 720p previz, and 540 for the 1080p finals. Keep 870–943 credits available
+for a 20–30% re-roll reserve; 950 is the practical working ceiling.
 
-- `focusEase` `[0.16, 1, 0.3, 1]` — the settle of a focus pull; used everywhere.
-- Reveals resolve from soft blur to sharp (`focusIn`), like an image finding focus.
-- Staggering (`contactSheet`) sequences frames like a contact sheet.
-- Motion is intentional, reversible, and stops: `viewport={{ once: true }}` everywhere,
-  no ambient loops, no scroll hijacking.
+```powershell
+# Free and safe to repeat.
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Estimate
 
-Each world scene (`src/components/worlds/WorldScene.tsx`) applies exactly one or two
-signature ideas:
+# Gate 1: only after the total spend ceiling is approved.
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Anchor -ApproveSpend
 
-- **drift** (Wander): the sea hero expands from a contained frame to full-bleed as you
-  scroll toward it — the horizon becomes the environment. Remaining frames drift in
-  from alternating sides with wide negative space.
-- **rise** (Sacred Geometry): a single centered column with a vertical hairline; every
-  frame rises monumentally into place.
-- **macro** (Small Wonders): every frame arrives out of focus and slightly enlarged,
-  then resolves — a focus pull. Sizes alternate to create scale shifts.
-- **quiet** (Living Things): the page itself darkens into a deep-forest passage; frames
-  fade in very slowly with generous stillness. The one deliberately dark section of an
-  otherwise bright site.
-- **gather** (At the Table): a warm clustered arrangement with slight rotations and
-  tactile shadows.
+# Gate 2: only after the rendered Wander anchor is visually approved.
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Stills -ApproveSpend -ApproveAnchor
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Draft -ApproveSpend -ApproveAnchor
 
-Reduced motion: every variant has a fade-only replacement (`revealVariants`), the
-pointer-parallax hook goes inert, and a global CSS `prefers-reduced-motion` rule
-collapses all remaining animation to fades. Content and navigation are unaffected.
+# Gate 3: only after the complete low-cost previz is visually approved.
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Final -ApproveSpend -ApproveDraft
 
-## Route behaviour
+# Local processing spends no generation credits.
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Encode
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Verify
 
-| Route                            | Purpose                                             | Data                                    |
-| -------------------------------- | --------------------------------------------------- | --------------------------------------- |
-| `/`                              | Opening constellation + world portals               | home view + full gallery feed           |
-| `/worlds/$world`                 | One world's scene                                   | gallery feed filtered by `category`     |
-| `/photos/$slug`                  | Photo detail (stable, shareable)                    | photo detail + world feed for prev/next |
-| `/archive`                       | The Index: contact-sheet archive, `?world=` filter  | gallery feed                            |
-| `/notes`                         | Field Notes (about)                                 | about view                              |
-| `/signal`                        | Signal (contact)                                    | contact view                            |
-| `/gallery`, `/about`, `/contact` | Legacy redirects to `/archive`, `/notes`, `/signal` | —                                       |
+# This final command can unlock video mode only when every SSIM check passes.
+./scripts/pocket-worlds/generate-assets.ps1 -Phase Verify -ApproveVisual
+```
 
-Photo slugs are clean ids (`/photos/leaf-after-rain`); the provider's slug lookup
-falls back to exact slug matching, so no encoded slugs are needed for local photos.
-Shared-element continuity between scene/index and detail uses the **View Transitions
-API** (`defaultViewTransition: true` in the router + per-photo `view-transition-name`);
-browsers without support get a normal instant navigation. The immersive layer never
-traps anyone: the opening carries a permanent "Skip to the Index" link, every scene
-links to the Index, and all content is reachable by keyboard.
+Each paid phase is idempotent: existing successful outputs are skipped. Approval of a
+switch is a human review decision, not a way to bypass a failed asset or quality check.
 
-## Content pipeline
+## Media contract
 
-- Source originals live in `photo-source/` (gitignored, never served — this also
-  protects unpublished portraits from being fetchable).
-- `node scripts/build-photo-assets.mjs` (requires the `sharp` devDependency) generates:
-  - responsive WebP variants at 320/480/768/1024/1440(+native) widths under
-    `public/photos/<id>/w<width>.webp` (~12 MB total for 18 photos),
-  - a 24px inline blur placeholder per photo,
-  - a measured 5-swatch palette per photo,
-  - `src/content/photo-manifest.json` (generated — do not hand-edit).
-- `src/content/worlds.ts` holds the editorial layer (titles, alt, captions, ordering,
-  world moods) and builds `Photo` domain records from the manifest.
-- **Local archive mode**: when Cloudinary/Sanity credentials are absent (any
-  environment), the providers serve this bundled curated set through the existing
-  repository contract. When credentials exist, Cloudinary/Sanity become canonical again
-  and this module is ignored. Publication guards, caching, and webhooks are untouched.
-- `PhotoImage` (`src/components/photo/PhotoImage.tsx`) is the single rendering path:
-  `local/<id>` publicIds resolve to bundled variants; anything else flows through the
-  Cloudinary image policy. No component may render a raw image URL.
+The runtime reads:
 
-## Visual system
+`/media/pocket-worlds/manifests/web-manifest.json`
 
-- Base: bright warm ivory (`#f8f5ee`) with a pale mist cast; charcoal ink; restrained
-  grain overlay. **The default theme is light** — the bright adaptive-surreal
-  direction is the artwork's home key. Dark is an explicit visitor choice (or
-  stored auto mode); the toggle shows current state (○ Light / ● Dark / ◐ Auto)
-  with the next action in its label. Darkness also appears deliberately inside
-  the experience (Living Things' forest passage, dark-theme night gallery).
-- World moods (`--world-wash/--world-deep/--world-accent`) tint scenes; wash strength
-  is theme-aware (`--wash-strength`: 80% light, 16% dark) so pale washes never fight
-  dark-mode text.
-- Type: **Fraunces** (variable, optical sizes; italic for captions and world lines) for
-  the editorial voice; **IBM Plex Sans** for UI; **IBM Plex Mono** for the photographic
-  interface layer (frame numbers `№ 03`, counters, filters, breadcrumbs).
-- Photographic interface references stay subtle: focus-mark corners on hover/focus,
-  frame counters, contact-sheet labels. The interface is not a fake camera UI.
+It does not request video unless that manifest is valid, complete, and `ready: true`.
+Expected layout:
 
-## Accessibility
+```text
+public/media/pocket-worlds/
+  master/      # native final H.264 clips
+  mobile/      # 720p, tighter-GOP phone clips
+  posters/     # desktop and mobile posters extracted from their encoded clips
+  stills/      # generated scene stills and fallback frames
+  manifests/   # runtime manifest and verification results
+```
 
-- Semantic landmarks (`main`, `nav` with labels, `figure`/`figcaption`, `dl` metadata).
-- Full keyboard access: visible focus rings (`:focus-visible` uses the world accent),
-  arrow-key prev/next on photo detail, arrow-key roving on the Index sheet.
-- Alt text is authored per photo in the content module and required by the publication
-  guard (photos without alt cannot publish — pre-existing rule, kept).
-- Reduced motion handled at three levels (variants, hook, global CSS).
-- No hover-only essentials, no autoplay audio, no scroll hijacking.
+Raw generations and intermediate boundary frames belong under the gitignored
+`artifacts/pocket-worlds/`, never loose in `public/`.
 
-## Performance strategy
+## Encoding rules
 
-- No WebGL in v1 — a deliberate boundary. The spatial feel comes from CSS depth,
-  blur-as-depth-of-field, pointer parallax, and scroll-linked transforms, which work on
-  every device and cost nothing when idle. If a future world genuinely needs shader
-  work (e.g. rain refraction), add it as an optional enhancement layer behind a
-  capability check; never render primary content in a canvas.
-- Images: responsive `srcset` + `sizes` on every photo, lazy loading below the fold,
-  eager + `fetchpriority=high` for heroes, inline blur placeholders, intrinsic
-  width/height everywhere (no layout shift).
-- Animations run once per element (`once: true`) and are driven by
-  IntersectionObserver via framer-motion; the parallax listener is passive and single.
-- SSR delivers full readable content (verified via curl — headline, captions, and meta
-  present in initial HTML).
+Desktop/master clips:
 
-## Technical boundaries
+- retain native resolution;
+- H.264, `yuv420p`, CRF 20, slow preset;
+- GOP 8, minimum keyframe interval 8, scene-cut keyframes disabled;
+- no audio;
+- `faststart` enabled;
+- restrained sharpening only when the source requires it.
 
-- UI consumes repository outputs (server functions) only — unchanged.
-- The presentation layer may import `src/content/worlds.ts` for world definitions and
-  moods (static editorial config, equivalent to code).
-- `framer-motion` + View Transitions API are the only animation systems. Do not add
-  GSAP/Three/etc. without removing something.
-- Every photograph renders through `PhotoImage`.
-- Portraits stay unpublished until permission is confirmed (see World structure).
+Phone clips:
 
-## Known limitations / future work
+- 720p derived from the final master;
+- CRF 23;
+- GOP 4, minimum keyframe interval 4;
+- no audio and `faststart` enabled;
+- no separate portrait generation unless a centre crop is demonstrably unusable and the
+  extra spend is separately approved.
 
-- Cloudinary/Sanity credentials are not configured locally; live-CMS mode is untested
-  against real accounts (the provider code paths are unchanged from the previous
-  verified architecture).
-- View-transition morphs are Chromium/Safari only; Firefox falls back to instant
-  navigation by design.
-- The legacy `CloudinaryImage` component and `PhotoCard`/`PhotoMasonry` remain for
-  reference but are no longer routed; remove once the new system is considered stable.
-- `/loop`-style device-tilt response on mobile was consciously skipped (permission
-  prompts outweigh the payoff at this archive size).
+Posters are extracted from the encoded files themselves. Poster-to-first-frame SSIM and
+every video seam are machine-checked after encoding.
+
+## Runtime ownership
+
+The homepage responsibilities are intentionally separated:
+
+- `src/content/pocket-worlds-journey.ts` — typed editorial journey and source fallbacks;
+- `PocketWorldsExperience.tsx` — SSR editorial floor and client-only upgrade boundary;
+- `PocketWorldsCinematic.tsx` — scroll mapping, media lifecycle, copy phases, and route rail;
+- `src/lib/pocket-world-media.ts` — strict runtime manifest contract;
+- `public/media/pocket-worlds/manifests/web-manifest.json` — deploy-time media readiness.
+
+The controller adapts the hardened `scroll-world` mechanics to React ownership:
+
+- raw scroll progress stays in refs and direct DOM updates;
+- React state changes only for active segment, active world, and copy phase;
+- clips are fetched as blobs for reliable in-memory seeking;
+- only current, previous, connector/next, and next-world segments are prefetched;
+- mobile seeks are coalesced while the decoder is busy;
+- muted videos are primed on first touch for iOS;
+- rejected playback falls back to stills without an error screen;
+- listeners, animation frames, fetches, videos, and object URLs are released on unmount;
+- homepage progress is restored after world-route back navigation.
+
+## Progressive enhancement
+
+### Basic DOM
+
+The server response contains one H1, five world H2s, all world summaries, and real links
+to every world, the Index, Field Notes, and Signal. JavaScript is not required for
+understanding or navigation.
+
+### Stills journey
+
+Used for reduced motion, data saver, slow connections, constrained memory, missing or
+invalid media manifests, video fetch failure, and rejected playback. It keeps the same
+scroll journey, copy, route rail, and CTAs but uses responsive source photographs with
+gentle crossfades. No MP4 is requested in these modes.
+
+### Cinematic journey
+
+Used only when motion is allowed, device/network signals are adequate, and the production
+manifest is ready. It prefetches the opening scene, next connector, and next world rather
+than downloading the complete chain. Tablets use master media when their viewport is wide
+enough; phones use the tighter-GOP mobile files.
+
+## Accessibility and navigation
+
+- semantic copy and real TanStack Router links remain DOM-owned;
+- inactive cinematic copy is removed from the tab order and accessibility tree;
+- route-rail controls have labels and `aria-current` state;
+- focus styles remain visible over every scene;
+- audio is absent from the final files and videos are always muted;
+- the Index is available in both the global header and cinematic chrome;
+- browser back/forward and direct world refresh remain standard routing operations;
+- the light journey pins a surface but never prevents ordinary browser scrolling.
+
+## SEO
+
+The SSR homepage contains the full editorial floor before hydration. The cinematic layer
+does not own metadata, routing, or headings until it replaces the fallback after hydration.
+The canonical title and description continue to come from the home view. Hidden portraits
+remain excluded by the existing publication guards.
+
+## Verification status
+
+Completed against the local stills and synthetic media harness:
+
+- desktop, phone, and responsive sticky-layout inspection;
+- fast forward and reverse scrolling;
+- all active-world CTA navigation;
+- browser back/forward with progress restoration;
+- direct world routes;
+- reduced-motion selection with zero MP4 requests;
+- data-saver selection with zero manifest or MP4 requests;
+- blob-backed video load and scroll-to-`currentTime` tracking;
+- opening prefetch limited to three adjacent clips;
+- simulated iOS Low Power Mode playback rejection and clean stills fallback;
+- TypeScript, ESLint, unit tests, and production build checks.
+
+Production SSIM values, clip durations, file sizes, generation IDs, spend, re-roll counts,
+and final device recordings remain intentionally blank until approved media is generated.
+The manifest must not be changed to `ready: true` before those checks pass.
+
+## Removal boundary
+
+After production media and fallbacks are visually verified, remove the obsolete
+`src/components/worlds/spatial/` tree, `src/lib/capability.ts`, and unused Three/R3F
+dependencies. Do not remove publication guards, world routes, photo detail pages, Index,
+Field Notes, Signal, responsive image infrastructure, or the editorial fallback.
