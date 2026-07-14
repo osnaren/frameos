@@ -18,7 +18,48 @@ at this tier), wrapped in an error boundary that renders nothing on failure, and
 `aria-hidden` — keyboard/screen-reader world selection is the DOM portal grid below
 the fold. If the canvas never mounts, the page is complete.
 
-## The spatial opening (`src/components/worlds/spatial/SpatialOpening.tsx`)
+## The homepage journey — FOLLOW THE LIGHT (July 2026 direction)
+
+The homepage is a scroll-driven WebGL fly-through of miniature Pocket Worlds
+connected by a thread of captured light. The current build is the **Wander
+vertical slice** (`src/components/worlds/spatial/wander/`): one
+production-quality world that establishes the visual language and the
+technical system before the remaining four worlds are built with the same
+vocabulary.
+
+**The diorama** (`WanderWorld.tsx` + `terrain.ts`) is authored, not random:
+a sculpted heightfield island with vertex-colored sand/grass/rock (strata
+bands on the cliff walls), a lagoon bay biting into the front edge with foam
+rolling toward the beach, an elevated plateau with a waterfall falling into a
+mist-puffed pool, blob-canopy trees that sway in the wind (kept clear of the
+route by the scatter algorithm), drifting clouds, hazy distant landforms, and
+one restrained aircraft pass. The **light route** is a tube shader embedded
+in the terrain — lit up to the camera's progress, a faint promise beyond —
+ending at a small weathered stone portal on the headland where the sea
+photograph waits inside the arch. Photographs enter the world as portal
+surfaces; the world stands without them.
+
+**Scroll & camera** (`WanderScene.tsx`): one scroll value drives a keyframed
+camera spline — wide establishing view (DOM identity block in the mist to the
+left), an approach along the coast, a held composition at the portal (the
+accessible DOM placard appears with a real Enter link), then a gentle pull
+away that hands off to the world grid below. Camera parameter and DOM state
+are damped per frame; there is no scroll snapping. Entering the world flies
+the camera through the arch into the photograph, then routes to
+`/worlds/wander`, whose full-bleed sea hero continues the image.
+
+**Tiers** (`capability.ts`): `spatial` (desktop: shadows, DPR ≤1.75, full
+scatter) → `spatial-lite` (touch/moderate devices: no shadows, DPR ≤1.5,
+fewer trees/clouds, its own top-down-leaning camera keyframes and a
+full-width touch panel) → `animated` (reduced-motion/save-data/no-WebGL/low
+memory: the complete DOM opening). The ~900 KB three.js runtime is one lazy
+chunk loaded only on spatial tiers; rendering pauses via IntersectionObserver
+and visibilitychange; procedural textures/geometries are disposed on unmount.
+
+Extending to the remaining four worlds = new `terrain.ts` landmark sets +
+diorama props per world, same scene shell, camera-key, and portal system.
+
+## The former spatial opening (superseded)
 
 One continuous ~4s timeline, never blocking the DOM (headline and actions render
 immediately; the canvas fades in when its six textures are ready):
