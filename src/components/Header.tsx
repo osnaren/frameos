@@ -19,7 +19,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="order-3 flex w-full flex-wrap gap-x-6 gap-y-1 text-[0.8rem] font-semibold tracking-[0.16em] uppercase sm:order-2 sm:ml-auto sm:w-auto">
+        <div className="order-3 flex w-full flex-wrap gap-x-6 gap-y-1 text-[0.8rem] font-semibold tracking-[0.16em] uppercase max-[520px]:flex-nowrap max-[520px]:gap-x-4 max-[520px]:text-[0.7rem] max-[520px]:tracking-[0.12em] sm:order-2 sm:ml-auto sm:w-auto">
           <Link
             to="/"
             className="site-nav-link"

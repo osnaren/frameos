@@ -62,7 +62,7 @@ export const worlds: WorldDefinition[] = [
   {
     slug: 'sacred-geometry',
     name: 'Sacred Geometry',
-    line: 'Stone that was taught to climb.',
+    line: 'Stone, sky, ritual, and repetition.',
     signature: 'rise',
     mood: { wash: '#e4ebf4', deep: '#0e2334', accent: '#2c5c9c' },
     heroId: 'tower-and-sky',
@@ -78,14 +78,14 @@ export const worlds: WorldDefinition[] = [
   {
     slug: 'living-things',
     name: 'Living Things',
-    line: 'Company that owes you nothing.',
+    line: 'Company that chooses its own distance.',
     signature: 'quiet',
     mood: { wash: '#e7eee7', deep: '#122019', accent: '#2f5d43' },
     heroId: 'parakeet',
   },
   {
     slug: 'at-the-table',
-    name: 'At the Table',
+    name: 'Table Notes',
     line: 'Meals worth interrupting.',
     signature: 'gather',
     mood: { wash: '#f4ead9', deep: '#33210f', accent: '#b05c2a' },
