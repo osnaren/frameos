@@ -39,3 +39,8 @@ photo-source/
 artifacts/pocket-worlds/
 w*.jpeg
 
+# Google Flow exports and extracted continuity frames are local production inputs.
+media-production/pocket-worlds-flow/outputs/*.mp4
+media-production/pocket-worlds-flow/handoffs/*.png
+!media-production/pocket-worlds-flow/outputs/.gitkeep
+!media-production/pocket-worlds-flow/handoffs/.gitkeep
