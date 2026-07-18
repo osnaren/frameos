@@ -33,10 +33,10 @@ export const pocketWorldJourney = [
     copySide: 'left',
     scrollWeight: 1.65,
     linger: 0.3,
-    fallbackImage: '/photos/the-sea/w1440.webp',
+    fallbackImage: '/media/pocket-worlds/keyframes/01-wander-1664.webp',
     fallbackSrcSet:
-      '/photos/the-sea/w768.webp 768w, /photos/the-sea/w1024.webp 1024w, /photos/the-sea/w1440.webp 1440w, /photos/the-sea/w2048.webp 2048w',
-    fallbackAlt: 'Waves breaking beneath a pale sky and an open horizon.',
+      '/media/pocket-worlds/keyframes/01-wander-768.webp 768w, /media/pocket-worlds/keyframes/01-wander-1280.webp 1280w, /media/pocket-worlds/keyframes/01-wander-1664.webp 1664w',
+    fallbackAlt: 'A luminous miniature coast leading through waterfalls toward distant worlds.',
   },
   {
     id: 'sacred-geometry',
@@ -50,10 +50,10 @@ export const pocketWorldJourney = [
     copySide: 'right',
     scrollWeight: 1.42,
     linger: 0.22,
-    fallbackImage: '/photos/tower-and-sky/w1440.webp',
+    fallbackImage: '/media/pocket-worlds/keyframes/02-sacred-geometry-1664.webp',
     fallbackSrcSet:
-      '/photos/tower-and-sky/w768.webp 768w, /photos/tower-and-sky/w1024.webp 1024w, /photos/tower-and-sky/w1440.webp 1440w, /photos/tower-and-sky/w1469.webp 1469w',
-    fallbackAlt: 'A carved temple tower rising beneath a streaked sky.',
+      '/media/pocket-worlds/keyframes/02-sacred-geometry-768.webp 768w, /media/pocket-worlds/keyframes/02-sacred-geometry-1280.webp 1280w, /media/pocket-worlds/keyframes/02-sacred-geometry-1664.webp 1664w',
+    fallbackAlt: 'A golden route climbing through a monumental miniature temple landscape.',
   },
   {
     id: 'small-wonders',
@@ -67,10 +67,10 @@ export const pocketWorldJourney = [
     copySide: 'left',
     scrollWeight: 1.5,
     linger: 0.34,
-    fallbackImage: '/photos/leaf-after-rain/w1440.webp',
+    fallbackImage: '/media/pocket-worlds/keyframes/03-small-wonders-1664.webp',
     fallbackSrcSet:
-      '/photos/leaf-after-rain/w768.webp 768w, /photos/leaf-after-rain/w1024.webp 1024w, /photos/leaf-after-rain/w1440.webp 1440w, /photos/leaf-after-rain/w1469.webp 1469w',
-    fallbackAlt: 'A heart-shaped leaf holding round droplets after rain.',
+      '/media/pocket-worlds/keyframes/03-small-wonders-768.webp 768w, /media/pocket-worlds/keyframes/03-small-wonders-1280.webp 1280w, /media/pocket-worlds/keyframes/03-small-wonders-1664.webp 1664w',
+    fallbackAlt: 'A dew-covered leaf world where a golden path refracts through a giant droplet.',
   },
   {
     id: 'living-things',
@@ -84,10 +84,10 @@ export const pocketWorldJourney = [
     copySide: 'right',
     scrollWeight: 1.46,
     linger: 0.38,
-    fallbackImage: '/photos/parakeet/w1440.webp',
+    fallbackImage: '/media/pocket-worlds/keyframes/04-living-things-1664.webp',
     fallbackSrcSet:
-      '/photos/parakeet/w768.webp 768w, /photos/parakeet/w1024.webp 1024w, /photos/parakeet/w1440.webp 1440w, /photos/parakeet/w1956.webp 1956w',
-    fallbackAlt: 'A green parakeet perched inside a deep canopy.',
+      '/media/pocket-worlds/keyframes/04-living-things-768.webp 768w, /media/pocket-worlds/keyframes/04-living-things-1280.webp 1280w, /media/pocket-worlds/keyframes/04-living-things-1664.webp 1664w',
+    fallbackAlt: 'A quiet parakeet discovered beside a captured-light path beneath the canopy.',
   },
   {
     id: 'table-notes',
@@ -101,10 +101,10 @@ export const pocketWorldJourney = [
     copySide: 'left',
     scrollWeight: 1.78,
     linger: 0.42,
-    fallbackImage: '/photos/banana-leaf-meal/w1440.webp',
+    fallbackImage: '/media/pocket-worlds/keyframes/05-table-notes-1664.webp',
     fallbackSrcSet:
-      '/photos/banana-leaf-meal/w768.webp 768w, /photos/banana-leaf-meal/w1024.webp 1024w, /photos/banana-leaf-meal/w1440.webp 1440w, /photos/banana-leaf-meal/w2048.webp 2048w',
-    fallbackAlt: 'A complete meal arranged in a circle on a banana leaf.',
+      '/media/pocket-worlds/keyframes/05-table-notes-768.webp 768w, /media/pocket-worlds/keyframes/05-table-notes-1280.webp 1280w, /media/pocket-worlds/keyframes/05-table-notes-1664.webp 1664w',
+    fallbackAlt: 'A warm circular gathering where the light resolves into an archive motif.',
   },
 ] as const satisfies ReadonlyArray<PocketWorldJourneyScene>
 
@@ -112,4 +112,7 @@ export const pocketWorldHero = {
   eyebrow: 'FrameOS — Pocket Worlds',
   title: 'Things I noticed, photographed on a phone.',
   body: 'Follow the light through five small worlds.',
+  fallbackImage: '/media/pocket-worlds/keyframes/00-overview-1664.webp',
+  fallbackSrcSet:
+    '/media/pocket-worlds/keyframes/00-overview-768.webp 768w, /media/pocket-worlds/keyframes/00-overview-1280.webp 1280w, /media/pocket-worlds/keyframes/00-overview-1664.webp 1664w',
 } as const

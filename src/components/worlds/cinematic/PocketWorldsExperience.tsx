@@ -21,8 +21,8 @@ export function PocketWorldsExperience({
       <section className="pw-basic" aria-label="Pocket Worlds" hidden={enhanced}>
         <div className="pw-basic__hero">
           <img
-            src={pocketWorldJourney[0].fallbackImage}
-            srcSet={pocketWorldJourney[0].fallbackSrcSet}
+            src={pocketWorldHero.fallbackImage}
+            srcSet={pocketWorldHero.fallbackSrcSet}
             sizes="100vw"
             alt=""
             className="pw-basic__hero-image"

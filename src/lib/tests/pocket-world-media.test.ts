@@ -12,7 +12,7 @@ const asset = {
   mobile: '/media/pocket-worlds/mobile/wander.mp4',
   poster: '/media/pocket-worlds/posters/wander.webp',
   mobilePoster: '/media/pocket-worlds/posters/wander-mobile.webp',
-  still: '/media/pocket-worlds/stills/wander.webp',
+  still: '/media/pocket-worlds/keyframes/01-wander-1664.webp',
   duration: 8,
   desktopBytes: 10_000,
   mobileBytes: 5_000,
@@ -26,7 +26,7 @@ describe('Pocket Worlds media manifest', () => {
         ready: true,
         architecture: 'B',
         generatedAt: '2026-07-14T00:00:00.000Z',
-        model: 'seedance_2_0',
+        model: 'google-flow',
         sections: [asset],
         connectors: [],
       })
@@ -62,7 +62,7 @@ function completeManifest(architecture: 'A' | 'B' = 'B'): PocketWorldMediaManife
     ready: true,
     architecture,
     generatedAt: '2026-07-14T00:00:00.000Z',
-    model: 'seedance_2_0',
+    model: 'google-flow',
     sections: sceneIds.map((id) => ({ ...asset, id })) as PocketWorldMediaManifest['sections'],
     connectors: architecture === 'B' ? connectorIds.map((id) => ({ ...asset, id })) : [],
   }

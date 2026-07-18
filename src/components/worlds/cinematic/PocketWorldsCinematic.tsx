@@ -72,17 +72,30 @@ function lingerEase(value: number, linger: number) {
 }
 
 function buildStillSegments(): Segment[] {
-  return pocketWorldJourney.map((scene, sceneIndex) => ({
-    id: scene.id,
-    kind: 'scene',
-    sceneIndex,
-    targetSceneIndex: sceneIndex,
-    weight: scene.scrollWeight,
-    linger: scene.linger,
-    poster: scene.fallbackImage,
-    still: scene.fallbackImage,
-    stillSrcSet: scene.fallbackSrcSet,
-  }))
+  return [
+    {
+      id: 'overview',
+      kind: 'scene',
+      sceneIndex: 0,
+      targetSceneIndex: 0,
+      weight: 0.72,
+      linger: 0.12,
+      poster: pocketWorldHero.fallbackImage,
+      still: pocketWorldHero.fallbackImage,
+      stillSrcSet: pocketWorldHero.fallbackSrcSet,
+    },
+    ...pocketWorldJourney.map((scene, sceneIndex) => ({
+      id: scene.id,
+      kind: 'scene' as const,
+      sceneIndex,
+      targetSceneIndex: sceneIndex,
+      weight: scene.scrollWeight,
+      linger: scene.linger,
+      poster: scene.fallbackImage,
+      still: scene.fallbackImage,
+      stillSrcSet: scene.fallbackSrcSet,
+    })),
+  ]
 }
 
 function findAsset(assets: PocketWorldMediaAsset[], id: string) {
@@ -101,7 +114,7 @@ function buildVideoSegments(manifest: PocketWorldMediaManifest): Segment[] {
     segments.push({
       id: scene.id,
       kind: 'scene',
-      sceneIndex,
+      sceneIndex: manifest.architecture === 'A' ? Math.max(0, sceneIndex - 1) : sceneIndex,
       targetSceneIndex: sceneIndex,
       weight: scene.scrollWeight,
       linger: scene.linger,
@@ -137,7 +150,7 @@ function buildVideoSegments(manifest: PocketWorldMediaManifest): Segment[] {
 }
 
 function sceneForSegment(segment: Segment, localProgress: number) {
-  if (segment.kind === 'connector' && localProgress >= 0.5) {
+  if (segment.targetSceneIndex !== segment.sceneIndex && localProgress >= 0.5) {
     return segment.targetSceneIndex
   }
   return segment.sceneIndex
@@ -288,9 +301,7 @@ export default function PocketWorldsCinematic({ onReady }: { onReady: () => void
 
       const targetIndex = Math.max(
         0,
-        segments.findIndex(
-          (segment) => segment.kind === 'scene' && segment.sceneIndex === sceneIndex
-        )
+        segments.findIndex((segment) => segment.id === pocketWorldJourney[sceneIndex].id)
       )
       const weightBefore = segments
         .slice(0, targetIndex)
@@ -310,8 +321,18 @@ export default function PocketWorldsCinematic({ onReady }: { onReady: () => void
 
   const returnToBeginning = useCallback(() => {
     window.sessionStorage.removeItem(RESTORE_KEY)
-    scrollToSegment(0, 0)
-  }, [scrollToSegment])
+    const root = rootRef.current
+    if (!root) {
+      return
+    }
+
+    const rootTop = Math.max(0, window.scrollY + root.getBoundingClientRect().top)
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({
+      top: rootTop,
+      behavior: reduce ? 'auto' : 'smooth',
+    })
+  }, [])
 
   useEffect(() => {
     if (mode === 'checking') {
