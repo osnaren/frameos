@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
 import { getWorld } from '@/content/worlds'
 import { getGalleryFeedServer, getPhotoDetailServer } from '@/server/server-functions/portfolio'
+
+import type { Photo } from '@/types/photo'
 
 export const Route = createFileRoute('/photos/$slug')({
   loader: async ({ params }) => {
@@ -60,10 +62,107 @@ function CopyLinkButton({ canonicalUrl }: { canonicalUrl: string }) {
       onClick={() => {
         void navigator.clipboard.writeText(canonicalUrl).then(() => setCopied(true))
       }}
-      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-4 py-2 hover:border-(--accent)"
+      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-4 py-2 transition-all duration-300 hover:border-(--accent) hover:shadow-md focus-visible:border-(--accent)"
     >
-      {copied ? 'Link copied' : 'Copy link'}
+      <span>{copied ? 'Link copied' : 'Copy link'}</span>
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Link copied to the clipboard' : ''}
+      </span>
     </button>
+  )
+}
+
+function MetadataHotspot({ photo }: { photo: Photo }) {
+  const [open, setOpen] = useState(false)
+  const metadata = photo.metadata
+  const aspectRatio =
+    metadata.width > 0 && metadata.height > 0 ? metadata.width / metadata.height : null
+  const details = [
+    ['Camera', metadata.camera],
+    ['Lens', metadata.lens],
+    ['Focal length', metadata.focalLength],
+    ['Aperture', metadata.aperture],
+    ['Shutter', metadata.shutterSpeed],
+    ['ISO', metadata.iso],
+    [
+      'Dimensions',
+      metadata.width > 0 && metadata.height > 0
+        ? `${metadata.width.toLocaleString()} × ${metadata.height.toLocaleString()}`
+        : undefined,
+    ],
+    ['Aspect', aspectRatio ? `${aspectRatio.toFixed(2)} : 1` : undefined],
+    ['Format', metadata.format.toUpperCase()],
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]))
+
+  useEffect(() => {
+    if (!open) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [open])
+
+  return (
+    <>
+      <button
+        type="button"
+        className="photo-metadata-hotspot"
+        aria-label="Open photograph information"
+        aria-expanded={open}
+        aria-controls="photo-capture-panel"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span aria-hidden="true" />
+        <span className="photo-metadata-hotspot-label">Capture data</span>
+      </button>
+
+      <AnimatePresence>
+        {open ? (
+          <>
+            <motion.button
+              type="button"
+              className="photo-metadata-backdrop"
+              aria-label="Close photograph information"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+            />
+            <motion.aside
+              id="photo-capture-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Photograph information"
+              className="photo-metadata-panel"
+              initial={{ opacity: 0, scale: 0.92, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="photo-metadata-panel-head">
+                <div>
+                  <p className="mono-label m-0">Digital contact point</p>
+                  <p className="display-font m-0 mt-1 text-2xl font-light">Capture data</p>
+                </div>
+                <button type="button" aria-label="Close" onClick={() => setOpen(false)}>
+                  ×
+                </button>
+              </div>
+              <dl className="photo-metadata-grid">
+                {details.map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mono-label m-0 mt-5">Tap outside or press Esc to close</p>
+            </motion.aside>
+          </>
+        ) : null}
+      </AnimatePresence>
+    </>
   )
 }
 
@@ -71,6 +170,13 @@ function PhotoDetailRoute() {
   const { detail, siblings, position } = Route.useLoaderData()
   const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
+  const figureRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: figureRef,
+    offset: ['start end', 'end start'],
+  })
+  const mediaY = useTransform(scrollYProgress, [0, 0.5, 1], [28, 0, -28])
+  const mediaScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.985, 1, 0.985])
   /* The photograph settles first; words arrive second. */
   const settleDelay = reducedMotion ? 0 : 0.38
   const photo = detail.photo
@@ -141,10 +247,26 @@ function PhotoDetailRoute() {
           ) : null}
         </nav>
 
-        <figure className="m-0 mt-6">
-          <div
-            className="pocket-frame mx-auto w-fit max-w-full"
-            style={{ viewTransitionName: `photo-${photo.slug.replace(/[^a-z0-9-]/gi, '')}` }}
+        <motion.figure
+          ref={figureRef}
+          className="photo-detail-stage relative m-0 mt-6"
+          initial={reducedMotion ? undefined : { opacity: 0, scale: 0.985 }}
+          animate={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <span className="photo-detail-index" aria-hidden="true">
+            {position >= 0 ? String(position + 1).padStart(2, '0') : 'FO'}
+          </span>
+          <motion.div
+            className="photo-detail-media pocket-frame mx-auto w-fit max-w-full"
+            style={{
+              aspectRatio:
+                photo.metadata.width > 0 && photo.metadata.height > 0
+                  ? `${photo.metadata.width} / ${photo.metadata.height}`
+                  : undefined,
+              y: reducedMotion ? undefined : mediaY,
+              scale: reducedMotion ? undefined : mediaScale,
+            }}
           >
             <PhotoImage
               publicId={photo.publicId}
@@ -152,9 +274,14 @@ function PhotoDetailRoute() {
               preset="detail"
               priority
               sizes="(max-width: 1024px) 100vw, 76vw"
+              intrinsicWidth={photo.metadata.width || undefined}
+              intrinsicHeight={photo.metadata.height || undefined}
               className="mx-auto h-auto max-h-[76svh] w-auto max-w-full"
             />
-          </div>
+            <span className="photo-detail-sheen" aria-hidden="true" />
+            <span className="frame-corners" aria-hidden="true" />
+            <MetadataHotspot photo={photo} />
+          </motion.div>
 
           <motion.figcaption
             className="mx-auto mt-8 max-w-2xl text-center"
@@ -168,6 +295,11 @@ function PhotoDetailRoute() {
             {photo.caption ? (
               <p className="display-italic mt-3 text-lg leading-8 text-(--muted-strong)">
                 {photo.caption}
+              </p>
+            ) : null}
+            {photo.description ? (
+              <p className="mx-auto mt-5 max-w-prose text-sm leading-7 text-(--muted)">
+                {photo.description}
               </p>
             ) : null}
             <dl className="metadata-list mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
@@ -195,7 +327,7 @@ function PhotoDetailRoute() {
               </div>
             </dl>
           </motion.figcaption>
-        </figure>
+        </motion.figure>
 
         <motion.nav
           aria-label="Previous and next photographs"

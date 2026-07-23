@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+﻿import { useRef } from 'react'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
@@ -33,10 +33,64 @@ const NOTICING = [
   'food that looks like where it came from',
 ]
 
+/** A thin reading-progress bar that fills as the user scrolls through the essay. */
+function ReadingProgress({ target }: { target: React.RefObject<HTMLDivElement | null> }) {
+  const reducedMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target,
+    offset: ['start start', 'end start'],
+  })
+
+  if (reducedMotion) return null
+
+  return (
+    <motion.div
+      className="reading-progress"
+      style={{ scaleX: scrollYProgress }}
+      aria-hidden="true"
+    />
+  )
+}
+
+/** Floating ambient particles that add atmospheric depth to the page. */
+function AmbientParticles() {
+  const particles = [
+    { x: '12%', y: '18%', size: 3, delay: 0, duration: 9 },
+    { x: '78%', y: '25%', size: 4, delay: 1.2, duration: 11 },
+    { x: '45%', y: '55%', size: 3, delay: 2.8, duration: 8 },
+    { x: '88%', y: '70%', size: 5, delay: 0.5, duration: 10 },
+    { x: '22%', y: '80%', size: 3, delay: 3.2, duration: 12 },
+  ]
+
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="ambient-particle"
+          style={{
+            left: p.x,
+            top: p.y,
+            width: p.size,
+            height: p.size,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 /**
- * Field Notes as a visual essay: the statement stays pinned while frames
- * drift past at different depths, one faded photograph crosses behind the
- * text, and the chapter closes on a small contact-sheet strip.
+ * Field Notes as a visual essay with:
+ * - reading progress bar
+ * - floating ambient particles
+ * - pull-quote with animated border
+ * - staggered noticing-list reveal
+ * - scroll-linked photo scale parallax
+ * - contact-strip hover depth
+ * - decorative golden thread divider
  */
 function FieldNotesRoute() {
   const data = Route.useLoaderData()!
@@ -49,6 +103,8 @@ function FieldNotesRoute() {
   const crossingY = useTransform(scrollYProgress, [0, 1], [60, -160])
   const slowY = useTransform(scrollYProgress, [0, 1], [40, -40])
   const fastY = useTransform(scrollYProgress, [0, 1], [110, -110])
+  const slowScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.95, 1, 1, 0.97])
+  const fastScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.92, 1, 1, 0.94])
 
   const crossing = data.gallery.at(0)
   const column = data.gallery.slice(1)
@@ -56,6 +112,12 @@ function FieldNotesRoute() {
 
   return (
     <main className="relative overflow-x-clip px-4 pt-12 pb-20">
+      {/* Reading progress indicator */}
+      <ReadingProgress target={essayRef} />
+
+      {/* Atmospheric ambient particles */}
+      <AmbientParticles />
+
       {/* A quiet green wash from the Small Wonders world opens the chapter */}
       <div
         aria-hidden="true"
@@ -64,6 +126,22 @@ function FieldNotesRoute() {
           background:
             'linear-gradient(180deg, color-mix(in srgb, #ecf1e2 var(--wash-strength), transparent), transparent)',
         }}
+      />
+
+      {/* Decorative radial glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-[30vh] right-0 -z-10 h-[60vh] w-[60vh] opacity-20 blur-3xl"
+        style={{
+          background:
+            'radial-gradient(circle, color-mix(in srgb, var(--accent) 25%, transparent), transparent 70%)',
+        }}
+      />
+
+      {/* Subtle dot grid texture */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-30 dot-grid-bg-soft"
       />
 
       <motion.div className="page-shell" initial="hidden" animate="visible" variants={contactSheet}>
@@ -106,18 +184,55 @@ function FieldNotesRoute() {
                 </p>
               ))}
 
+              {/* Pull quote */}
+              <motion.blockquote
+                className="pull-quote m-0 mt-8"
+                initial={reducedMotion ? undefined : { opacity: 0 }}
+                whileInView={reducedMotion ? undefined : { opacity: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <motion.span
+                  aria-hidden="true"
+                  className="pull-quote-line"
+                  initial={reducedMotion ? false : { scaleY: 0 }}
+                  whileInView={{ scaleY: 1 }}
+                  viewport={{ once: true, amount: 0.6 }}
+                  transition={{ duration: reducedMotion ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] }}
+                />
+                The phone is the camera that is present when something worth noticing happens.
+              </motion.blockquote>
+
               <div className="border-t border-(--line) pt-6">
                 <p className="mono-label m-0">What tends to get noticed</p>
-                <ul className="mt-4 list-none space-y-2 p-0">
-                  {NOTICING.map((item) => (
-                    <li key={item} className="display-italic text-lg text-(--muted-strong)">
-                      — {item}
-                    </li>
+                <ul className="mt-4 list-none space-y-3 p-0">
+                  {NOTICING.map((item, index) => (
+                    <motion.li
+                      key={item}
+                      className="display-italic text-lg text-(--muted-strong)"
+                      initial={reducedMotion ? undefined : { opacity: 0, x: -12 }}
+                      whileInView={reducedMotion ? undefined : { opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.5 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: index * 0.1,
+                        ease: [0.16, 1, 0.3, 1],
+                      }}
+                    >
+                      <span
+                        className="mr-2 inline-block h-px w-4 align-middle"
+                        style={{ background: 'var(--accent)' }}
+                      />
+                      {item}
+                    </motion.li>
                   ))}
                 </ul>
               </div>
 
-              <p className="m-0 border-t border-(--line) pt-6 text-sm leading-7 text-(--muted)">
+              {/* Golden thread divider */}
+              <div className="golden-thread my-6" aria-hidden="true" />
+
+              <p className="m-0 text-sm leading-7 text-(--muted)">
                 The archive runs on a small pipeline: photographs stay canonical in one place,
                 editorial words in another, and this site reads both. Portraits of people stay
                 unpublished until each person has said yes.
@@ -131,19 +246,26 @@ function FieldNotesRoute() {
                 <motion.figure
                   key={item.imagePublicId}
                   className={`m-0 ${index % 2 === 1 ? 'lg:ml-16' : 'lg:mr-10'}`}
-                  style={reducedMotion ? undefined : { y: index % 2 === 0 ? slowY : fastY }}
+                  style={
+                    reducedMotion
+                      ? undefined
+                      : {
+                          y: index % 2 === 0 ? slowY : fastY,
+                          scale: index % 2 === 0 ? slowScale : fastScale,
+                        }
+                  }
                 >
                   <Link
                     to="/photos/$slug"
                     params={{ slug: slugOf(item.photoHref) }}
-                    className="pocket-frame block no-underline"
+                    className="pocket-frame depth-frame group block no-underline"
                   >
                     <PhotoImage
                       publicId={item.imagePublicId}
                       alt={item.alt}
                       preset="card"
                       sizes="(max-width: 1024px) 92vw, 420px"
-                      className="h-auto w-full"
+                      className="h-auto w-full transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
                     />
                     <span aria-hidden="true" className="frame-corners" />
                   </Link>
@@ -171,8 +293,11 @@ function FieldNotesRoute() {
         >
           <div className="flex flex-wrap items-end justify-between gap-4">
             <p className="mono-label m-0">Contact sheet</p>
-            <Link to="/archive" className="px-2 py-2 text-sm font-semibold text-(--muted-strong)">
-              See every frame →
+            <Link
+              to="/archive"
+              className="link-glow px-2 py-2 text-sm font-semibold text-(--muted-strong)"
+            >
+              See every frame \u2192
             </Link>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -181,8 +306,8 @@ function FieldNotesRoute() {
                 key={`strip-${item.imagePublicId}`}
                 to="/photos/$slug"
                 params={{ slug: slugOf(item.photoHref) }}
-                aria-label={`View “${item.title}”`}
-                className="pocket-frame block w-24 no-underline sm:w-32"
+                aria-label={`View \u201c${item.title}\u201d`}
+                className="pocket-frame contact-strip-item block w-24 no-underline sm:w-32"
               >
                 <PhotoImage
                   publicId={item.imagePublicId}
@@ -207,13 +332,13 @@ function FieldNotesRoute() {
           <Link
             to="/"
             hash="worlds"
-            className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline"
+            className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
           >
             Step into the worlds
           </Link>
           <Link
             to="/signal"
-            className="rounded-full border border-(--line) bg-(--panel) px-6 py-3.5 text-sm font-semibold text-(--ink) no-underline"
+            className="rounded-full border border-(--line) bg-(--panel) px-6 py-3.5 text-sm font-semibold text-(--ink) no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
           >
             Send a signal
           </Link>
