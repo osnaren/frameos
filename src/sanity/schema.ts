@@ -1,6 +1,7 @@
 import { aboutPageType } from '@/sanity/documents/about-page'
 import { contactPageType } from '@/sanity/documents/contact-page'
 import { homePageType } from '@/sanity/documents/home-page'
+import { photoType } from '@/sanity/documents/photo'
 import { siteSettingsType } from '@/sanity/documents/site-settings'
 import { cloudinaryAssetRefType } from '@/sanity/objects/cloudinary-asset-ref'
 import { ctaType } from '@/sanity/objects/cta'
@@ -12,6 +13,7 @@ export const schemaTypes = [
   homePageType,
   aboutPageType,
   contactPageType,
+  photoType,
   seoType,
   socialLinkType,
   ctaType,

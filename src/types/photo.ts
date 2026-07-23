@@ -17,6 +17,7 @@ export interface PhotoMetadata {
   updatedAt?: string
   camera?: string
   lens?: string
+  focalLength?: string
   iso?: string
   shutterSpeed?: string
   aperture?: string
@@ -30,6 +31,7 @@ export interface Photo {
   status: PhotoStatus
   title: string
   alt: string
+  description?: string
   caption?: string
   category?: string
   series?: string
@@ -39,6 +41,25 @@ export interface Photo {
   metadataVersion: 'v1'
   tags: string[]
   metadata: PhotoMetadata
+}
+
+export interface PhotoEditorial {
+  publicId: string
+  title?: string
+  alt?: string
+  description?: string
+  caption?: string
+  category?: string
+  series?: string
+  locationLabel?: string
+  captureDate?: string
+  sortOrder?: number
+  camera?: string
+  lens?: string
+  focalLength?: string
+  iso?: string
+  shutterSpeed?: string
+  aperture?: string
 }
 
 export interface PhotoCardView {

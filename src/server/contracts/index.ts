@@ -8,7 +8,13 @@ import type {
   PageDocumentId,
   SiteSettings,
 } from '@/types/content'
-import type { GalleryFeed, Photo, PhotoDetailView, PhotoFilters } from '@/types/photo'
+import type {
+  GalleryFeed,
+  Photo,
+  PhotoDetailView,
+  PhotoEditorial,
+  PhotoFilters,
+} from '@/types/photo'
 
 export interface CloudinaryProvider {
   searchPhotos: (filters: PhotoFilters) => Promise<{ photos: Photo[]; nextCursor?: string }>
@@ -29,22 +35,25 @@ export interface CloudinaryProvider {
   normalizeAsset: (rawAsset: unknown) => Photo
 }
 
+export type SanityDocumentId = PageDocumentId | 'photo'
+
 export interface SanityProvider {
   getSiteSettings: () => Promise<SiteSettings | null>
   getHomePage: () => Promise<HomePageContent | null>
   getAboutPage: () => Promise<AboutPageContent | null>
   getContactPage: () => Promise<ContactPageContent | null>
+  getPhotoEditorial: (publicId: string) => Promise<PhotoEditorial | null>
   getCuratedPhotoRefs: (
     pageId: Exclude<PageDocumentId, 'siteSettings'>
   ) => Promise<{ publicId: string; slug: string }[]>
-  listChangedDocuments: (sinceIso: string) => Promise<PageDocumentId[]>
+  listChangedDocuments: (sinceIso: string) => Promise<SanityDocumentId[]>
   verifyWebhook: (
     request: Request,
     bodyText: string
   ) => Promise<{
     ok: boolean
     reason?: string
-    documentId?: PageDocumentId
+    documentId?: SanityDocumentId
     idempotencyKey?: string
     updatedAt?: string
   }>
