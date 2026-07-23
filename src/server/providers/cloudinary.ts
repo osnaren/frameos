@@ -160,6 +160,7 @@ function normalizePhotoAsset(rawAsset: CloudinaryAsset): Photo {
         publicId.split('/').at(-1)
       ) ?? 'Untitled frame',
     alt: firstDefinedString(metadata.alt, context.alt) ?? '',
+    description: firstDefinedString(metadata.description, context.description),
     caption: firstDefinedString(metadata.caption, context.caption),
     category: firstDefinedString(metadata.category, context.category),
     series: firstDefinedString(metadata.series, context.series),
@@ -184,6 +185,12 @@ function normalizePhotoAsset(rawAsset: CloudinaryAsset): Photo {
         exif.CameraModelName
       ),
       lens: firstDefinedString(imageMetadata.LensModel, exif.LensModel),
+      focalLength: firstDefinedString(
+        imageMetadata.FocalLength,
+        exif.FocalLength,
+        imageMetadata.FocalLengthIn35mmFormat,
+        exif.FocalLengthIn35mmFormat
+      ),
       iso: firstDefinedString(imageMetadata.ISO, exif.ISO),
       shutterSpeed: firstDefinedString(
         imageMetadata.ExposureTime,

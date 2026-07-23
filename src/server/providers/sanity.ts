@@ -12,15 +12,15 @@ import {
   fixtureSiteSettings,
 } from '@/server/providers/mock-data'
 
-import type { SanityProvider } from '@/server/contracts'
+import type { SanityDocumentId, SanityProvider } from '@/server/contracts'
 import type {
   AboutPageContent,
   CloudinaryAssetRef,
   ContactPageContent,
   HomePageContent,
-  PageDocumentId,
   SiteSettings,
 } from '@/types/content'
+import type { PhotoEditorial } from '@/types/photo'
 
 type SanityAssetRefValue = {
   asset?: {
@@ -60,6 +60,25 @@ type SanityContactDocument = SanityPageBase & {
   body?: string[]
   email?: string
   socials?: Array<{ label?: string; href?: string }>
+}
+
+type SanityPhotoDocument = {
+  publicId?: string
+  title?: string
+  alt?: string
+  description?: string
+  caption?: string
+  world?: string
+  series?: string
+  locationLabel?: string
+  captureDate?: string
+  sortOrder?: number
+  camera?: string
+  lens?: string
+  focalLength?: string
+  iso?: string
+  shutterSpeed?: string
+  aperture?: string
 }
 
 let sanityClient: ReturnType<typeof createClient> | null = null
@@ -210,6 +229,27 @@ const contactPageQuery = `*[_type == "contactPage"][0]{
   }
 }`
 
+const photoEditorialQuery = `*[
+  _type == "photo" && cloudinary.asset.public_id == $publicId
+][0]{
+  "publicId": cloudinary.asset.public_id,
+  title,
+  alt,
+  description,
+  caption,
+  world,
+  series,
+  locationLabel,
+  captureDate,
+  sortOrder,
+  camera,
+  lens,
+  focalLength,
+  iso,
+  shutterSpeed,
+  aperture
+}`
+
 export function createSanityProvider(): SanityProvider {
   return {
     async getSiteSettings() {
@@ -313,6 +353,40 @@ export function createSanityProvider(): SanityProvider {
         seo: normalizeSeo(document.seo, fallbackTitle, fallbackDescription),
       } satisfies ContactPageContent
     },
+    async getPhotoEditorial(publicId) {
+      if (isLocalArchiveMode()) {
+        return null
+      }
+
+      const document = await fetchSanityDocument<SanityPhotoDocument>(photoEditorialQuery, {
+        publicId,
+      })
+
+      if (!document?.publicId) {
+        return null
+      }
+
+      const text = (value: string | undefined) => value?.trim() || undefined
+
+      return {
+        publicId: document.publicId,
+        title: text(document.title),
+        alt: text(document.alt),
+        description: text(document.description),
+        caption: text(document.caption),
+        category: text(document.world),
+        series: text(document.series),
+        locationLabel: text(document.locationLabel),
+        captureDate: text(document.captureDate),
+        sortOrder: document.sortOrder,
+        camera: text(document.camera),
+        lens: text(document.lens),
+        focalLength: text(document.focalLength),
+        iso: text(document.iso),
+        shutterSpeed: text(document.shutterSpeed),
+        aperture: text(document.aperture),
+      } satisfies PhotoEditorial
+    },
     async getCuratedPhotoRefs(pageId) {
       switch (pageId) {
         case 'homePage':
@@ -334,8 +408,8 @@ export function createSanityProvider(): SanityProvider {
         return []
       }
 
-      const rows = await client.fetch<Array<{ _type: PageDocumentId }>>(
-        `*[_type in ["siteSettings", "homePage", "aboutPage", "contactPage"] && _updatedAt > $since]{
+      const rows = await client.fetch<Array<{ _type: SanityDocumentId }>>(
+        `*[_type in ["siteSettings", "homePage", "aboutPage", "contactPage", "photo"] && _updatedAt > $since]{
           _type
         }`,
         { since: sinceIso }
@@ -381,7 +455,8 @@ export function createSanityProvider(): SanityProvider {
         documentType === 'siteSettings' ||
         documentType === 'homePage' ||
         documentType === 'aboutPage' ||
-        documentType === 'contactPage'
+        documentType === 'contactPage' ||
+        documentType === 'photo'
           ? documentType
           : undefined
 

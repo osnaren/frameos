@@ -9,14 +9,8 @@ import { logInfo, logWarn, recordMetric } from '@/server/observability/logger'
 import { createCloudinaryProvider } from '@/server/providers/cloudinary'
 import { createSanityProvider } from '@/server/providers/sanity'
 
-import type { PortfolioRepository } from '@/server/contracts'
-import type {
-  AboutView,
-  ContactView,
-  HomeView,
-  PageDocumentId,
-  SiteSettings,
-} from '@/types/content'
+import type { PortfolioRepository, SanityDocumentId } from '@/server/contracts'
+import type { AboutView, ContactView, HomeView, SiteSettings } from '@/types/content'
 import type { GalleryFeed, Photo, PhotoDetailView } from '@/types/photo'
 
 class ServiceUnavailableError extends Error {
@@ -73,6 +67,44 @@ export function createPortfolioRepository(): PortfolioRepository {
         outcome: 'fallback',
       })
       return getFallbackSiteSettings()
+    }
+  }
+
+  async function applyPhotoEditorial(photo: Photo) {
+    try {
+      const editorial = await sanityProvider.getPhotoEditorial(photo.publicId)
+      if (!editorial) {
+        return photo
+      }
+
+      return {
+        ...photo,
+        title: editorial.title ?? photo.title,
+        alt: editorial.alt ?? photo.alt,
+        description: editorial.description ?? photo.description,
+        caption: editorial.caption ?? photo.caption,
+        category: editorial.category ?? photo.category,
+        series: editorial.series ?? photo.series,
+        locationLabel: editorial.locationLabel ?? photo.locationLabel,
+        captureDate: editorial.captureDate ?? photo.captureDate,
+        sortOrder: editorial.sortOrder ?? photo.sortOrder,
+        metadata: {
+          ...photo.metadata,
+          camera: editorial.camera ?? photo.metadata.camera,
+          lens: editorial.lens ?? photo.metadata.lens,
+          focalLength: editorial.focalLength ?? photo.metadata.focalLength,
+          iso: editorial.iso ?? photo.metadata.iso,
+          shutterSpeed: editorial.shutterSpeed ?? photo.metadata.shutterSpeed,
+          aperture: editorial.aperture ?? photo.metadata.aperture,
+        },
+      } satisfies Photo
+    } catch (error) {
+      captureException(error, {
+        route: 'photoEditorial',
+        publicId: photo.publicId,
+        outcome: 'fallback',
+      })
+      return photo
     }
   }
 
@@ -208,12 +240,13 @@ export function createPortfolioRepository(): PortfolioRepository {
       const snapshotKey = getSnapshotKey('photo', slug)
 
       try {
-        const photo = ensurePublishedPhoto(await cloudinaryProvider.getPhotoBySlug(slug))
+        const sourcePhoto = ensurePublishedPhoto(await cloudinaryProvider.getPhotoBySlug(slug))
 
-        if (!photo) {
+        if (!sourcePhoto) {
           return null
         }
 
+        const photo = await applyPhotoEditorial(sourcePhoto)
         const result: PhotoDetailView = {
           photo,
           canonicalUrl: buildCanonicalUrl(options.baseUrl, `/photos/${photo.slug}`),
@@ -426,9 +459,20 @@ export function createPortfolioRepository(): PortfolioRepository {
       let degraded = false
 
       if (provider === 'sanity') {
-        const documentId = payload.documentId as PageDocumentId | undefined
+        const documentId = payload.documentId as SanityDocumentId | undefined
 
-        if (documentId) {
+        if (documentId === 'photo') {
+          tags.add('gallery')
+          const publicId =
+            typeof payload.publicId === 'string'
+              ? payload.publicId
+              : typeof payload.cloudinaryPublicId === 'string'
+                ? payload.cloudinaryPublicId
+                : undefined
+          if (publicId) {
+            tags.add(`photo-id:${publicId}`)
+          }
+        } else if (documentId) {
           getPageTags(documentId).forEach((tag) => tags.add(tag))
         } else {
           getPageTags('siteSettings').forEach((tag) => tags.add(tag))
@@ -487,7 +531,11 @@ export function createPortfolioRepository(): PortfolioRepository {
         ])
 
         changedDocuments.forEach((documentId) => {
-          getPageTags(documentId).forEach((tag) => tags.add(tag))
+          if (documentId === 'photo') {
+            tags.add('gallery')
+          } else {
+            getPageTags(documentId).forEach((tag) => tags.add(tag))
+          }
         })
 
         changedPhotos.forEach((photo) => {
