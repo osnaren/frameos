@@ -29,9 +29,7 @@
     ".output/**",
     "dist/**"
   ],
-  "files": [
-    "**/*.{ts,tsx,js,jsx,md,css,html,yaml,yml}"
-  ],
+  "files": ["**/*.{ts,tsx,js,jsx,md,css,html,yaml,yml}"],
   "minWordLength": 4,
   "allowCompoundWords": false,
   "caseSensitive": false,

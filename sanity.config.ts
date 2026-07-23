@@ -1,5 +1,6 @@
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
+import { structureTool } from 'sanity/structure'
 import { cloudinarySchemaPlugin } from 'sanity-plugin-cloudinary'
 
 import { schemaTypes } from './src/sanity/schema'
@@ -12,7 +13,7 @@ export default defineConfig({
   title: process.env.SANITY_STUDIO_PROJECT_TITLE ?? 'FrameOS Studio',
   projectId,
   dataset,
-  plugins: [cloudinarySchemaPlugin(), visionTool()],
+  plugins: [structureTool(), cloudinarySchemaPlugin(), visionTool()],
   schema: {
     types: schemaTypes,
   },
