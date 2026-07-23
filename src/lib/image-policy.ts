@@ -2,7 +2,7 @@ const DEFAULT_TRANSFORMS = ['f_auto', 'q_auto', 'dpr_auto']
 
 export const responsiveBreakpoints = [320, 480, 640, 768, 1024, 1280, 1536, 1920] as const
 
-export type ImagePreset = 'thumb' | 'card' | 'hero' | 'detail' | 'og'
+export type ImagePreset = 'thumb' | 'card' | 'gallery' | 'hero' | 'detail' | 'spatial' | 'og'
 
 export interface ImagePresetDefinition {
   width: number
@@ -27,6 +27,11 @@ export const imagePresetMap: Record<ImagePreset, ImagePresetDefinition> = {
     aspectRatio: '4 / 5',
     crop: 'c_fill,g_auto',
   },
+  gallery: {
+    width: 960,
+    sizes: '(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px',
+    crop: 'c_limit',
+  },
   hero: {
     width: 1920,
     height: 1200,
@@ -37,6 +42,11 @@ export const imagePresetMap: Record<ImagePreset, ImagePresetDefinition> = {
   detail: {
     width: 1600,
     sizes: '(max-width: 1024px) 100vw, 70vw',
+    crop: 'c_limit',
+  },
+  spatial: {
+    width: 768,
+    sizes: '768px',
     crop: 'c_limit',
   },
   og: {

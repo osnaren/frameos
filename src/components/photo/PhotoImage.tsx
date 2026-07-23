@@ -20,6 +20,8 @@ export interface PhotoImageProps {
   className?: string
   sizes?: string
   priority?: boolean
+  intrinsicWidth?: number
+  intrinsicHeight?: number
   style?: CSSProperties
 }
 
@@ -35,9 +37,13 @@ export function PhotoImage({
   className,
   sizes,
   priority = false,
+  intrinsicWidth,
+  intrinsicHeight,
   style,
 }: PhotoImageProps) {
   const presetDefinition = getImagePresetDefinition(preset)
+  const intrinsicAspectRatio =
+    intrinsicWidth && intrinsicHeight ? `${intrinsicWidth} / ${intrinsicHeight}` : undefined
   const local = getLocalPhotoAsset(publicId)
 
   if (local) {
@@ -70,7 +76,10 @@ export function PhotoImage({
       <div
         aria-hidden="true"
         className={className}
-        style={{ aspectRatio: presetDefinition.aspectRatio ?? undefined, ...style }}
+        style={{
+          aspectRatio: intrinsicAspectRatio ?? presetDefinition.aspectRatio ?? undefined,
+          ...style,
+        }}
       />
     )
   }
@@ -82,15 +91,15 @@ export function PhotoImage({
       src={buildCloudinaryImageUrl({ cloudName, publicId, preset })}
       srcSet={buildCloudinarySrcSet({ cloudName, publicId, preset })}
       sizes={sizes ?? presetDefinition.sizes}
-      width={presetDefinition.width}
-      height={presetDefinition.height}
+      width={intrinsicWidth ?? presetDefinition.width}
+      height={intrinsicHeight ?? presetDefinition.height}
       loading={priority ? 'eager' : 'lazy'}
       fetchPriority={priority ? 'high' : 'auto'}
       style={{
         backgroundImage: `url(${buildCloudinaryPlaceholder({ cloudName, publicId, preset })})`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
-        aspectRatio: presetDefinition.aspectRatio ?? undefined,
+        aspectRatio: intrinsicAspectRatio ?? presetDefinition.aspectRatio ?? undefined,
         ...style,
       }}
     />
