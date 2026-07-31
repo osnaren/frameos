@@ -4,6 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
+import { PhotoImage } from '@/components/photo/PhotoImage'
 import { useMagneticHover } from '@/hooks/use-magnetic-hover'
 import { contactSheet, revealVariants } from '@/lib/motion'
 import { getContactViewServer } from '@/server/server-functions/portfolio'
@@ -204,8 +205,20 @@ function SignalRoute() {
   return (
     <main
       className="relative flex min-h-[70svh] items-center overflow-x-clip px-4 py-16"
-      style={{ '--world-accent': '#4d7a38' } as React.CSSProperties}
+      style={{ '--world-accent': '#79aeb8' } as React.CSSProperties}
     >
+      {/* A real horizon, standing in for the one whoever's writing might be picturing. */}
+      <div className="signal-backdrop" aria-hidden="true">
+        <PhotoImage
+          publicId="local/the-sea"
+          alt=""
+          preset="hero"
+          sizes="100vw"
+          priority
+          className="h-full w-full"
+        />
+      </div>
+
       {/* Atmospheric background glow */}
       <div
         aria-hidden="true"
