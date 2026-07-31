@@ -100,6 +100,9 @@ function MetadataHotspot({ photo }: { photo: Photo }) {
     ['Aspect', aspectRatio ? `${aspectRatio.toFixed(2)} : 1` : undefined],
     ['Format', metadata.format.toUpperCase()],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]))
+  const hasExif = Boolean(
+    metadata.camera || metadata.lens || metadata.aperture || metadata.shutterSpeed || metadata.iso
+  )
 
   useEffect(() => {
     if (!open) return
@@ -142,10 +145,10 @@ function MetadataHotspot({ photo }: { photo: Photo }) {
               aria-modal="true"
               aria-label="Photograph information"
               className="photo-metadata-panel"
-              initial={{ opacity: 0, scale: 0.92, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
             >
               <div className="photo-metadata-panel-head">
                 <div>
@@ -164,6 +167,11 @@ function MetadataHotspot({ photo }: { photo: Photo }) {
                   </div>
                 ))}
               </dl>
+              {!hasExif ? (
+                <p className="display-italic mt-5 text-sm leading-6 text-(--muted-strong)">
+                  This one didn&rsquo;t keep its camera settings — just the frame itself.
+                </p>
+              ) : null}
               <p className="mono-label m-0 mt-5">Tap outside or press Esc to close</p>
             </motion.aside>
           </>
@@ -308,6 +316,8 @@ function PhotoDetailRoute() {
               sizes="(max-width: 1024px) 100vw, 76vw"
               intrinsicWidth={photo.metadata.width || undefined}
               intrinsicHeight={photo.metadata.height || undefined}
+              lqip={photo.image?.lqip}
+              hotspot={photo.image?.hotspot}
               className="mx-auto h-auto max-h-[76svh] w-auto max-w-full"
             />
             <span className="photo-detail-sheen" aria-hidden="true" />

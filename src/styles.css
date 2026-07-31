@@ -319,6 +319,14 @@ img {
   isolation: isolate;
   /* Own compositing layer: prevents Chromium ghosting when blurred children are clipped */
   transform: translateZ(0);
+  /* Without this, a click with even a pixel or two of pointer drift starts a
+     native text/image drag-selection instead of registering as a click. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.pocket-frame img {
+  -webkit-user-drag: none;
 }
 
 .pocket-frame::after {
@@ -548,6 +556,28 @@ a:focus-visible .frame-corners {
 @keyframes vt-arrive {
   from {
     opacity: 0;
+  }
+}
+
+/* ---- Theme toggle: an aperture iris opening over the new theme, from the
+   toggle button itself. Scoped to .is-theme-transition so it overrides (and
+   never fights) the photo-navigation "portal moment" transition above. ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .is-theme-transition::view-transition-old(root) {
+    animation: none;
+  }
+
+  .is-theme-transition::view-transition-new(root) {
+    animation: theme-iris 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes theme-iris {
+  from {
+    clip-path: circle(0% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
+  }
+  to {
+    clip-path: circle(140% at var(--theme-toggle-x, 50%) var(--theme-toggle-y, 50%));
   }
 }
 
@@ -1620,42 +1650,6 @@ a:focus-visible .frame-corners {
   }
 }
 
-/* ---- Footer light thread ---- */
-.footer-thread {
-  position: relative;
-  height: 80px;
-  overflow: hidden;
-}
-
-.footer-thread svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.footer-thread path {
-  stroke: var(--accent);
-  stroke-width: 1.5;
-  fill: none;
-  stroke-dasharray: 600;
-  stroke-dashoffset: 600;
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 40%, transparent));
-  transition: stroke-dashoffset 1.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.footer-thread.is-visible path {
-  stroke-dashoffset: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .footer-thread path {
-    transition: none;
-    stroke-dashoffset: 0;
-  }
-}
-
 /* ---- Enhanced notice list stagger ---- */
 .notice-item {
   opacity: 0;
@@ -2377,13 +2371,16 @@ a:focus-visible .frame-corners {
 
 /* ---- Film-strip perforations along the footer's top edge ---- */
 .footer-sprockets {
-  height: 5px;
+  height: 6px;
   margin-bottom: 0.5rem;
-  background-image: radial-gradient(circle, var(--line) 1.4px, transparent 1.6px);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--muted-strong) 55%, transparent) 1.6px,
+    transparent 1.8px
+  );
   background-position: center;
   background-repeat: repeat-x;
-  background-size: 16px 5px;
-  opacity: 0.7;
+  background-size: 16px 6px;
 }
 
 /* ---- Back-to-top aperture icon: blades draw inward on hover, like closing a stop ---- */
@@ -2924,6 +2921,13 @@ a:focus-visible .frame-corners {
   background: transparent;
   color: white;
   cursor: pointer;
+  opacity: 1;
+  transition: opacity 250ms ease;
+}
+
+.photo-metadata-hotspot[aria-expanded='true'] {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .photo-metadata-hotspot > span:first-child {
@@ -2971,30 +2975,32 @@ a:focus-visible .frame-corners {
 }
 
 .photo-metadata-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 4;
+  z-index: 40;
   border: 0;
-  background: rgba(8, 10, 11, 0.46);
-  backdrop-filter: blur(5px) saturate(0.75);
+  background: rgba(8, 10, 11, 0.4);
+  backdrop-filter: blur(3px) saturate(0.85);
   cursor: default;
 }
 
+/* Docked to the viewport edge (not the photo) so the capture data never
+   covers the photograph it describes -- it used to float on top of it. */
 .photo-metadata-panel {
-  position: absolute;
-  right: clamp(1rem, 5vw, 4rem);
-  bottom: clamp(1rem, 5vw, 4rem);
-  z-index: 6;
-  width: min(25rem, calc(100% - 2rem));
-  max-height: calc(100% - 2rem);
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  width: min(23rem, 100%);
   overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 1.1rem;
-  padding: clamp(1rem, 3vw, 1.5rem);
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border: 0;
+  border-left: 1px solid var(--line);
+  padding: clamp(1.5rem, 3vw, 2rem);
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
   color: var(--ink);
-  box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(24px) saturate(1.15);
+  box-shadow: -2rem 0 6rem rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(28px) saturate(1.15);
 }
 
 .photo-metadata-panel-head {
@@ -3020,10 +3026,10 @@ a:focus-visible .frame-corners {
 }
 
 .photo-metadata-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1px;
-  margin: 1rem 0 0;
+  margin: 1.25rem 0 0;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 0.75rem;
@@ -3031,8 +3037,9 @@ a:focus-visible .frame-corners {
 }
 
 .photo-metadata-grid > div {
+  flex: 1 1 40%;
   min-width: 0;
-  padding: 0.8rem;
+  padding: 0.9rem 1rem;
   background: var(--panel-strong);
 }
 
@@ -3181,15 +3188,21 @@ a:focus-visible .frame-corners {
     display: none;
   }
 
+  /* A bottom sheet reads more naturally than a right drawer at thumb width. */
   .photo-metadata-panel {
-    right: 0.75rem;
-    bottom: 0.75rem;
-    width: calc(100% - 1.5rem);
-    max-height: calc(100% - 1.5rem);
+    top: auto;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-height: 82svh;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 1.25rem 1.25rem 0 0;
+    box-shadow: 0 -1.5rem 4rem rgba(0, 0, 0, 0.25);
   }
 
-  .photo-metadata-grid {
-    grid-template-columns: 1fr;
+  .photo-metadata-grid > div {
+    flex-basis: 100%;
   }
 
   .world-gallery {
@@ -3371,5 +3384,43 @@ a:focus-visible .frame-corners {
 
   .world-gallery-focus strong {
     font-size: 1.55rem;
+  }
+}
+
+/* ---- 404: darkroom safelight behind the unexposed frame ---- */
+.not-found-safelight {
+  position: absolute;
+  inset: -4rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, #ff8a3d 16%, transparent),
+    transparent 70%
+  );
+  animation: not-found-glow 5s ease-in-out infinite;
+}
+
+@keyframes not-found-glow {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.not-found-frame {
+  animation: not-found-frame-pulse 3.6s ease-in-out infinite;
+}
+
+@keyframes not-found-frame-pulse {
+  50% {
+    border-color: color-mix(in srgb, #ff8a3d 45%, var(--line));
+    color: color-mix(in srgb, #ff8a3d 60%, var(--muted));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found-safelight,
+  .not-found-frame {
+    animation: none;
   }
 }

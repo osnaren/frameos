@@ -66,11 +66,40 @@ export default function ThemeToggle() {
     }
   }, [mode])
 
-  function cycleMode() {
+  function cycleMode(event: React.MouseEvent<HTMLButtonElement>) {
     const nextMode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length]
-    setMode(nextMode)
-    applyThemeMode(nextMode)
-    window.localStorage.setItem('theme', nextMode)
+
+    const applyChange = () => {
+      setMode(nextMode)
+      applyThemeMode(nextMode)
+      window.localStorage.setItem('theme', nextMode)
+    }
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const supportsViewTransitions = typeof document.startViewTransition === 'function'
+
+    if (reducedMotion || !supportsViewTransitions) {
+      applyChange()
+      return
+    }
+
+    // An iris opening from the button itself, like a lens stopping down to a new exposure.
+    const rect = event.currentTarget.getBoundingClientRect()
+    const root = document.documentElement
+    root.style.setProperty('--theme-toggle-x', `${rect.left + rect.width / 2}px`)
+    root.style.setProperty('--theme-toggle-y', `${rect.top + rect.height / 2}px`)
+    root.classList.add('is-theme-transition')
+
+    const transition = document.startViewTransition(applyChange)
+    // Rapid clicks can interrupt/skip a transition, which rejects its promises --
+    // expected, not an error worth surfacing. All three can reject independently.
+    transition.ready.catch(() => {})
+    transition.updateCallbackDone.catch(() => {})
+    transition.finished
+      .catch(() => {})
+      .finally(() => {
+        root.classList.remove('is-theme-transition')
+      })
   }
 
   const nextMode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length]

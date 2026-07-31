@@ -11,42 +11,6 @@ function FilmSprockets() {
   return <div className="footer-sprockets" aria-hidden="true" />
 }
 
-/** An SVG light thread that draws itself when the footer enters the viewport. */
-function FooterThread() {
-  const ref = useRef<HTMLDivElement>(null)
-  const reducedMotion = useReducedMotion()
-  const [visible, setVisible] = useState(Boolean(reducedMotion))
-
-  useEffect(() => {
-    if (reducedMotion) {
-      setVisible(true)
-      return
-    }
-
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [reducedMotion])
-
-  return (
-    <div ref={ref} className={`footer-thread ${visible ? 'is-visible' : ''}`} aria-hidden="true">
-      <svg viewBox="0 0 1200 80" preserveAspectRatio="none">
-        <path d="M0,40 C200,10 400,70 600,35 C800,0 1000,60 1200,30" />
-      </svg>
-    </div>
-  )
-}
-
 function Keyframe({ scene }: { scene: (typeof pocketWorldJourney)[number] }) {
   return (
     <Link
@@ -62,6 +26,7 @@ function Keyframe({ scene }: { scene: (typeof pocketWorldJourney)[number] }) {
         sizes="144px"
         className="h-auto w-full rounded-lg"
         loading="lazy"
+        draggable={false}
       />
       <span className="frame-corners" aria-hidden="true" />
     </Link>
@@ -238,7 +203,6 @@ export default function Footer() {
   return (
     <footer className="site-footer border-t border-(--line) px-4 pb-10 pt-6 text-(--muted)">
       <FilmSprockets />
-      <FooterThread />
       <KeyframeStrip />
 
       <div className="page-shell mt-10 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">

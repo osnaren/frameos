@@ -1,19 +1,16 @@
 import {
-  buildCloudinaryImageUrl,
-  buildCloudinaryPlaceholder,
-  buildCloudinarySrcSet,
+  buildSanityImageUrl,
+  buildSanitySrcSet,
   getImagePresetDefinition,
   type ImagePreset,
+  type SanityImageHotspot,
 } from '@/lib/image-policy'
 import { getLocalPhotoAsset } from '@/lib/local-photos'
 
 import type { CSSProperties } from 'react'
 
-function getCloudName() {
-  return import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || (import.meta.env.DEV ? 'demo' : '')
-}
-
 export interface PhotoImageProps {
+  /** Local fixture id (`local/<id>`) or a Sanity image CDN base URL. */
   publicId: string
   alt: string
   preset: ImagePreset
@@ -22,13 +19,17 @@ export interface PhotoImageProps {
   priority?: boolean
   intrinsicWidth?: number
   intrinsicHeight?: number
+  /** Base64 blur placeholder from Sanity's asset metadata (`Photo.image.lqip`). */
+  lqip?: string
+  /** Editor-set focal point from Sanity's asset metadata (`Photo.image.hotspot`). */
+  hotspot?: SanityImageHotspot
   style?: CSSProperties
 }
 
 /**
  * The single rendering path for every photograph. Local archive photos
  * (`local/<id>`) resolve to bundled responsive WebP variants; everything else
- * flows through the Cloudinary image policy.
+ * is a Sanity CDN base URL run through the Sanity image policy.
  */
 export function PhotoImage({
   publicId,
@@ -39,6 +40,8 @@ export function PhotoImage({
   priority = false,
   intrinsicWidth,
   intrinsicHeight,
+  lqip,
+  hotspot,
   style,
 }: PhotoImageProps) {
   const presetDefinition = getImagePresetDefinition(preset)
@@ -59,6 +62,7 @@ export function PhotoImage({
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
         fetchPriority={priority ? 'high' : 'auto'}
+        draggable={false}
         style={{
           backgroundImage: `url(${local.placeholder})`,
           backgroundPosition: 'center',
@@ -69,9 +73,7 @@ export function PhotoImage({
     )
   }
 
-  const cloudName = getCloudName()
-
-  if (!cloudName) {
+  if (!publicId) {
     return (
       <div
         aria-hidden="true"
@@ -88,15 +90,16 @@ export function PhotoImage({
     <img
       alt={alt}
       className={className}
-      src={buildCloudinaryImageUrl({ cloudName, publicId, preset })}
-      srcSet={buildCloudinarySrcSet({ cloudName, publicId, preset })}
+      src={buildSanityImageUrl({ baseUrl: publicId, preset, hotspot })}
+      srcSet={buildSanitySrcSet({ baseUrl: publicId, preset, hotspot })}
       sizes={sizes ?? presetDefinition.sizes}
       width={intrinsicWidth ?? presetDefinition.width}
       height={intrinsicHeight ?? presetDefinition.height}
       loading={priority ? 'eager' : 'lazy'}
       fetchPriority={priority ? 'high' : 'auto'}
+      draggable={false}
       style={{
-        backgroundImage: `url(${buildCloudinaryPlaceholder({ cloudName, publicId, preset })})`,
+        backgroundImage: lqip ? `url(${lqip})` : undefined,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
         aspectRatio: intrinsicAspectRatio ?? presetDefinition.aspectRatio ?? undefined,
