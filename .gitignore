@@ -49,3 +49,7 @@ media-production/pocket-worlds-flow/handoffs/*.png
 .sanity-dist-check/
 
 .sanity/
+
+.playwright-mcp/
+
+.playwright-mcp/

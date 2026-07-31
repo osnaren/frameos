@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type PanInfo,
+} from 'framer-motion'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
@@ -62,7 +69,7 @@ function CopyLinkButton({ canonicalUrl }: { canonicalUrl: string }) {
       onClick={() => {
         void navigator.clipboard.writeText(canonicalUrl).then(() => setCopied(true))
       }}
-      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-4 py-2 transition-all duration-300 hover:border-(--accent) hover:shadow-md focus-visible:border-(--accent)"
+      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-4 py-2 transition-all duration-300 hover:border-(--accent) hover:shadow-md focus-visible:border-(--accent) active:scale-95"
     >
       <span>{copied ? 'Link copied' : 'Copy link'}</span>
       <span className="sr-only" aria-live="polite">
@@ -177,6 +184,7 @@ function PhotoDetailRoute() {
   })
   const mediaY = useTransform(scrollYProgress, [0, 0.5, 1], [28, 0, -28])
   const mediaScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.985, 1, 0.985])
+  const [touchCapable, setTouchCapable] = useState(false)
   /* The photograph settles first; words arrive second. */
   const settleDelay = reducedMotion ? 0 : 0.38
   const photo = detail.photo
@@ -184,6 +192,10 @@ function PhotoDetailRoute() {
   const previousSlug = position > 0 ? siblings[position - 1] : null
   const nextSlug = position >= 0 && position < siblings.length - 1 ? siblings[position + 1] : null
   const washColor = photo.metadata.palette?.[0]
+
+  useEffect(() => {
+    setTouchCapable(window.matchMedia('(pointer: coarse)').matches)
+  }, [])
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -199,6 +211,16 @@ function PhotoDetailRoute() {
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
   }, [navigate, previousSlug, nextSlug])
+
+  const handleDragEnd = (_event: PointerEvent, info: PanInfo) => {
+    const swipePower = Math.abs(info.offset.x) * info.velocity.x
+
+    if (swipePower < -8000 && nextSlug) {
+      void navigate({ to: '/photos/$slug', params: { slug: nextSlug } })
+    } else if (swipePower > 8000 && previousSlug) {
+      void navigate({ to: '/photos/$slug', params: { slug: previousSlug } })
+    }
+  }
 
   return (
     <main
@@ -223,6 +245,12 @@ function PhotoDetailRoute() {
       ) : null}
 
       <div className="page-shell">
+        <p role="status" aria-live="polite" className="sr-only">
+          {position >= 0
+            ? `Frame ${position + 1} of ${siblings.length}: ${photo.title}`
+            : photo.title}
+        </p>
+
         <nav
           aria-label="Photograph context"
           className="flex flex-wrap items-center gap-x-4 gap-y-2"
@@ -258,7 +286,7 @@ function PhotoDetailRoute() {
             {position >= 0 ? String(position + 1).padStart(2, '0') : 'FO'}
           </span>
           <motion.div
-            className="photo-detail-media pocket-frame mx-auto w-fit max-w-full"
+            className="photo-detail-media pocket-frame mx-auto w-fit max-w-full touch-pan-y"
             style={{
               aspectRatio:
                 photo.metadata.width > 0 && photo.metadata.height > 0
@@ -267,6 +295,10 @@ function PhotoDetailRoute() {
               y: reducedMotion ? undefined : mediaY,
               scale: reducedMotion ? undefined : mediaScale,
             }}
+            drag={touchCapable ? 'x' : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.6}
+            onDragEnd={handleDragEnd}
           >
             <PhotoImage
               publicId={photo.publicId}
@@ -282,6 +314,9 @@ function PhotoDetailRoute() {
             <span className="frame-corners" aria-hidden="true" />
             <MetadataHotspot photo={photo} />
           </motion.div>
+          {touchCapable && (previousSlug || nextSlug) ? (
+            <p className="mono-label mt-3 text-center">Swipe to browse</p>
+          ) : null}
 
           <motion.figcaption
             className="mx-auto mt-8 max-w-2xl text-center"

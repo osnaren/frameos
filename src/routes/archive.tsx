@@ -219,10 +219,10 @@ function ArchiveRoute() {
             }}
           >
             <p className="mono-label">
-              Index \u00B7 {String(feed.items.length).padStart(2, '0')} frames
-              {activeWorld ? ` \u00B7 ${activeWorld.name}` : ' \u00B7 all worlds'}
+              Index · {String(feed.items.length).padStart(2, '0')} frames
+              {activeWorld ? ` · ${activeWorld.name}` : ' · all worlds'}
             </p>
-            <h1 className="display-font mt-3 text-4xl font-light text-(--ink) sm:text-5xl">
+            <h1 className="display-font text-balance mt-3 text-4xl font-light text-(--ink) sm:text-5xl">
               Every frame, on one sheet.
             </h1>
           </motion.div>
@@ -241,7 +241,7 @@ function ArchiveRoute() {
               hash="worlds"
               className="link-glow text-sm font-semibold text-(--muted-strong)"
             >
-              Back to the worlds \u2192
+              Back to the worlds →
             </Link>
           </motion.div>
         </motion.header>
@@ -291,13 +291,18 @@ function ArchiveRoute() {
                   to="/archive"
                   search={{ world: world.slug }}
                   aria-current={isActive ? 'true' : undefined}
-                  className={`filter-pill rounded-full border px-5 py-2.5 font-mono text-[0.78rem] tracking-[0.12em] uppercase no-underline transition-all duration-300 ${
+                  className={`filter-pill inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-mono text-[0.78rem] tracking-[0.12em] uppercase no-underline transition-all duration-300 ${
                     isActive
                       ? 'border-(--ink) bg-(--ink) text-(--bg)!'
                       : 'border-(--line) hover:border-(--ink)'
                   }`}
                   style={{ color: isActive ? undefined : world.mood.accent }}
                 >
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ background: isActive ? 'currentColor' : world.mood.accent }}
+                  />
                   {world.name}
                 </Link>
               </motion.div>
@@ -314,79 +319,87 @@ function ArchiveRoute() {
         ) : null}
 
         {/* Justified contact-sheet rows with staggered scroll reveal + 3D tilt */}
-        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-        <ul
-          ref={sheetRef}
-          onKeyDown={handleSheetKeyDown}
-          className="mt-8 flex list-none flex-wrap gap-2 p-0"
-        >
-          {feed.items.map((item, index) => {
-            const photo = item.photo
-            const { width, height } = photo.metadata
-            const ratio = width > 0 && height > 0 ? width / height : 1
-            const world = photo.category ? getWorld(photo.category) : null
+        {feed.items.length === 0 ? (
+          <p className="mono-label mt-16 text-center">
+            No frames in {activeWorld ? activeWorld.name : 'this world'} yet — try another world.
+          </p>
+        ) : (
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+          <ul
+            ref={sheetRef}
+            onKeyDown={handleSheetKeyDown}
+            className="mt-8 flex list-none flex-wrap gap-2 p-0"
+          >
+            {feed.items.map((item, index) => {
+              const photo = item.photo
+              const { width, height } = photo.metadata
+              const ratio = width > 0 && height > 0 ? width / height : 1
+              const world = photo.category ? getWorld(photo.category) : null
 
-            return (
-              <motion.li
-                key={photo.slug}
-                data-frame-index={index}
-                className="m-0 grow"
-                style={{
-                  flexBasis: `${Math.round(ratio * 200)}px`,
-                  flexGrow: Math.round(ratio * 100),
-                }}
-                initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.96 }}
-                whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: '-40px 0px' }}
-                transition={{
-                  duration: 0.6,
-                  delay: staggerDelay(index),
-                  ease: focusEase,
-                }}
-              >
-                <TiltCard className="h-full">
-                  <Link
-                    to="/photos/$slug"
-                    params={{ slug: photo.slug }}
-                    viewTransition={false}
-                    aria-label={`View \u201c${photo.title}\u201d`}
-                    className="pocket-frame depth-frame group block h-full no-underline"
-                    style={
-                      {
-                        '--glow-color': world?.mood.accent ?? 'var(--accent)',
-                      } as React.CSSProperties
-                    }
-                  >
-                    <PhotoImage
-                      publicId={photo.publicId}
-                      alt={photo.alt}
-                      preset="gallery"
-                      sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px"
-                      priority={index < 6}
-                      intrinsicWidth={width || undefined}
-                      intrinsicHeight={height || undefined}
-                      className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
-                      style={{
-                        aspectRatio: `${width || 1} / ${height || 1}`,
-                      }}
-                    />
-                    <span aria-hidden="true" className="archive-photo-glow" />
-                    <span aria-hidden="true" className="frame-corners" />
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-x-0 bottom-0 z-2 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/60 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+              return (
+                <motion.li
+                  key={photo.slug}
+                  data-frame-index={index}
+                  className="m-0 grow"
+                  style={{
+                    flexBasis: `${Math.round(ratio * 200)}px`,
+                    flexGrow: Math.round(ratio * 100),
+                  }}
+                  initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.96 }}
+                  whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: '-40px 0px' }}
+                  transition={{
+                    duration: 0.6,
+                    delay: staggerDelay(index),
+                    ease: focusEase,
+                  }}
+                >
+                  <TiltCard className="h-full">
+                    <Link
+                      to="/photos/$slug"
+                      params={{ slug: photo.slug }}
+                      viewTransition={false}
+                      aria-label={`View \u201c${photo.title}\u201d`}
+                      className="pocket-frame depth-frame group block h-full no-underline"
+                      style={
+                        {
+                          '--glow-color': world?.mood.accent ?? 'var(--accent)',
+                        } as React.CSSProperties
+                      }
                     >
-                      <span className="truncate text-xs font-medium text-white">{photo.title}</span>
-                      <span className="mono-label shrink-0 text-white/80!">
-                        {world ? world.name : ''}
+                      <PhotoImage
+                        publicId={photo.publicId}
+                        alt={photo.alt}
+                        preset="gallery"
+                        sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px"
+                        priority={index < 6}
+                        intrinsicWidth={width || undefined}
+                        intrinsicHeight={height || undefined}
+                        className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
+                        style={{
+                          aspectRatio: `${width || 1} / ${height || 1}`,
+                        }}
+                      />
+                      <span aria-hidden="true" className="archive-photo-glow" />
+                      <span aria-hidden="true" className="frame-corners" />
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-x-0 bottom-0 z-2 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/60 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                      >
+                        <span className="truncate text-xs font-medium text-white">
+                          {photo.title}
+                        </span>
+                        <span className="mono-label shrink-0 text-white/80!">
+                          {world ? world.name : ''}
+                        </span>
                       </span>
-                    </span>
-                  </Link>
-                </TiltCard>
-              </motion.li>
-            )
-          })}
-        </ul>
+                    </Link>
+                  </TiltCard>
+                </motion.li>
+              )
+            })}
+          </ul>
+        )}
 
         <p className="mono-label mt-10">Arrow keys move between frames</p>
       </div>

@@ -134,6 +134,21 @@ const NAV_LINKS = [
   { to: '/signal', label: 'Signal' },
 ] as const
 
+function BackToTop() {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+      }}
+      className="mono-label cursor-pointer transition-colors hover:text-(--ink)"
+    >
+      Back to top ↑
+    </button>
+  )
+}
+
 export default function Footer() {
   const year = new Date().getFullYear()
   const reducedMotion = useReducedMotion()
@@ -199,6 +214,9 @@ export default function Footer() {
           <p className="mono-label m-0 text-[0.6rem]! tracking-[0.18em]!">
             Things I noticed, photographed on a phone.
           </p>
+          <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+            <BackToTop />
+          </div>
         </div>
       </div>
     </footer>

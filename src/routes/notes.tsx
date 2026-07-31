@@ -149,7 +149,7 @@ function FieldNotesRoute() {
           Field Notes
         </motion.p>
         <motion.h1
-          className="display-font mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.05] font-light text-(--ink)"
+          className="display-font text-balance mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.05] font-light text-(--ink)"
           variants={revealVariants(reducedMotion)}
         >
           {data.page.headline}
@@ -297,7 +297,7 @@ function FieldNotesRoute() {
               to="/archive"
               className="link-glow px-2 py-2 text-sm font-semibold text-(--muted-strong)"
             >
-              See every frame \u2192
+              See every frame →
             </Link>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">

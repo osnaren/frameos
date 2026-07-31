@@ -4,6 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
+import { useMagneticHover } from '@/hooks/use-magnetic-hover'
 import { contactSheet, revealVariants } from '@/lib/motion'
 import { getContactViewServer } from '@/server/server-functions/portfolio'
 
@@ -39,7 +40,7 @@ function CopyEmailButton({ email }: { email: string }) {
       onClick={() => {
         void navigator.clipboard.writeText(email).then(() => setCopied(true))
       }}
-      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-5 py-3 transition-all duration-300 hover:border-(--accent) hover:bg-(--panel-strong) hover:shadow-md focus-visible:border-(--accent) focus-visible:bg-(--panel-strong)"
+      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-5 py-3 transition-all duration-300 hover:border-(--accent) hover:bg-(--panel-strong) hover:shadow-md focus-visible:border-(--accent) focus-visible:bg-(--panel-strong) active:scale-95"
     >
       <span>{copied ? 'Address copied' : 'Copy address'}</span>
       <span className="sr-only" aria-live="polite">
@@ -139,7 +140,7 @@ function ConstellationLinks({ links }: { links: Array<{ href: string; label: str
               target="_blank"
             >
               {social.label}
-              <span className="text-[0.6rem] opacity-50">\u2197</span>
+              <span className="text-[0.6rem] opacity-50">↗</span>
             </a>
           </li>
         ))}
@@ -165,7 +166,7 @@ function ConstellationLinks({ links }: { links: Array<{ href: string; label: str
               target="_blank"
             >
               {social.label}
-              <span className="text-[0.6rem] opacity-50">\u2197</span>
+              <span className="text-[0.6rem] opacity-50">↗</span>
             </a>
           </motion.li>
         ))}
@@ -198,6 +199,7 @@ function SignalRoute() {
   const reducedMotion = useReducedMotion()
   const email = data.page.email
   const socials = data.page.socials.filter((s) => !s.href.startsWith('mailto:'))
+  const ctaRef = useMagneticHover<HTMLAnchorElement>(0.3, 14)
 
   return (
     <main
@@ -261,8 +263,8 @@ function SignalRoute() {
           className="pull-quote mt-8 max-w-md"
           variants={revealVariants(reducedMotion)}
         >
-          If one of these frames reminded you of a place, a meal, or an afternoon \u2014 write and
-          say so.
+          If one of these frames reminded you of a place, a meal, or an afternoon — write and say
+          so.
         </motion.blockquote>
 
         {email ? (
@@ -271,8 +273,9 @@ function SignalRoute() {
             variants={revealVariants(reducedMotion)}
           >
             <a
+              ref={ctaRef}
               href={`mailto:${email}`}
-              className="signal-pulse rounded-full bg-(--ink) px-7 py-3.5 text-sm font-semibold text-(--bg) no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+              className="signal-pulse rounded-full bg-(--ink) px-7 py-3.5 text-sm font-semibold text-(--bg) no-underline transition-shadow duration-300 hover:shadow-lg"
             >
               Write to {email}
             </a>

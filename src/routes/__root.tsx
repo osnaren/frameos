@@ -7,7 +7,9 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
+import { NotFound } from '@/components/content/NotFound'
 import { ServiceState } from '@/components/content/ServiceState'
+import { ViewfinderCursor } from '@/components/layout/ViewfinderCursor'
 
 import Footer from '../components/Footer'
 import Header from '../components/Header'
@@ -45,6 +47,7 @@ export const Route = createRootRoute({
   }),
   shellComponent: RootDocument,
   errorComponent: RootErrorBoundary,
+  notFoundComponent: RootNotFound,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -55,9 +58,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(173,120,64,0.28)]">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <Header />
-        <div className="relative pb-20">{children}</div>
+        <div id="main-content" className="relative pb-20">
+          {children}
+        </div>
         <Footer />
+        <ViewfinderCursor />
         {import.meta.env.DEV ? (
           <TanStackDevtools
             config={{
@@ -80,11 +89,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function RootErrorBoundary({ error }: ErrorComponentProps) {
   const message = error instanceof Error ? error.message : 'The route could not be rendered.'
 
+  // Rendered inside RootDocument's own outlet by the router — do not
+  // re-wrap with <RootDocument>, which would nest a second <html>/<body>.
   return (
-    <RootDocument>
-      <main className="page-shell px-4 pt-12">
-        <ServiceState title="The archive needs a moment." body={message} />
-      </main>
-    </RootDocument>
+    <main className="page-shell px-4 pt-12">
+      <ServiceState title="The archive needs a moment." body={message} />
+    </main>
+  )
+}
+
+function RootNotFound() {
+  return (
+    <main className="page-shell px-4 pt-12">
+      <NotFound />
+    </main>
   )
 }

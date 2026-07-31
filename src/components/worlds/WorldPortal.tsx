@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
+import { useTiltHover } from '@/hooks/use-tilt-hover'
 import { revealVariants } from '@/lib/motion'
 
 import type { WorldDefinition } from '@/content/worlds'
@@ -21,10 +22,12 @@ export function WorldPortal({
   sizes?: string
 }) {
   const reducedMotion = useReducedMotion()
+  const tiltRef = useTiltHover<HTMLAnchorElement>(6)
 
   return (
     <motion.div variants={revealVariants(reducedMotion)} className={className}>
       <Link
+        ref={tiltRef}
         to="/worlds/$world"
         params={{ world: world.slug }}
         className="pocket-frame group relative block h-full min-h-70 no-underline"

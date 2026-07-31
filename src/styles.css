@@ -244,8 +244,19 @@ a {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: linear-gradient(180deg, var(--header-bg), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+  background: color-mix(in srgb, var(--header-bg) 88%, transparent);
   backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--shadow) 45%, transparent);
+  transition:
+    background 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.site-header[data-scrolled='true'] {
+  background: var(--header-bg);
+  border-bottom-color: var(--line);
 }
 
 .site-nav-link {
@@ -404,6 +415,107 @@ a:focus-visible .frame-corners {
   .signal-pulse:focus-visible::before {
     animation: none;
     opacity: 0.6;
+  }
+}
+
+/* ---- Skip link: a keyboard-first way past the header on every page ---- */
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  border-radius: 9999px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.6rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 200ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ---- Viewfinder cursor: the pocket-frame corner marks, brought to the pointer.
+   Locks onto any photograph the cursor crosses; absent on the home page,
+   touch devices, and under reduced motion (see media query below). ---- */
+
+.viewfinder-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 240ms ease,
+    width 340ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewfinder-cursor[data-active='true'] {
+  width: 60px;
+  height: 60px;
+  opacity: 1;
+}
+
+.viewfinder-cursor__brackets {
+  position: absolute;
+  inset: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(to right, currentcolor 1.5px, transparent 1.5px) top left / 9px 1.5px no-repeat,
+    linear-gradient(to bottom, currentcolor 1.5px, transparent 1.5px) top left / 1.5px 9px no-repeat,
+    linear-gradient(to left, currentcolor 1.5px, transparent 1.5px) top right / 9px 1.5px no-repeat,
+    linear-gradient(to bottom, currentcolor 1.5px, transparent 1.5px) top right / 1.5px 9px
+      no-repeat,
+    linear-gradient(to right, currentcolor 1.5px, transparent 1.5px) bottom left / 9px 1.5px
+      no-repeat,
+    linear-gradient(to top, currentcolor 1.5px, transparent 1.5px) bottom left / 1.5px 9px no-repeat,
+    linear-gradient(to left, currentcolor 1.5px, transparent 1.5px) bottom right / 9px 1.5px
+      no-repeat,
+    linear-gradient(to top, currentcolor 1.5px, transparent 1.5px) bottom right / 1.5px 9px
+      no-repeat;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.viewfinder-cursor[data-active='true'] .viewfinder-cursor__brackets {
+  opacity: 0.9;
+}
+
+.viewfinder-cursor__label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 220ms ease 60ms;
+}
+
+.viewfinder-cursor[data-active='true'] .viewfinder-cursor__label {
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .viewfinder-cursor {
+    display: none;
   }
 }
 
@@ -2054,12 +2166,6 @@ a:focus-visible .frame-corners {
 /* ================================================================
    CINEMATIC SYSTEM — final cross-page polish
    ================================================================ */
-
-.site-header {
-  border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
-  background: color-mix(in srgb, var(--header-bg) 88%, transparent);
-  box-shadow: 0 12px 40px color-mix(in srgb, var(--shadow) 45%, transparent);
-}
 
 .site-header::after {
   content: '';

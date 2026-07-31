@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 import { Link } from '@tanstack/react-router'
 
 import ThemeToggle from './ThemeToggle'
@@ -10,8 +12,17 @@ const NAV_LINKS = [
 ] as const
 
 export default function Header() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 8)
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <header className="site-header px-4">
+    <header className="site-header px-4" data-scrolled={scrolled}>
       <nav aria-label="Primary" className="page-shell flex flex-wrap items-center gap-4 py-4">
         <Link to="/" className="site-brand group flex shrink-0 items-center gap-3 no-underline">
           <span aria-hidden="true" className="site-brand-mark">

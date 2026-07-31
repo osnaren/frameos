@@ -84,7 +84,7 @@ export default function ThemeToggle() {
       onClick={cycleMode}
       aria-label={label}
       title={label}
-      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-(--line) bg-(--panel) px-4 py-2.5 text-[0.72rem] font-semibold tracking-[0.16em] uppercase text-(--ink) shadow-[0_14px_30px_var(--shadow)] transition hover:-translate-y-0.5"
+      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-(--line) bg-(--panel) px-4 py-2.5 text-[0.72rem] font-semibold tracking-[0.16em] uppercase text-(--ink) shadow-[0_14px_30px_var(--shadow)] transition hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
     >
       <span aria-hidden="true" className="text-[0.6rem]">
         {glyph}
