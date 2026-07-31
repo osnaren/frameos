@@ -110,7 +110,7 @@ export function WorldDome({ world, photos }: { world: WorldDefinition; photos: P
   const reducedMotion = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const tileRefs = useRef<Array<HTMLDivElement | null>>([])
+  const frameRefs = useRef<Array<HTMLAnchorElement | null>>([])
   const { tiles, tileSize, radiusFactor } = useMemo(() => buildTiles(photos), [photos])
   const tilesRef = useRef(tiles)
   tilesRef.current = tiles
@@ -144,14 +144,34 @@ export function WorldDome({ world, photos }: { world: WorldDefinition; photos: P
       // softer) so the ring reads as something you're looking INTO rather than a
       // flat strip of cards with a fake tilt. Written directly to the DOM (no CSS
       // transition) so it stays perfectly in lockstep with the transform above.
+      //
+      // IMPORTANT: this must be written to the FRAME (the translateZ leaf), never
+      // to the .world-dome__tile wrapper. A computed opacity other than 1 forces
+      // transform-style to flat on the element it's set on -- setting it on the
+      // tile (which declares preserve-3d so the frame's translateZ composes with
+      // the tile's own rotateY/rotateX) silently flattened the frame's 3D
+      // position, collapsing every tile onto the same spot on screen regardless
+      // of its ring angle. The frame itself has no 3D children, so flattening it
+      // is harmless.
+      //
+      // The falloff is measured in "steps" (the angle between adjacent tiles),
+      // not raw degrees: a plain cosine stays near-1 for a wide arc around
+      // center, so two neighbouring tiles were both ~95%+ opaque at once and
+      // collided into a "half-open book" look whenever the ring passed the
+      // midpoint between them. Normalizing by the step size guarantees the
+      // fade completes before the next tile takes over, so only one tile is
+      // ever the clear "hero" at a time.
       const currentTiles = tilesRef.current
+      const stepDeg = 360 / currentTiles.length
       for (let i = 0; i < currentTiles.length; i++) {
-        const el = tileRefs.current[i]
+        const el = frameRefs.current[i]
         if (!el) continue
-        const angle = (currentTiles[i].rotateY + rotation.current.y) * (Math.PI / 180)
-        const facing = (Math.cos(angle) + 1) / 2 // 0 = facing away, 1 = facing the viewer
-        el.style.opacity = (0.4 + 0.6 * facing).toFixed(2)
-        el.style.filter = facing > 0.94 ? 'none' : `blur(${((1 - facing) * 2.2).toFixed(2)}px)`
+        const wrapped = (((currentTiles[i].rotateY + rotation.current.y) % 360) + 360) % 360
+        const angleDiff = wrapped > 180 ? wrapped - 360 : wrapped
+        const normalized = Math.min(1, Math.abs(angleDiff) / (stepDeg * 0.9))
+        const facing = 1 - normalized * normalized * (3 - 2 * normalized) // smoothstep falloff
+        el.style.opacity = (0.35 + 0.65 * facing).toFixed(2)
+        el.style.filter = facing > 0.96 ? 'none' : `blur(${((1 - facing) * 3).toFixed(2)}px)`
       }
     }
 
@@ -290,13 +310,13 @@ export function WorldDome({ world, photos }: { world: WorldDefinition; photos: P
         {tiles.map((tile, index) => (
           <div
             key={tile.key}
-            ref={(el) => {
-              tileRefs.current[index] = el
-            }}
             className="world-dome__tile"
             style={{ transform: `rotateY(${tile.rotateY}deg) rotateX(${tile.rotateX}deg)` }}
           >
             <Link
+              ref={(el) => {
+                frameRefs.current[index] = el
+              }}
               to="/photos/$slug"
               params={{ slug: tile.photo.slug }}
               aria-label={`View “${tile.photo.title}”`}
