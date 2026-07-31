@@ -1,16 +1,15 @@
-import { lazy, Suspense, useRef, useState } from 'react'
+import { useRef } from 'react'
 
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { motion, useReducedMotion, useScroll, useTransform, type Variants } from 'framer-motion'
 
 import { PhotoFrame } from '@/components/photo/PhotoFrame'
 import { getPublicWorlds, type WorldDefinition } from '@/content/worlds'
-import { useExperienceTier } from '@/lib/capability'
 import { contactSheet, revealVariants, settleSlow } from '@/lib/motion'
 
-import type { Photo } from '@/types/photo'
+import { WorldDome } from './WorldDome'
 
-const WorldGallery = lazy(() => import('./spatial/gallery/WorldGallery'))
+import type { Photo } from '@/types/photo'
 
 interface SceneProps {
   world: WorldDefinition
@@ -280,10 +279,7 @@ export function WorldScene({
   nextWorld: WorldDefinition
 }) {
   const worldRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
-  const experienceTier = useExperienceTier()
-  const [spatialFailed, setSpatialFailed] = useState(false)
   const { scrollYProgress } = useScroll({
     target: worldRef,
     offset: ['start start', 'end end'],
@@ -292,7 +288,6 @@ export function WorldScene({
   const rest = photos.filter((photo) => photo.slug !== hero?.slug)
   const frameNumber = (photo: Photo) => photos.findIndex((p) => p.slug === photo.slug) + 1
   const Scene = SCENES[world.signature]
-  const useSpatial = experienceTier !== 'animated' && !spatialFailed && photos.length > 0
 
   return (
     <div
@@ -366,23 +361,11 @@ export function WorldScene({
         </motion.div>
       </motion.header>
 
-      {useSpatial ? (
-        <Suspense
-          fallback={<Scene world={world} hero={hero} rest={rest} frameNumber={frameNumber} />}
-        >
-          <WorldGallery
-            photos={photos}
-            world={world}
-            quality={experienceTier === 'spatial' ? 'full' : 'lite'}
-            onSelect={(slug) => {
-              void navigate({ to: '/photos/$slug', params: { slug }, viewTransition: false })
-            }}
-            onError={() => setSpatialFailed(true)}
-          />
-        </Suspense>
-      ) : (
-        <Scene world={world} hero={hero} rest={rest} frameNumber={frameNumber} />
-      )}
+      <div className="page-shell">
+        <WorldDome world={world} photos={photos} />
+      </div>
+
+      <Scene world={world} hero={hero} rest={rest} frameNumber={frameNumber} />
 
       <motion.nav
         aria-label="World navigation"

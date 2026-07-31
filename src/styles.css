@@ -2487,6 +2487,186 @@ a:focus-visible .frame-corners {
   }
 }
 
+/* ---- World dome: the world's photographs, glued to a drum you can spin.
+   A DOM/CSS-only stand-in for the old WebGL planet — no shaders, no
+   lighting rig, and the photographs are actually the point. ---- */
+
+.world-dome {
+  position: relative;
+  width: 100%;
+  height: clamp(280px, 34vw, 420px);
+  margin-top: 1rem;
+  perspective: 1000px;
+  perspective-origin: 50% 44%;
+  touch-action: none;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.world-dome:active {
+  cursor: grabbing;
+}
+
+.world-dome__ground {
+  position: absolute;
+  bottom: 14%;
+  left: 50%;
+  z-index: 0;
+  width: min(64%, 380px);
+  height: clamp(24px, 3.4vw, 40px);
+  transform: translateX(-50%);
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--ink) 24%, transparent),
+    transparent 75%
+  );
+  filter: blur(1px);
+}
+
+.world-dome__stage {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.world-dome__tile {
+  --tile-size: var(--dome-tile-size, 140px);
+  --tile-radius: calc(var(--tile-size) * var(--dome-radius-factor, 1.7));
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  margin: calc(var(--tile-size) / -2) 0 0 calc(var(--tile-size) / -2);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.world-dome__frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  transform: translateZ(var(--tile-radius));
+  box-shadow: 0 20px 45px var(--shadow);
+  transition:
+    transform 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 450ms ease;
+}
+
+.world-dome__tile:hover .world-dome__frame,
+.world-dome__tile:focus-within .world-dome__frame {
+  transform: translateZ(calc(var(--tile-radius) + 16px)) scale(1.1);
+  box-shadow: 0 28px 60px var(--shadow);
+}
+
+/* Isolated from the frame's translateZ push above on purpose: pairing a large,
+   continuously-reoriented 3D offset with overflow:hidden + border-radius on the
+   very same element made Chromium intermittently paint a tile blank mid-spin.
+   Keeping the rounded clip on its own leaf layer avoids that. */
+.world-dome__clip {
+  position: absolute;
+  inset: 0;
+}
+
+.world-dome__caption {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  overflow: hidden;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--world-deep) 78%, transparent);
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 280ms ease,
+    transform 280ms ease;
+}
+
+.world-dome__tile:hover .world-dome__caption,
+.world-dome__tile:focus-within .world-dome__caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.world-dome__vignette {
+  position: absolute;
+  inset: -4rem;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(closest-side, transparent 46%, var(--bg) 92%);
+}
+
+.world-dome__hint {
+  position: absolute;
+  bottom: 0.65rem;
+  left: 50%;
+  z-index: 3;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  animation: world-dome-hint 5.5s ease forwards;
+}
+
+.world-dome.is-interacted .world-dome__hint {
+  display: none;
+}
+
+@keyframes world-dome-hint {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-dome__frame,
+  .world-dome__caption {
+    transition-duration: 0.01ms;
+  }
+
+  .world-dome__hint {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .world-navigation-card {
   position: relative;
   display: grid;
