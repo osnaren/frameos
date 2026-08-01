@@ -17,15 +17,12 @@
     "spellcheck:fix": "cspell lint . --words-only --no-summary",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "ui:add": "shadcn add",
-    "sanity:dev": "sanity dev",
-    "sanity:deploy": "sanity deploy"
+    "ui:add": "shadcn add"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@react-three/fiber": "^9.6.1",
     "@sanity/client": "^7.23.0",
-    "@sanity/vision": "^6.4.0",
     "@sanity/webhook": "^4.0.4",
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-devtools": "latest",
@@ -44,7 +41,6 @@
     "nitro": "npm:nitro-nightly@latest",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sanity": "^6.4.0",
     "shadcn": "^4.13.0",
     "styled-components": "^6.4.3",
     "tailwind-merge": "^3.6.0",
