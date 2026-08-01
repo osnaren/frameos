@@ -45,6 +45,10 @@ idempotency
 idempotent
 refetch
 revalidate
+lqip
+hotspot
+focalpoint
+unpublishing
 
 # UI / design terms
 parallax

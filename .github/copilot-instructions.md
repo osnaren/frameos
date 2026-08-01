@@ -39,7 +39,7 @@
 - Environment parsing is centralized in `src/server/env.ts`; add new server env vars there with zod validation.
 - Provider fallbacks to fixtures can happen in development when config is missing; do not rely on that behavior for production logic.
 - Gallery filtering/search normalization must use `src/lib/gallery-search.ts`.
-- Photo slug handling must use `createPhotoSlug` / `decodePhotoSlug` from `src/lib/photo-slug.ts`.
+- Photo slugs are Sanity's native `slug` field (`photo.slug.current`) — there is no separate slug-encoding utility.
 - Keep caching and invalidation behavior consistent with `src/server/cache/*` and repository reconciliation flows.
 
 ## API, Webhook, and Reconciliation Rules
@@ -63,6 +63,7 @@
 ## Key References (link, don’t embed)
 
 - `README.md`
+- `docs/README.md` (full architecture, guides, and decision records)
 - `package.json`
 - `eslint.config.js`
 - `prettier.config.js`
@@ -72,4 +73,3 @@
 - `src/server/server-functions/portfolio.ts`
 - `src/server/repository/portfolio.ts`
 - `src/routes/api/webhooks/sanity.ts`
-- `src/routes/api/webhooks/cloudinary.ts`

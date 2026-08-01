@@ -1,9 +1,11 @@
 # FrameOS — Pocket Worlds
 
 Production reference for the cinematic Pocket Worlds homepage introduced in July 2026.
-The server, cache, Sanity, Cloudinary, and publication architecture is unchanged; see
-[new-arch.md](./new-arch.md). The original creative brief remains in
-[video-pocket-worlds.md](./video-pocket-worlds.md).
+The server, cache, and publication architecture is unchanged; photo storage/delivery
+moved from Cloudinary to Sanity's native image pipeline in August 2026 — see
+[architecture/overview.md](./architecture/overview.md) and
+[decisions/0002-remove-cloudinary.md](./decisions/0002-remove-cloudinary.md). The
+original creative brief remains in [video-pocket-worlds.md](./video-pocket-worlds.md).
 
 ## Current status
 
