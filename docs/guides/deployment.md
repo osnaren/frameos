@@ -42,6 +42,21 @@ In your Sanity project → API → Webhooks, create a webhook:
 See [../architecture/caching-and-webhooks.md](../architecture/caching-and-webhooks.md)
 for exactly what happens when this webhook fires.
 
+## Deploying Sanity Studio
+
+Studio is a separate project (`../studio-frameos`) with its own deploy
+target — it is **not** part of this app's Vercel deployment.
+
+```bash
+cd ../studio-frameos
+pnpm deploy
+```
+
+Sanity hosts the built Studio for free at `https://<project-id>.sanity.studio`
+(or a custom hostname you choose on first deploy). This only needs to be
+re-run when the schema changes; content edits in Studio don't require a
+redeploy.
+
 ## Free-tier limits to be aware of
 
 | Service            | Free tier                                                                      | Notes                                                                                                                                                                                                          |

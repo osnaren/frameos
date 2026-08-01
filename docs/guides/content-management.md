@@ -1,14 +1,22 @@
 # Content Management (Sanity Studio)
 
+Sanity Studio is a standalone sibling project, `studio-frameos`, living next
+to this app (`../studio-frameos`, its own git repo and `package.json`) —
+not embedded in this repo. This app only reads content via `@sanity/client`.
+
 ## Running Studio
 
 ```bash
-pnpm sanity:dev      # local Studio at http://localhost:3333
-pnpm sanity:deploy   # deploy the hosted Studio
+cd ../studio-frameos
+pnpm install     # first time only
+pnpm dev         # local Studio at http://localhost:3333
+pnpm deploy      # deploy the hosted Studio
 ```
 
-Requires `SANITY_PROJECT_ID` and `SANITY_DATASET` in `.env` — see
+This app requires `SANITY_PROJECT_ID` and `SANITY_DATASET` in `.env` — see
 [../reference/environment-variables.md](../reference/environment-variables.md).
+The Studio project itself has `projectId`/`dataset` hardcoded in its own
+`sanity.config.ts`/`sanity.cli.ts` (no `.env` needed there).
 
 ## Document types
 
@@ -21,10 +29,10 @@ Requires `SANITY_PROJECT_ID` and `SANITY_DATASET` in `.env` — see
 | `photo`        | The photo library — one document per photograph      | No (the actual content list) |
 
 Singletons are pinned to a single fixed node in Studio's structure
-(`src/sanity/structure.ts`) — there's always exactly one `siteSettings`,
-`homePage`, `aboutPage`, `contactPage`, and their delete/duplicate actions
-are disabled, so an editor can't accidentally create a second copy or delete
-the only one.
+(`structure.ts` in `studio-frameos`) — there's always exactly one
+`siteSettings`, `homePage`, `aboutPage`, `contactPage`, and their
+delete/duplicate actions are disabled, so an editor can't accidentally
+create a second copy or delete the only one.
 
 ## The `photo` document
 

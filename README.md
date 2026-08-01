@@ -49,17 +49,19 @@ connecting a real Sanity project.
 | `pnpm typecheck`         | `tsc --noEmit` across the whole project |
 | `pnpm lint` / `lint:fix` | ESLint                                  |
 | `pnpm check`             | Prettier write + ESLint fix             |
-| `pnpm sanity:dev`        | Run Sanity Studio locally               |
-| `pnpm sanity:deploy`     | Deploy the hosted Sanity Studio         |
+
+Sanity Studio is a separate project — see
+[docs/guides/content-management.md](docs/guides/content-management.md).
 
 ## Project structure
 
 - `src/routes/` — TanStack Start file-based routes (pages + `api/**` handlers)
 - `src/server/` — the Sanity provider, the `portfolioRepository` that turns it
   into view models, caching, webhooks, reconcile, observability
-- `src/sanity/` — Sanity schema (documents + reusable objects) and Studio structure
 - `src/components/`, `src/content/`, `src/lib/` — UI, editorial/local fixture
   content, and shared utilities (image policy, gallery search, etc.)
 - `docs/` — architecture, guides, decision records (see [docs/README.md](docs/README.md))
 - `legacy-src/` — visual/reference material only from the pre-migration app;
   not built, tested, or linted
+- `../studio-frameos` — the standalone Sanity Studio (sibling project, own
+  repo) that owns the schema/structure; not part of this repo

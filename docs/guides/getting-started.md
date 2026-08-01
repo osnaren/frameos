@@ -76,4 +76,6 @@ pnpm build       # production build
 ## Next steps
 
 - [content-management.md](./content-management.md) — connect a real Sanity project
+  and run the standalone Studio (`../studio-frameos`) to add real photos and
+  copy
 - [deployment.md](./deployment.md) — deploy to Vercel

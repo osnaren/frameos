@@ -2,7 +2,8 @@
 
 ## Architecture
 
-- Active application code lives in `src/` (frontend + routes), `src/server/` (BFF/server logic), and `src/sanity/` (Sanity schemas).
+- Active application code lives in `src/` (frontend + routes) and `src/server/` (BFF/server logic).
+- Sanity Studio is a standalone sibling project at `../studio-frameos` (its own repo, own `package.json`) — this app only queries Sanity via `@sanity/client`, it does not host or embed the Studio.
 - Treat `legacy-src/` as **visual/reference material only** while migration continues.
 - TanStack file-based routing is authoritative: page routes in `src/routes/*.tsx`, API handlers in `src/routes/api/**`.
 - Server flow is `routes` -> `src/server/server-functions/portfolio.ts` -> `src/server/repository/portfolio.ts` -> provider implementations in `src/server/providers/*`.
@@ -19,7 +20,7 @@
   - `npm run typecheck`
   - `npm run lint`
   - `npm run check` (auto-format + auto-fix lint)
-  - `npm run sanity:dev` (Sanity Studio)
+  - Sanity Studio: `cd ../studio-frameos && pnpm dev` (separate project, not run from here)
 - Vitest test locations are `src/**/tests/**/*.test.ts(x)` and `tests/**/*.test.ts(x)`.
 - `legacy-src/**` is excluded from tests/lint in current config and should not receive routine feature changes.
 

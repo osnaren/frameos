@@ -31,7 +31,8 @@ docs/
 │   └── deployment.md         Vercel, cron, webhooks, free-tier limits
 ├── decisions/              Why things are built this way (ADRs)
 │   ├── 0001-tanstack-start-baseline.md
-│   └── 0002-remove-cloudinary.md
+│   ├── 0002-remove-cloudinary.md
+│   └── 0003-standalone-sanity-studio.md
 ├── reference/               Lookup tables
 │   └── environment-variables.md
 ├── pocket-worlds.md         Production notes for the cinematic homepage
