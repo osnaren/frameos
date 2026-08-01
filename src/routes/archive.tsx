@@ -375,6 +375,8 @@ function ArchiveRoute() {
                         priority={index < 6}
                         intrinsicWidth={width || undefined}
                         intrinsicHeight={height || undefined}
+                        lqip={photo.image?.lqip}
+                        hotspot={photo.image?.hotspot}
                         className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
                         style={{
                           aspectRatio: `${width || 1} / ${height || 1}`,

@@ -39,6 +39,8 @@ export function WorldPortal({
             alt={hero.alt}
             preset="card"
             sizes={sizes ?? '(max-width: 768px) 92vw, 40vw'}
+            lqip={hero.image?.lqip}
+            hotspot={hero.image?.hotspot}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
           />
         ) : null}

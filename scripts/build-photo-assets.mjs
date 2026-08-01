@@ -4,17 +4,20 @@
  * Reads source originals from photo-source/ (never served, never committed),
  * emits responsive WebP variants to public/photos/<id>/w<width>.webp and a
  * generated manifest at src/content/photo-manifest.json containing dimensions,
- * a tiny inline blur placeholder, and a measured color palette per photo.
+ * a tiny inline blur placeholder, a measured color palette, and any real
+ * camera/lens/exposure/GPS/capture-date EXIF found in the source file.
  *
- * Photos marked `hidden: true` get NO public variants and NO placeholder —
- * only dimensions land in the manifest, so unpublished portraits cannot be
- * fetched from any deploy. Flip `hidden` and re-run to publish later.
+ * Photos marked `hidden: true` get NO public variants, NO placeholder, and NO
+ * capture data — only dimensions land in the manifest, so unpublished
+ * portraits cannot be fetched from any deploy. Flip `hidden` and re-run to
+ * publish later.
  *
  * Usage: node scripts/build-photo-assets.mjs
  */
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
+import exifr from 'exifr'
 import sharp from 'sharp'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
@@ -51,6 +54,104 @@ const SOURCES = [
 
 function toHex(r, g, b) {
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
+/** "Apple", "iPhone 13 Pro" → "iPhone 13 Pro" (skip redundant brand prefix); otherwise join both. */
+function formatCamera(make, model) {
+  const trimmedMake = typeof make === 'string' ? make.trim() : ''
+  const trimmedModel = typeof model === 'string' ? model.trim() : ''
+
+  if (!trimmedModel) {
+    return trimmedMake || undefined
+  }
+
+  if (!trimmedMake || trimmedModel.toLowerCase().includes(trimmedMake.toLowerCase())) {
+    return trimmedModel
+  }
+
+  return `${trimmedMake} ${trimmedModel}`
+}
+
+function formatFocalLength(focalLength) {
+  return typeof focalLength === 'number' && Number.isFinite(focalLength)
+    ? `${Math.round(focalLength)}mm`
+    : undefined
+}
+
+function formatIso(iso) {
+  return typeof iso === 'number' && Number.isFinite(iso) ? String(iso) : undefined
+}
+
+/** 1/200s for fast exposures, whole seconds for long exposures. */
+function formatShutterSpeed(exposureTime) {
+  if (typeof exposureTime !== 'number' || !Number.isFinite(exposureTime) || exposureTime <= 0) {
+    return undefined
+  }
+
+  if (exposureTime >= 1) {
+    return `${Math.round(exposureTime * 10) / 10}s`
+  }
+
+  return `1/${Math.round(1 / exposureTime)}s`
+}
+
+function formatAperture(fNumber) {
+  if (typeof fNumber !== 'number' || !Number.isFinite(fNumber)) {
+    return undefined
+  }
+
+  return `f/${Math.round(fNumber * 10) / 10}`
+}
+
+function formatGps(latitude, longitude) {
+  return typeof latitude === 'number' && typeof longitude === 'number'
+    ? `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`
+    : undefined
+}
+
+function formatCaptureDate(value) {
+  return value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString() : undefined
+}
+
+/**
+ * Best-effort real EXIF read (camera, lens, exposure, GPS, capture date).
+ * Returns only the fields actually present in the file — never invented,
+ * matching the editorial rule in src/content/worlds.ts. Screenshots/exports
+ * with no EXIF (e.g. plain PNGs) simply yield an empty object.
+ */
+async function extractCaptureInfo(buffer) {
+  let tags
+
+  try {
+    tags = await exifr.parse(buffer)
+  } catch {
+    return {}
+  }
+
+  if (!tags) {
+    return {}
+  }
+
+  const info = {}
+  const camera = formatCamera(tags.Make, tags.Model)
+  const lens = typeof tags.LensModel === 'string' ? tags.LensModel.trim() : undefined
+  const focalLength = formatFocalLength(tags.FocalLength)
+  const iso = formatIso(tags.ISO)
+  const shutterSpeed = formatShutterSpeed(tags.ExposureTime)
+  const aperture = formatAperture(tags.FNumber)
+  const gps = formatGps(tags.latitude, tags.longitude)
+  const captureDate = formatCaptureDate(tags.DateTimeOriginal ?? tags.CreateDate)
+
+  if (camera) info.camera = camera
+  if (lens) info.lens = lens
+  if (focalLength) info.focalLength = focalLength
+  if (iso) info.iso = iso
+  if (shutterSpeed) info.shutterSpeed = shutterSpeed
+  if (aperture) info.aperture = aperture
+  if (gps) info.gps = gps
+  if (captureDate) info.captureDate = captureDate
+
+  return info
 }
 
 /** Coarse quantization palette: top swatches from a 64px sample, most-frequent first. */
@@ -90,7 +191,8 @@ async function extractPalette(image) {
 
 async function processPhoto(source) {
   const inputPath = path.join(SOURCE_DIR, source.file)
-  const original = sharp(await readFile(inputPath))
+  const sourceBuffer = await readFile(inputPath)
+  const original = sharp(sourceBuffer)
   const meta = await original.metadata()
   const entry = {
     id: source.id,
@@ -106,6 +208,7 @@ async function processPhoto(source) {
     return entry
   }
 
+  Object.assign(entry, await extractCaptureInfo(sourceBuffer))
   entry.palette = await extractPalette(original)
 
   const placeholder = await original
@@ -146,8 +249,9 @@ async function main() {
   for (const source of SOURCES) {
     const entry = await processPhoto(source)
     entries.push(entry)
+    const captureNote = entry.camera ? `, EXIF: ${entry.camera}` : ''
     console.log(
-      `${entry.id}: ${entry.width}x${entry.height}${entry.hidden ? ' (hidden, no public assets)' : ` → ${entry.widths.length} variants`}`
+      `${entry.id}: ${entry.width}x${entry.height}${entry.hidden ? ' (hidden, no public assets)' : ` → ${entry.widths.length} variants${captureNote}`}`
     )
   }
 

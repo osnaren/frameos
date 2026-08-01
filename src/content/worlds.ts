@@ -4,9 +4,10 @@
  * This module is the editorial source for the launch archive: world
  * definitions (name, statement, mood, motion signature) and per-photo
  * editorial data (title, alt, caption, ordering). Physical image data
- * (dimensions, palettes, placeholders, variant widths) comes from the
- * generated photo-manifest.json; run `node scripts/build-photo-assets.mjs`
- * after changing source photos.
+ * (dimensions, palettes, placeholders, variant widths, and any real
+ * camera/lens/exposure/GPS/capture-date EXIF found in the source file)
+ * comes from the generated photo-manifest.json; run
+ * `node scripts/build-photo-assets.mjs` after changing source photos.
  *
  * Titles and captions are creative naming of what is visible in each
  * photograph. Locations, dates, and equipment are intentionally absent
@@ -310,6 +311,15 @@ export interface ManifestEntry {
   widths: number[]
   placeholder: string
   palette: string[]
+  /** Real EXIF, extracted by scripts/build-photo-assets.mjs — absent when the source has none. */
+  camera?: string
+  lens?: string
+  focalLength?: string
+  iso?: string
+  shutterSpeed?: string
+  aperture?: string
+  gps?: string
+  captureDate?: string
 }
 
 const manifestPhotos = manifest.photos as Record<string, ManifestEntry>
@@ -348,9 +358,9 @@ export const curatedPhotos: Photo[] = editorial.map((entry) => {
     category: entry.world,
     series: undefined,
     locationLabel: undefined,
-    captureDate: undefined,
+    captureDate: asset.captureDate,
     sortOrder: entry.sortOrder,
-    metadataVersion: 'v1',
+    metadataVersion: 'v2',
     tags: entry.tags,
     metadata: {
       width: asset.width,
@@ -358,6 +368,13 @@ export const curatedPhotos: Photo[] = editorial.map((entry) => {
       format: 'webp',
       bytes: 0,
       createdAt: ARCHIVE_CREATED_AT,
+      camera: asset.camera,
+      lens: asset.lens,
+      focalLength: asset.focalLength,
+      iso: asset.iso,
+      shutterSpeed: asset.shutterSpeed,
+      aperture: asset.aperture,
+      gps: asset.gps,
       palette: asset.palette.length > 0 ? asset.palette : undefined,
     },
   }

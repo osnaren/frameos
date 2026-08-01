@@ -47,6 +47,8 @@ export function PhotoFrame({
           preset={preset}
           sizes={sizes}
           priority={priority}
+          lqip={photo.image?.lqip}
+          hotspot={photo.image?.hotspot}
           className={imageClassName ?? 'h-auto w-full'}
         />
         <span aria-hidden="true" className="frame-corners" />

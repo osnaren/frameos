@@ -171,6 +171,8 @@ function FieldNotesRoute() {
                 alt=""
                 preset="card"
                 sizes="300px"
+                lqip={crossing.imageLqip}
+                hotspot={crossing.imageHotspot}
                 className="h-auto w-full rounded-xl"
               />
             </motion.div>
@@ -265,6 +267,8 @@ function FieldNotesRoute() {
                       alt={item.alt}
                       preset="card"
                       sizes="(max-width: 1024px) 92vw, 420px"
+                      lqip={item.imageLqip}
+                      hotspot={item.imageHotspot}
                       className="h-auto w-full transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
                     />
                     <span aria-hidden="true" className="frame-corners" />
@@ -314,6 +318,8 @@ function FieldNotesRoute() {
                   alt=""
                   preset="thumb"
                   sizes="128px"
+                  lqip={item.imageLqip}
+                  hotspot={item.imageHotspot}
                   className="h-auto w-full"
                 />
                 <span aria-hidden="true" className="frame-corners" />
