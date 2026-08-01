@@ -20,7 +20,7 @@ export const aboutPageType = defineType({
     defineField({
       name: 'photoHighlights',
       type: 'array',
-      of: [{ type: 'cloudinaryAssetRef' }],
+      of: [{ type: 'reference', to: [{ type: 'photo' }] }],
       validation: (rule) => rule.required().min(1).max(6),
     }),
     defineField({

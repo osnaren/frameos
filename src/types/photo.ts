@@ -25,7 +25,16 @@ export interface PhotoMetadata {
   palette?: string[]
 }
 
+/** Rendering hints available only for live Sanity-hosted images (not the local fixture archive). */
+export interface PhotoImageHints {
+  /** Base64 blur data URI, used directly as the placeholder — no extra network request. */
+  lqip?: string
+  /** Editor-set focal point (0..1), used for hotspot-aware cropped presets. */
+  hotspot?: { x: number; y: number }
+}
+
 export interface Photo {
+  /** Local fixture id (`local/<id>`) or a Sanity image CDN base URL — see PhotoImage. */
   publicId: string
   slug: string
   status: PhotoStatus
@@ -38,28 +47,10 @@ export interface Photo {
   locationLabel?: string
   captureDate?: string
   sortOrder: number
-  metadataVersion: 'v1'
+  metadataVersion: 'v2'
   tags: string[]
   metadata: PhotoMetadata
-}
-
-export interface PhotoEditorial {
-  publicId: string
-  title?: string
-  alt?: string
-  description?: string
-  caption?: string
-  category?: string
-  series?: string
-  locationLabel?: string
-  captureDate?: string
-  sortOrder?: number
-  camera?: string
-  lens?: string
-  focalLength?: string
-  iso?: string
-  shutterSpeed?: string
-  aperture?: string
+  image?: PhotoImageHints
 }
 
 export interface PhotoCardView {

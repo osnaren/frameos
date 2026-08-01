@@ -19,10 +19,23 @@ export const photoType = defineType({
   ],
   fields: [
     defineField({
-      name: 'cloudinary',
-      title: 'Cloudinary image',
-      type: 'cloudinaryAssetRef',
+      name: 'image',
+      title: 'Photograph',
+      type: 'image',
       group: 'editorial',
+      options: {
+        hotspot: true,
+        metadata: ['exif', 'location', 'palette', 'lqip', 'blurhash'],
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      description: 'Used in the photo\u2019s public URL: /photos/<slug>.',
+      type: 'slug',
+      group: 'editorial',
+      options: { source: 'title', maxLength: 96 },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -35,7 +48,7 @@ export const photoType = defineType({
     defineField({
       name: 'alt',
       title: 'Alternative text',
-      description: 'Describe the image for someone who cannot see it.',
+      description: 'Describe the image for someone who cannot see it. Required to publish.',
       type: 'string',
       group: 'editorial',
       validation: (rule) => rule.required().max(220),
@@ -54,6 +67,14 @@ export const photoType = defineType({
       type: 'text',
       rows: 3,
       group: 'editorial',
+    }),
+    defineField({
+      name: 'archived',
+      title: 'Archived',
+      description: 'Hide this photo from every public page without deleting it.',
+      type: 'boolean',
+      initialValue: false,
+      group: 'organization',
     }),
     defineField({
       name: 'world',
@@ -75,14 +96,24 @@ export const photoType = defineType({
       group: 'organization',
     }),
     defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: { layout: 'tags' },
+      group: 'organization',
+    }),
+    defineField({
       name: 'captureDate',
       title: 'Capture date',
+      description: 'Auto-extracted from EXIF when present; override here if needed.',
       type: 'datetime',
       group: 'capture',
     }),
     defineField({
       name: 'camera',
       title: 'Camera',
+      description: 'Auto-extracted from EXIF when present; override here if needed.',
       type: 'string',
       group: 'capture',
     }),
@@ -129,13 +160,13 @@ export const photoType = defineType({
     select: {
       title: 'title',
       subtitle: 'world',
-      media: 'cloudinary.asset',
-      publicId: 'cloudinary.asset.public_id',
+      media: 'image',
+      archived: 'archived',
     },
-    prepare({ title, subtitle, media, publicId }) {
+    prepare({ title, subtitle, media, archived }) {
       return {
-        title: title || publicId || 'Untitled photo',
-        subtitle: subtitle ? `${subtitle} · ${publicId ?? ''}` : publicId,
+        title: title || 'Untitled photo',
+        subtitle: [subtitle, archived ? 'archived' : undefined].filter(Boolean).join(' · '),
         media,
       }
     },

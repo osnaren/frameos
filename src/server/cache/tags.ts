@@ -32,9 +32,7 @@ export function getGalleryTags(filters?: Pick<PhotoFilters, 'category' | 'series
   return tags
 }
 
-export function getPhotoTags(
-  photo: Pick<Photo, 'publicId' | 'slug' | 'category' | 'series' | 'tags'>
-) {
+export function getPhotoTags(photo: Pick<Photo, 'slug' | 'category' | 'series' | 'tags'>) {
   return [
     ...getGalleryTags({
       category: photo.category,
@@ -42,6 +40,5 @@ export function getPhotoTags(
     }),
     ...photo.tags.map((tag) => `gallery:tag:${tag}`),
     `photo:${photo.slug}`,
-    `photo-id:${photo.publicId}`,
   ]
 }

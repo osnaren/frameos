@@ -18,6 +18,7 @@ postcss
 tailwindcss
 lucide
 zod
+exifr
 
 # Three.js / R3F
 R3F

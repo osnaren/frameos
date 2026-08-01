@@ -9,8 +9,7 @@ describe('cache tag helpers', () => {
 
   it('builds gallery and detail tags from a photo record', () => {
     const tags = getPhotoTags({
-      publicId: 'portfolio/street/night-walk',
-      slug: 'night-walk--cG9ydGZvbGlvL3N0cmVldC9uaWdodC13YWxr',
+      slug: 'night-walk',
       category: 'street',
       series: 'night',
       tags: ['featured', 'monochrome'],
@@ -21,7 +20,6 @@ describe('cache tag helpers', () => {
     expect(tags).toContain('gallery:series:night')
     expect(tags).toContain('gallery:tag:featured')
     expect(tags).toContain('gallery:tag:monochrome')
-    expect(tags).toContain('photo:night-walk--cG9ydGZvbGlvL3N0cmVldC9uaWdodC13YWxr')
-    expect(tags).toContain('photo-id:portfolio/street/night-walk')
+    expect(tags).toContain('photo:night-walk')
   })
 })

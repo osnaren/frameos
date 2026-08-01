@@ -19,7 +19,7 @@ export const seoType = defineType({
     defineField({
       name: 'imagePublicId',
       type: 'string',
-      description: 'Optional Cloudinary public ID for OG image generation.',
+      description: 'Optional photo slug to use for OG image generation.',
     }),
   ],
 })

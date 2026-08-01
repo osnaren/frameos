@@ -1,9 +1,9 @@
 /**
  * Local archive fixtures.
  *
- * When Cloudinary/Sanity are not configured, the providers serve this bundled
- * launch content instead: the real curated Pocket Worlds photo set plus the
- * editorial page copy. Once Cloudinary credentials exist, the provider layer
+ * When Sanity is not configured, the provider serves this bundled launch
+ * content instead: the real curated Pocket Worlds photo set plus the
+ * editorial page copy. Once Sanity credentials exist, the provider layer
  * switches to live data automatically and this module is ignored.
  */
 import { curatedPhotos, getPublicWorlds } from '@/content/worlds'
@@ -12,6 +12,7 @@ import type {
   AboutPageContent,
   ContactPageContent,
   HomePageContent,
+  PhotoRef,
   SiteSettings,
 } from '@/types/content'
 import type { Photo } from '@/types/photo'
@@ -20,14 +21,21 @@ export const fixturePhotos: Photo[] = curatedPhotos
 
 const publishedPhotos = curatedPhotos.filter((photo) => photo.status === 'published')
 
-function refsForIds(ids: string[]) {
-  return ids
-    .map((id) => publishedPhotos.find((photo) => photo.slug === id))
-    .filter((photo): photo is Photo => Boolean(photo))
-    .map((photo) => ({ publicId: photo.publicId, slug: photo.slug }))
+function findPublishedPhoto(id: string) {
+  return publishedPhotos.find((photo) => photo.slug === id)
 }
 
-const heroRefs = refsForIds(getPublicWorlds().map((world) => world.heroId))
+function refsForIds(ids: string[]): PhotoRef[] {
+  return ids
+    .map((id) => findPublishedPhoto(id))
+    .filter((photo): photo is Photo => Boolean(photo))
+    .map((photo) => ({ slug: photo.slug }))
+}
+
+const heroPhotos = getPublicWorlds()
+  .map((world) => findPublishedPhoto(world.heroId))
+  .filter((photo): photo is Photo => Boolean(photo))
+const heroRefs = heroPhotos.map((photo) => ({ slug: photo.slug }))
 
 export const fixtureSiteSettings: SiteSettings = {
   brandMark: 'FO',
@@ -40,7 +48,7 @@ export const fixtureSiteSettings: SiteSettings = {
     title: 'FrameOS — Pocket Worlds',
     description:
       'A personal archive of things noticed and photographed on a phone: travel, temples, small wonders, living things, and food.',
-    imagePublicId: heroRefs[0]?.publicId,
+    imagePublicId: heroPhotos[0]?.publicId,
   },
 }
 
@@ -58,7 +66,7 @@ export const fixtureHomePage: HomePageContent = {
     title: 'FrameOS — Pocket Worlds',
     description:
       'A world noticed through a pocket-sized frame: travel, temples, small wonders, living things, and food, photographed entirely on a phone.',
-    imagePublicId: heroRefs[0]?.publicId,
+    imagePublicId: heroPhotos[0]?.publicId,
   },
 }
 
@@ -74,7 +82,7 @@ export const fixtureAboutPage: AboutPageContent = {
     title: 'Field Notes — FrameOS',
     description:
       'Who is behind FrameOS, why the archive is mobile-only, and what tends to get noticed.',
-    imagePublicId: heroRefs[0]?.publicId,
+    imagePublicId: heroPhotos[0]?.publicId,
   },
 }
 

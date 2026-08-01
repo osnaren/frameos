@@ -1,13 +1,11 @@
 import { buildCanonicalGallerySearch } from '@/lib/gallery-search'
-import { createPhotoSlug } from '@/lib/photo-slug'
 import { buildCanonicalUrl } from '@/lib/url'
 import { readSnapshot, rememberSnapshot } from '@/server/cache/snapshots'
 import { getPageTags, getPhotoTags } from '@/server/cache/tags'
 import { invalidateCacheTags } from '@/server/cache/vercel'
 import { captureException } from '@/server/observability/error-tracker'
 import { logInfo, logWarn, recordMetric } from '@/server/observability/logger'
-import { createCloudinaryProvider } from '@/server/providers/cloudinary'
-import { createSanityProvider } from '@/server/providers/sanity'
+import { createSanityProvider, invalidateAllPhotosCache } from '@/server/providers/sanity'
 
 import type { PortfolioRepository, SanityDocumentId } from '@/server/contracts'
 import type { AboutView, ContactView, HomeView, SiteSettings } from '@/types/content'
@@ -47,12 +45,13 @@ function resolveFeaturedItems(photos: Photo[]) {
     title: photo.title,
     location: photo.locationLabel,
     imagePublicId: photo.publicId,
+    imageLqip: photo.image?.lqip,
+    imageHotspot: photo.image?.hotspot,
     alt: photo.alt,
   }))
 }
 
 export function createPortfolioRepository(): PortfolioRepository {
-  const cloudinaryProvider = createCloudinaryProvider()
   const sanityProvider = createSanityProvider()
 
   async function loadSiteSettings() {
@@ -70,48 +69,8 @@ export function createPortfolioRepository(): PortfolioRepository {
     }
   }
 
-  async function applyPhotoEditorial(photo: Photo) {
-    try {
-      const editorial = await sanityProvider.getPhotoEditorial(photo.publicId)
-      if (!editorial) {
-        return photo
-      }
-
-      return {
-        ...photo,
-        title: editorial.title ?? photo.title,
-        alt: editorial.alt ?? photo.alt,
-        description: editorial.description ?? photo.description,
-        caption: editorial.caption ?? photo.caption,
-        category: editorial.category ?? photo.category,
-        series: editorial.series ?? photo.series,
-        locationLabel: editorial.locationLabel ?? photo.locationLabel,
-        captureDate: editorial.captureDate ?? photo.captureDate,
-        sortOrder: editorial.sortOrder ?? photo.sortOrder,
-        metadata: {
-          ...photo.metadata,
-          camera: editorial.camera ?? photo.metadata.camera,
-          lens: editorial.lens ?? photo.metadata.lens,
-          focalLength: editorial.focalLength ?? photo.metadata.focalLength,
-          iso: editorial.iso ?? photo.metadata.iso,
-          shutterSpeed: editorial.shutterSpeed ?? photo.metadata.shutterSpeed,
-          aperture: editorial.aperture ?? photo.metadata.aperture,
-        },
-      } satisfies Photo
-    } catch (error) {
-      captureException(error, {
-        route: 'photoEditorial',
-        publicId: photo.publicId,
-        outcome: 'fallback',
-      })
-      return photo
-    }
-  }
-
-  async function resolvePhotosByRefs(refs: Array<{ publicId: string }>) {
-    const resolved = await Promise.all(
-      refs.map((ref) => cloudinaryProvider.getPhotoByPublicId(ref.publicId))
-    )
+  async function resolvePhotosByRefs(refs: Array<{ slug: string }>) {
+    const resolved = await Promise.all(refs.map((ref) => sanityProvider.getPhotoBySlug(ref.slug)))
 
     return resolved
       .map((photo) => ensurePublishedPhoto(photo))
@@ -122,29 +81,24 @@ export function createPortfolioRepository(): PortfolioRepository {
     return `${type}:${suffix}`
   }
 
-  async function addCuratedPageTags(publicIds: string[], tags: Set<string>) {
-    if (publicIds.length === 0) {
+  async function addCuratedPageTags(slugs: string[], tags: Set<string>) {
+    if (slugs.length === 0) {
       return false
     }
 
     try {
-      const [homeRefs, aboutRefs, contactRefs] = await Promise.all([
-        sanityProvider.getCuratedPhotoRefs('homePage'),
-        sanityProvider.getCuratedPhotoRefs('aboutPage'),
-        sanityProvider.getCuratedPhotoRefs('contactPage'),
+      const [homePage, aboutPage] = await Promise.all([
+        sanityProvider.getHomePage(),
+        sanityProvider.getAboutPage(),
       ])
-      const publicIdSet = new Set(publicIds)
+      const slugSet = new Set(slugs)
 
-      if (homeRefs.some((ref) => publicIdSet.has(ref.publicId))) {
+      if (homePage?.featuredPhotos.some((ref) => slugSet.has(ref.slug))) {
         tags.add('page:home')
       }
 
-      if (aboutRefs.some((ref) => publicIdSet.has(ref.publicId))) {
+      if (aboutPage?.photoHighlights.some((ref) => slugSet.has(ref.slug))) {
         tags.add('page:about')
-      }
-
-      if (contactRefs.some((ref) => publicIdSet.has(ref.publicId))) {
-        tags.add('page:contact')
       }
 
       return false
@@ -170,7 +124,7 @@ export function createPortfolioRepository(): PortfolioRepository {
       const startedAt = Date.now()
 
       try {
-        const response = await cloudinaryProvider.searchPhotos(filters)
+        const response = await sanityProvider.searchPhotos(filters)
         const publishedItems = response.photos
           .map((photo) => ensurePublishedPhoto(photo))
           .filter((photo): photo is Photo => Boolean(photo))
@@ -214,7 +168,7 @@ export function createPortfolioRepository(): PortfolioRepository {
             ...snapshot,
             isDegraded: true,
             errorMessage:
-              'The latest Cloudinary data is temporarily unavailable. Showing the last successful snapshot.',
+              'The latest content is temporarily unavailable. Showing the last successful snapshot.',
           }
         }
 
@@ -232,7 +186,7 @@ export function createPortfolioRepository(): PortfolioRepository {
           },
           isDegraded: true,
           errorMessage:
-            'The gallery is temporarily unavailable while the image provider is recovering. Please try again shortly.',
+            'The gallery is temporarily unavailable while the content provider is recovering. Please try again shortly.',
         }
       }
     },
@@ -240,13 +194,12 @@ export function createPortfolioRepository(): PortfolioRepository {
       const snapshotKey = getSnapshotKey('photo', slug)
 
       try {
-        const sourcePhoto = ensurePublishedPhoto(await cloudinaryProvider.getPhotoBySlug(slug))
+        const photo = ensurePublishedPhoto(await sanityProvider.getPhotoBySlug(slug))
 
-        if (!sourcePhoto) {
+        if (!photo) {
           return null
         }
 
-        const photo = await applyPhotoEditorial(sourcePhoto)
         const result: PhotoDetailView = {
           photo,
           canonicalUrl: buildCanonicalUrl(options.baseUrl, `/photos/${photo.slug}`),
@@ -270,7 +223,7 @@ export function createPortfolioRepository(): PortfolioRepository {
         }
 
         throw new ServiceUnavailableError(
-          'This photograph is temporarily unavailable while Cloudinary is recovering.'
+          'This photograph is temporarily unavailable while Sanity is recovering.'
         )
       }
     },
@@ -458,55 +411,34 @@ export function createPortfolioRepository(): PortfolioRepository {
       const tags = new Set<string>()
       let degraded = false
 
-      if (provider === 'sanity') {
-        const documentId = payload.documentId as SanityDocumentId | undefined
+      const documentId = payload.documentId as SanityDocumentId | undefined
 
-        if (documentId === 'photo') {
-          tags.add('gallery')
-          const publicId =
-            typeof payload.publicId === 'string'
-              ? payload.publicId
-              : typeof payload.cloudinaryPublicId === 'string'
-                ? payload.cloudinaryPublicId
-                : undefined
-          if (publicId) {
-            tags.add(`photo-id:${publicId}`)
-          }
-        } else if (documentId) {
-          getPageTags(documentId).forEach((tag) => tags.add(tag))
-        } else {
-          getPageTags('siteSettings').forEach((tag) => tags.add(tag))
-        }
-      }
+      if (documentId === 'photo') {
+        tags.add('gallery')
+        const slug = typeof payload.slug === 'string' ? payload.slug : undefined
 
-      if (provider === 'cloudinary') {
-        const publicId =
-          typeof payload.publicId === 'string'
-            ? payload.publicId
-            : typeof payload.public_id === 'string'
-              ? payload.public_id
-              : undefined
+        if (slug) {
+          const photo = await sanityProvider.getPhotoBySlug(slug)
 
-        if (publicId) {
-          const asset = await cloudinaryProvider.getPhotoByPublicId(publicId)
-
-          if (asset) {
-            getPhotoTags(asset).forEach((tag) => tags.add(tag))
+          if (photo) {
+            getPhotoTags(photo).forEach((tag) => tags.add(tag))
           } else {
-            tags.add('gallery')
-            tags.add(`photo:${createPhotoSlug(publicId)}`)
-            tags.add(`photo-id:${publicId}`)
+            tags.add(`photo:${slug}`)
             degraded = true
           }
 
-          degraded = (await addCuratedPageTags([publicId], tags)) || degraded
+          degraded = (await addCuratedPageTags([slug], tags)) || degraded
         } else {
-          tags.add('gallery')
           degraded = true
         }
+      } else if (documentId) {
+        getPageTags(documentId).forEach((tag) => tags.add(tag))
+      } else {
+        getPageTags('siteSettings').forEach((tag) => tags.add(tag))
       }
 
       const invalidatedTags = await invalidateCacheTags(Array.from(tags))
+      invalidateAllPhotosCache()
 
       logInfo('repository.reconcile.webhook', {
         provider,
@@ -527,7 +459,7 @@ export function createPortfolioRepository(): PortfolioRepository {
       try {
         const [changedDocuments, changedPhotos] = await Promise.all([
           sanityProvider.listChangedDocuments(sinceIso),
-          cloudinaryProvider.listChangedPhotos(sinceIso),
+          sanityProvider.listChangedPhotos(sinceIso),
         ])
 
         changedDocuments.forEach((documentId) => {
@@ -544,7 +476,7 @@ export function createPortfolioRepository(): PortfolioRepository {
 
         degraded =
           (await addCuratedPageTags(
-            changedPhotos.map((photo) => photo.publicId),
+            changedPhotos.map((photo) => photo.slug),
             tags
           )) || degraded
       } catch (error) {
@@ -554,8 +486,11 @@ export function createPortfolioRepository(): PortfolioRepository {
         })
       }
 
+      const invalidatedTags = await invalidateCacheTags(Array.from(tags))
+      invalidateAllPhotosCache()
+
       return {
-        invalidatedTags: await invalidateCacheTags(Array.from(tags)),
+        invalidatedTags,
         degraded,
       }
     },

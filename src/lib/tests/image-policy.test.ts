@@ -1,26 +1,24 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildCloudinaryImageUrl, buildCloudinarySrcSet, imagePresetMap } from '@/lib/image-policy'
+import { buildSanityImageUrl, buildSanitySrcSet, imagePresetMap } from '@/lib/image-policy'
 
 describe('image policy helpers', () => {
   it('builds transformed delivery URLs for the requested preset', () => {
-    const url = buildCloudinaryImageUrl({
-      cloudName: 'demo',
-      publicId: 'portfolio/hero-shot',
+    const url = buildSanityImageUrl({
+      baseUrl: 'https://cdn.sanity.io/images/proj/production/hero-shot-1920x1200.jpg',
       preset: 'hero',
     })
 
-    expect(url).toContain('f_auto')
-    expect(url).toContain('q_auto')
-    expect(url).toContain('dpr_auto')
-    expect(url).toContain('c_fill,g_auto')
-    expect(url).toContain(`w_${imagePresetMap.hero.width}`)
+    expect(url).toContain('auto=format')
+    expect(url).toContain('q=75')
+    expect(url).toContain('fit=crop')
+    expect(url).toContain('crop=focalpoint')
+    expect(url).toContain(`w=${imagePresetMap.hero.width}`)
   })
 
   it('limits generated srcset widths to the preset maximum', () => {
-    const srcSet = buildCloudinarySrcSet({
-      cloudName: 'demo',
-      publicId: 'portfolio/detail-shot',
+    const srcSet = buildSanitySrcSet({
+      baseUrl: 'https://cdn.sanity.io/images/proj/production/detail-shot-1600x2000.jpg',
       preset: 'card',
     })
 

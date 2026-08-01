@@ -1,10 +1,6 @@
 import { z } from 'zod'
 
 const serverEnvSchema = z.object({
-  CLOUDINARY_API_KEY: z.string().min(1).optional(),
-  CLOUDINARY_API_SECRET: z.string().min(1).optional(),
-  CLOUDINARY_CLOUD_NAME: z.string().min(1).optional(),
-  CLOUDINARY_FOLDER: z.string().min(1).optional(),
   SANITY_PROJECT_ID: z.string().min(1).optional(),
   SANITY_DATASET: z.string().min(1).optional(),
   SANITY_API_TOKEN: z.string().min(1).optional(),
@@ -36,15 +32,8 @@ export function getServerEnv() {
 
 export function getPublicRuntimeConfig() {
   return {
-    cloudName:
-      import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ?? process.env.CLOUDINARY_CLOUD_NAME ?? '',
     siteUrl: import.meta.env.VITE_SITE_URL ?? 'http://localhost:3000',
   }
-}
-
-export function hasCloudinaryConfig() {
-  const env = getServerEnv()
-  return Boolean(env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET && env.CLOUDINARY_CLOUD_NAME)
 }
 
 export function hasSanityConfig() {

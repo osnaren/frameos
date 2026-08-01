@@ -4,8 +4,8 @@ export interface SeoFields {
   imagePublicId?: string
 }
 
-export interface CloudinaryAssetRef {
-  publicId: string
+/** A curated reference to a `photo` Sanity document, resolved to the full Photo by slug. */
+export interface PhotoRef {
   slug: string
 }
 
@@ -33,7 +33,7 @@ export interface HomePageContent {
   eyebrow: string
   headline: string
   intro: string
-  featuredPhotos: CloudinaryAssetRef[]
+  featuredPhotos: PhotoRef[]
   cta?: Cta
   seo: SeoFields
 }
@@ -41,7 +41,7 @@ export interface HomePageContent {
 export interface AboutPageContent {
   headline: string
   body: string[]
-  photoHighlights: CloudinaryAssetRef[]
+  photoHighlights: PhotoRef[]
   seo: SeoFields
 }
 
@@ -56,12 +56,14 @@ export interface ContactPageContent {
 export interface HomeView {
   site: SiteSettings
   page: HomePageContent
-  featuredPhotos: CloudinaryAssetRef[]
+  featuredPhotos: PhotoRef[]
   featuredItems: {
     photoHref: string
     title: string
     location?: string
     imagePublicId: string
+    imageLqip?: string
+    imageHotspot?: { x: number; y: number }
     alt: string
   }[]
   canonicalUrl: string
@@ -75,6 +77,8 @@ export interface AboutView {
     photoHref: string
     title: string
     imagePublicId: string
+    imageLqip?: string
+    imageHotspot?: { x: number; y: number }
     alt: string
   }[]
   canonicalUrl: string

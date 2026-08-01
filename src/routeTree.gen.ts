@@ -19,7 +19,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorldsWorldRouteImport } from './routes/worlds.$world'
 import { Route as PhotosSlugRouteImport } from './routes/photos.$slug'
 import { Route as ApiWebhooksSanityRouteImport } from './routes/api/webhooks/sanity'
-import { Route as ApiWebhooksCloudinaryRouteImport } from './routes/api/webhooks/cloudinary'
 import { Route as ApiReconcileContentRouteImport } from './routes/api/reconcile/content'
 
 const SignalRoute = SignalRouteImport.update({
@@ -72,11 +71,6 @@ const ApiWebhooksSanityRoute = ApiWebhooksSanityRouteImport.update({
   path: '/api/webhooks/sanity',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWebhooksCloudinaryRoute = ApiWebhooksCloudinaryRouteImport.update({
-  id: '/api/webhooks/cloudinary',
-  path: '/api/webhooks/cloudinary',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiReconcileContentRoute = ApiReconcileContentRouteImport.update({
   id: '/api/reconcile/content',
   path: '/api/reconcile/content',
@@ -94,7 +88,6 @@ export interface FileRoutesByFullPath {
   '/photos/$slug': typeof PhotosSlugRoute
   '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
-  '/api/webhooks/cloudinary': typeof ApiWebhooksCloudinaryRoute
   '/api/webhooks/sanity': typeof ApiWebhooksSanityRoute
 }
 export interface FileRoutesByTo {
@@ -108,7 +101,6 @@ export interface FileRoutesByTo {
   '/photos/$slug': typeof PhotosSlugRoute
   '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
-  '/api/webhooks/cloudinary': typeof ApiWebhooksCloudinaryRoute
   '/api/webhooks/sanity': typeof ApiWebhooksSanityRoute
 }
 export interface FileRoutesById {
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   '/photos/$slug': typeof PhotosSlugRoute
   '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
-  '/api/webhooks/cloudinary': typeof ApiWebhooksCloudinaryRoute
   '/api/webhooks/sanity': typeof ApiWebhooksSanityRoute
 }
 export interface FileRouteTypes {
@@ -139,7 +130,6 @@ export interface FileRouteTypes {
     | '/photos/$slug'
     | '/worlds/$world'
     | '/api/reconcile/content'
-    | '/api/webhooks/cloudinary'
     | '/api/webhooks/sanity'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/photos/$slug'
     | '/worlds/$world'
     | '/api/reconcile/content'
-    | '/api/webhooks/cloudinary'
     | '/api/webhooks/sanity'
   id:
     | '__root__'
@@ -167,7 +156,6 @@ export interface FileRouteTypes {
     | '/photos/$slug'
     | '/worlds/$world'
     | '/api/reconcile/content'
-    | '/api/webhooks/cloudinary'
     | '/api/webhooks/sanity'
   fileRoutesById: FileRoutesById
 }
@@ -182,7 +170,6 @@ export interface RootRouteChildren {
   PhotosSlugRoute: typeof PhotosSlugRoute
   WorldsWorldRoute: typeof WorldsWorldRoute
   ApiReconcileContentRoute: typeof ApiReconcileContentRoute
-  ApiWebhooksCloudinaryRoute: typeof ApiWebhooksCloudinaryRoute
   ApiWebhooksSanityRoute: typeof ApiWebhooksSanityRoute
 }
 
@@ -258,13 +245,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksSanityRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhooks/cloudinary': {
-      id: '/api/webhooks/cloudinary'
-      path: '/api/webhooks/cloudinary'
-      fullPath: '/api/webhooks/cloudinary'
-      preLoaderRoute: typeof ApiWebhooksCloudinaryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/reconcile/content': {
       id: '/api/reconcile/content'
       path: '/api/reconcile/content'
@@ -286,7 +266,6 @@ const rootRouteChildren: RootRouteChildren = {
   PhotosSlugRoute: PhotosSlugRoute,
   WorldsWorldRoute: WorldsWorldRoute,
   ApiReconcileContentRoute: ApiReconcileContentRoute,
-  ApiWebhooksCloudinaryRoute: ApiWebhooksCloudinaryRoute,
   ApiWebhooksSanityRoute: ApiWebhooksSanityRoute,
 }
 export const routeTree = rootRouteImport

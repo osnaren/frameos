@@ -8,32 +8,7 @@ import type {
   PageDocumentId,
   SiteSettings,
 } from '@/types/content'
-import type {
-  GalleryFeed,
-  Photo,
-  PhotoDetailView,
-  PhotoEditorial,
-  PhotoFilters,
-} from '@/types/photo'
-
-export interface CloudinaryProvider {
-  searchPhotos: (filters: PhotoFilters) => Promise<{ photos: Photo[]; nextCursor?: string }>
-  getPhotoByPublicId: (publicId: string) => Promise<Photo | null>
-  getPhotoBySlug: (slug: string) => Promise<Photo | null>
-  listChangedPhotos: (sinceIso: string) => Promise<Photo[]>
-  verifyWebhook: (
-    request: Request,
-    bodyText: string
-  ) => Promise<{
-    ok: boolean
-    reason?: string
-    fingerprint?: string
-    eventType?: string
-    publicId?: string
-    timestamp?: string
-  }>
-  normalizeAsset: (rawAsset: unknown) => Photo
-}
+import type { GalleryFeed, Photo, PhotoDetailView, PhotoFilters } from '@/types/photo'
 
 export type SanityDocumentId = PageDocumentId | 'photo'
 
@@ -42,10 +17,9 @@ export interface SanityProvider {
   getHomePage: () => Promise<HomePageContent | null>
   getAboutPage: () => Promise<AboutPageContent | null>
   getContactPage: () => Promise<ContactPageContent | null>
-  getPhotoEditorial: (publicId: string) => Promise<PhotoEditorial | null>
-  getCuratedPhotoRefs: (
-    pageId: Exclude<PageDocumentId, 'siteSettings'>
-  ) => Promise<{ publicId: string; slug: string }[]>
+  searchPhotos: (filters: PhotoFilters) => Promise<{ photos: Photo[]; nextCursor?: string }>
+  getPhotoBySlug: (slug: string) => Promise<Photo | null>
+  listChangedPhotos: (sinceIso: string) => Promise<Photo[]>
   listChangedDocuments: (sinceIso: string) => Promise<SanityDocumentId[]>
   verifyWebhook: (
     request: Request,
@@ -75,7 +49,7 @@ export interface PortfolioRepository {
     robots?: string
   }>
   reconcileFromWebhook: (
-    provider: 'cloudinary' | 'sanity',
+    provider: 'sanity',
     payload: Record<string, unknown>
   ) => Promise<{ invalidatedTags: string[]; degraded: boolean }>
   reconcileSince: (sinceIso: string) => Promise<{ invalidatedTags: string[]; degraded: boolean }>

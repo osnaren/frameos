@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_CLOUDINARY_CLOUD_NAME?: string
   readonly VITE_SITE_URL?: string
   readonly DEV?: boolean
 }
@@ -14,10 +13,6 @@ interface ImportMeta {
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      readonly CLOUDINARY_API_KEY?: string
-      readonly CLOUDINARY_API_SECRET?: string
-      readonly CLOUDINARY_CLOUD_NAME?: string
-      readonly CLOUDINARY_FOLDER?: string
       readonly SANITY_PROJECT_ID?: string
       readonly SANITY_DATASET?: string
       readonly SANITY_API_TOKEN?: string
