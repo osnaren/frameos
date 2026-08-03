@@ -1,22 +1,24 @@
 # Content Management (Sanity Studio)
 
-Sanity Studio is a standalone sibling project, `studio-frameos`, living next
-to this app (`../studio-frameos`, its own git repo and `package.json`) —
-not embedded in this repo. This app only reads content via `@sanity/client`.
+Sanity Studio lives at `apps/studio` in this monorepo — its own deployable
+package with its own `package.json`, separate from the web app. The web app
+(`apps/web`) only reads content via `@sanity/client`.
 
 ## Running Studio
 
 ```bash
-cd ../studio-frameos
-pnpm install     # first time only
-pnpm dev         # local Studio at http://localhost:3333
-pnpm deploy      # deploy the hosted Studio
+pnpm --filter @frameos/studio dev       # local Studio at http://localhost:3333
+pnpm --filter @frameos/studio deploy    # deploy the hosted Studio
 ```
 
-This app requires `SANITY_PROJECT_ID` and `SANITY_DATASET` in `.env` — see
+Or `cd apps/studio` and run `pnpm dev`/`pnpm deploy` directly. `pnpm dev:studio`
+from the repo root also works (see root [package.json](../../package.json)).
+
+The web app requires `SANITY_PROJECT_ID` and `SANITY_DATASET` in
+`apps/web/.env` — see
 [../reference/environment-variables.md](../reference/environment-variables.md).
-The Studio project itself has `projectId`/`dataset` hardcoded in its own
-`sanity.config.ts`/`sanity.cli.ts` (no `.env` needed there).
+The Studio package itself has `projectId`/`dataset` hardcoded in its own
+`apps/studio/sanity.config.ts`/`sanity.cli.ts` (no `.env` needed there).
 
 ## Document types
 
@@ -29,7 +31,7 @@ The Studio project itself has `projectId`/`dataset` hardcoded in its own
 | `photo`        | The photo library — one document per photograph      | No (the actual content list) |
 
 Singletons are pinned to a single fixed node in Studio's structure
-(`structure.ts` in `studio-frameos`) — there's always exactly one
+(`apps/studio/structure.ts`) — there's always exactly one
 `siteSettings`, `homePage`, `aboutPage`, `contactPage`, and their
 delete/duplicate actions are disabled, so an editor can't accidentally
 create a second copy or delete the only one.

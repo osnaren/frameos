@@ -93,8 +93,8 @@ they're omitted from the diagram above — see the field tables in
 [content-management.md](../guides/content-management.md) for their fields.
 
 - `siteSettings`, `homePage`, `aboutPage`, `contactPage` — singletons, pinned
-  in Studio (see `structure.ts` in the standalone `studio-frameos` project)
-  so editors can't create duplicates or delete the only copy.
+  in Studio (see `apps/studio/structure.ts`) so editors can't create
+  duplicates or delete the only copy.
 - `photo` — the canonical photo document: a native Sanity `image` field
   (`hotspot: true`, `metadata: ['exif', 'location', 'palette', 'lqip',
 'blurhash']`), a native `slug` field, editorial fields, and an `archived`

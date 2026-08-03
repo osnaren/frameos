@@ -5,6 +5,10 @@ framework) with **Sanity** as the single content and photo provider, deployed
 on **Vercel**. There is no separate photo/image CDN — Sanity's own asset
 pipeline handles storage, transforms, and delivery.
 
+This is a monorepo (`apps/web` + `apps/studio`, see the root
+[README](../../README.md#project-structure)) — every `src/`-relative path in
+this architecture section refers to `apps/web/src/` unless stated otherwise.
+
 ## System diagram
 
 ```mermaid

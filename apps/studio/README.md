@@ -1,9 +1,28 @@
-# Sanity Clean Content Studio
+# FrameOS Studio
 
-Congratulations, you have now installed the Sanity Content Studio, an open-source real-time content editing environment connected to the Sanity backend.
+Sanity Studio for FrameOS — the editorial UI for `siteSettings`, the three
+singleton pages (`homePage`, `aboutPage`, `contactPage`), and the `photo`
+document library. Part of the [FrameOS monorepo](../../README.md); see
+[docs/guides/content-management.md](../../docs/guides/content-management.md)
+for the full guide to the schema and curation workflow.
 
-Now you can do the following things:
+## Commands
 
-- [Read “getting started” in the docs](https://www.sanity.io/docs/introduction/getting-started?utm_source=readme)
-- [Join the Sanity community](https://www.sanity.io/community/join?utm_source=readme)
-- [Extend and build plugins](https://www.sanity.io/docs/content-studio/extending?utm_source=readme)
+Run from this directory, or from the repo root with
+`pnpm --filter @frameos/studio <script>`:
+
+| Script      | Purpose                                       |
+| ----------- | --------------------------------------------- |
+| `dev`       | Local Studio at `http://localhost:3333`       |
+| `build`     | Production build (`dist/`)                    |
+| `deploy`    | Deploy the hosted Studio to Sanity's free CDN |
+| `lint`      | ESLint (`@sanity/eslint-config-studio`)       |
+| `typecheck` | `tsc --noEmit`                                |
+
+## Structure
+
+- `schemaTypes/documents/` — `siteSettings`, `homePage`, `aboutPage`,
+  `contactPage`, `photo`
+- `schemaTypes/objects/` — reusable field groups: `seo`, `cta`, `socialLink`
+- `structure.ts` — pins the four singletons to a single fixed node each and
+  disables their delete/duplicate actions (wired in `sanity.config.ts`)

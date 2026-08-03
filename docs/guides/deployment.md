@@ -7,22 +7,26 @@ for the free-tier comparison that led to this architecture.
 
 ## Vercel setup
 
-1. Import the repo into Vercel.
+1. Import the repo into Vercel. Set the project's **Root Directory** (Project
+   Settings → General) to `apps/web` — Vercel then auto-detects the
+   Turborepo + pnpm workspace and builds only the web app. If this project
+   was already deployed before the monorepo restructure, update this setting
+   once by hand — it can't be set from a file in the repo.
 2. Set the environment variables from
    [../reference/environment-variables.md](../reference/environment-variables.md)
    in the project's Settings → Environment Variables.
-3. Deploy. `vercel.json` already declares the reconcile cron job — no extra
-   configuration needed.
+3. Deploy. `apps/web/vercel.json` already declares the reconcile cron job —
+   no extra configuration needed.
 
 ### Cron jobs and the Hobby plan
 
-`vercel.json`'s cron entry runs the reconcile endpoint **once a day**
-(`0 3 * * *`), not hourly. This is a hard Vercel Hobby-plan constraint — cron
-expressions that would run more than once a day fail deployment outright on
-that plan. This is fine functionally: the Sanity webhook (below) is the
-real-time invalidation path, and the cron job is only a drift-correcting
-safety net. If the project ever moves to a paid Vercel plan, this can be
-raised to hourly or more frequent in `vercel.json`.
+`apps/web/vercel.json`'s cron entry runs the reconcile endpoint **once a
+day** (`0 3 * * *`), not hourly. This is a hard Vercel Hobby-plan constraint —
+cron expressions that would run more than once a day fail deployment
+outright on that plan. This is fine functionally: the Sanity webhook (below)
+is the real-time invalidation path, and the cron job is only a
+drift-correcting safety net. If the project ever moves to a paid Vercel
+plan, this can be raised to hourly or more frequent in `apps/web/vercel.json`.
 
 ## Configuring the Sanity webhook
 
@@ -44,12 +48,11 @@ for exactly what happens when this webhook fires.
 
 ## Deploying Sanity Studio
 
-Studio is a separate project (`../studio-frameos`) with its own deploy
-target — it is **not** part of this app's Vercel deployment.
+Studio (`apps/studio`) is a separate deployable package — it is **not** part
+of the web app's Vercel deployment.
 
 ```bash
-cd ../studio-frameos
-pnpm deploy
+pnpm --filter @frameos/studio deploy
 ```
 
 Sanity hosts the built Studio for free at `https://<project-id>.sanity.studio`
