@@ -1,4 +1,4 @@
-import type { StructureResolver } from 'sanity/structure'
+import type {StructureResolver} from 'sanity/structure'
 
 /**
  * Documents that exist exactly once. Pinned to a single fixed node in the

@@ -1,11 +1,11 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 const WORLD_OPTIONS = [
-  { title: 'Wander', value: 'wander' },
-  { title: 'Sacred Geometry', value: 'sacred-geometry' },
-  { title: 'Small Wonders', value: 'small-wonders' },
-  { title: 'Living Things', value: 'living-things' },
-  { title: 'Table Notes', value: 'at-the-table' },
+  {title: 'Wander', value: 'wander'},
+  {title: 'Sacred Geometry', value: 'sacred-geometry'},
+  {title: 'Small Wonders', value: 'small-wonders'},
+  {title: 'Living Things', value: 'living-things'},
+  {title: 'Table Notes', value: 'at-the-table'},
 ]
 
 export const photoType = defineType({
@@ -13,9 +13,9 @@ export const photoType = defineType({
   title: 'Photo',
   type: 'document',
   groups: [
-    { name: 'editorial', title: 'Editorial', default: true },
-    { name: 'capture', title: 'Capture data' },
-    { name: 'organization', title: 'Organization' },
+    {name: 'editorial', title: 'Editorial', default: true},
+    {name: 'capture', title: 'Capture data'},
+    {name: 'organization', title: 'Organization'},
   ],
   fields: [
     defineField({
@@ -35,7 +35,7 @@ export const photoType = defineType({
       description: 'Used in the photo\u2019s public URL: /photos/<slug>.',
       type: 'slug',
       group: 'editorial',
-      options: { source: 'title', maxLength: 96 },
+      options: {source: 'title', maxLength: 96},
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -81,7 +81,7 @@ export const photoType = defineType({
       title: 'World',
       type: 'string',
       group: 'organization',
-      options: { list: WORLD_OPTIONS, layout: 'radio' },
+      options: {list: WORLD_OPTIONS, layout: 'radio'},
     }),
     defineField({
       name: 'series',
@@ -99,8 +99,8 @@ export const photoType = defineType({
       name: 'tags',
       title: 'Tags',
       type: 'array',
-      of: [{ type: 'string' }],
-      options: { layout: 'tags' },
+      of: [{type: 'string'}],
+      options: {layout: 'tags'},
       group: 'organization',
     }),
     defineField({
@@ -163,7 +163,7 @@ export const photoType = defineType({
       media: 'image',
       archived: 'archived',
     },
-    prepare({ title, subtitle, media, archived }) {
+    prepare({title, subtitle, media, archived}) {
       return {
         title: title || 'Untitled photo',
         subtitle: [subtitle, archived ? 'archived' : undefined].filter(Boolean).join(' \u00b7 '),

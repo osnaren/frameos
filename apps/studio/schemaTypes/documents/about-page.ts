@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export const aboutPageType = defineType({
   name: 'aboutPage',
@@ -14,13 +14,13 @@ export const aboutPageType = defineType({
     defineField({
       name: 'body',
       type: 'array',
-      of: [{ type: 'text' }],
+      of: [{type: 'text'}],
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: 'photoHighlights',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'photo' }] }],
+      of: [{type: 'reference', to: [{type: 'photo'}]}],
       validation: (rule) => rule.required().min(1).max(6),
     }),
     defineField({

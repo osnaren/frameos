@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export const siteSettingsType = defineType({
   name: 'siteSettings',
@@ -32,7 +32,7 @@ export const siteSettingsType = defineType({
     defineField({
       name: 'socials',
       type: 'array',
-      of: [{ type: 'socialLink' }],
+      of: [{type: 'socialLink'}],
     }),
     defineField({
       name: 'seo',

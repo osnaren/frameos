@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export const homePageType = defineType({
   name: 'homePage',
@@ -25,7 +25,7 @@ export const homePageType = defineType({
     defineField({
       name: 'featuredPhotos',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'photo' }] }],
+      of: [{type: 'reference', to: [{type: 'photo'}]}],
       validation: (rule) => rule.required().min(1).max(6),
     }),
     defineField({

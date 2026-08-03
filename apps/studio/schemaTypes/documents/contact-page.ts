@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity'
+import {defineField, defineType} from 'sanity'
 
 export const contactPageType = defineType({
   name: 'contactPage',
@@ -14,7 +14,7 @@ export const contactPageType = defineType({
     defineField({
       name: 'body',
       type: 'array',
-      of: [{ type: 'text' }],
+      of: [{type: 'text'}],
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
@@ -24,7 +24,7 @@ export const contactPageType = defineType({
     defineField({
       name: 'socials',
       type: 'array',
-      of: [{ type: 'socialLink' }],
+      of: [{type: 'socialLink'}],
     }),
     defineField({
       name: 'seo',
