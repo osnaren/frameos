@@ -1,5 +1,5 @@
 {
-  "name": "frameos",
+  "name": "@frameos/studio",
   "private": true,
   "version": "1.0.0",
   "main": "package.json",
@@ -9,24 +9,28 @@
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "dev": "sanity dev",
-    "start": "sanity start"
+    "start": "sanity start",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "sanity"
   ],
   "dependencies": {
     "@sanity/vision": "^6.8.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "sanity": "^6.8.0",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
+    "@frameos/typescript-config": "workspace:*",
     "@sanity/eslint-config-studio": "^6.0.0",
-    "@types/react": "^19.2.14",
-    "eslint": "^9.28",
-    "prettier": "^3.5",
-    "typescript": "^5.8"
+    "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
   },
   "prettier": {
     "bracketSpacing": false,

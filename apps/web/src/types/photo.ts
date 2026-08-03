@@ -1,4 +1,6 @@
-export type PhotoStatus = 'draft' | 'published' | 'archived'
+import type { Photo } from '@frameos/content-schema'
+
+export type { Photo, PhotoImageHints, PhotoMetadata, PhotoStatus } from '@frameos/content-schema'
 
 export interface PhotoFilters {
   category?: string
@@ -6,51 +8,6 @@ export interface PhotoFilters {
   tag?: string
   after?: string
   limit?: number
-}
-
-export interface PhotoMetadata {
-  width: number
-  height: number
-  format: string
-  bytes: number
-  createdAt: string
-  updatedAt?: string
-  camera?: string
-  lens?: string
-  focalLength?: string
-  iso?: string
-  shutterSpeed?: string
-  aperture?: string
-  gps?: string
-  palette?: string[]
-}
-
-/** Rendering hints available only for live Sanity-hosted images (not the local fixture archive). */
-export interface PhotoImageHints {
-  /** Base64 blur data URI, used directly as the placeholder — no extra network request. */
-  lqip?: string
-  /** Editor-set focal point (0..1), used for hotspot-aware cropped presets. */
-  hotspot?: { x: number; y: number }
-}
-
-export interface Photo {
-  /** Local fixture id (`local/<id>`) or a Sanity image CDN base URL — see PhotoImage. */
-  publicId: string
-  slug: string
-  status: PhotoStatus
-  title: string
-  alt: string
-  description?: string
-  caption?: string
-  category?: string
-  series?: string
-  locationLabel?: string
-  captureDate?: string
-  sortOrder: number
-  metadataVersion: 'v2'
-  tags: string[]
-  metadata: PhotoMetadata
-  image?: PhotoImageHints
 }
 
 export interface PhotoCardView {
