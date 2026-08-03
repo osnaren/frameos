@@ -81,6 +81,6 @@ the existing app moved to `apps/web`:
   matching edit here. A future improvement would be generating this package
   from Sanity's schema (`sanity schema extract` + typegen) instead; not done
   now to keep this change scoped to structure, not tooling.
-- The original standalone `studio-frameos` checkout (and its git history)
-  remains on disk as a local fallback but is no longer the source of truth —
-  `apps/studio` in this repo is.
+- The original standalone `studio-frameos` checkout has been deleted —
+  `apps/studio`'s history (preserved via the squashed subtree merge) is now
+  the only copy, and `apps/studio` in this repo is the sole source of truth.

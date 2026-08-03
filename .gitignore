@@ -19,7 +19,6 @@ dist-ssr
 .codex-temp
 .playwright-cli/
 output/playwright/
-legacy-src/
 
 # Environment files
 .env

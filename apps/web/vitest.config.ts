@@ -11,6 +11,5 @@ export default defineConfig({
       'tests/**/*.test.ts',
       'tests/**/*.test.tsx',
     ],
-    exclude: ['legacy-src/**'],
   },
 })

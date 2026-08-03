@@ -20,7 +20,6 @@
     "*.jpg",
     "*.ico",
     "*.svg",
-    "legacy-src/**",
     "apps/web/public/photos/**",
     "apps/web/src/content/photo-manifest.json",
     "apps/web/src/routeTree.gen.ts",

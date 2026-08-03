@@ -77,7 +77,6 @@ packages/
   content-schema/      Shared content/photo TypeScript types (types-only, no build step)
 docs/           Architecture, guides, decision records (see docs/README.md)
 media-production/  Creative-production inputs/outputs for the Pocket Worlds photo/video set
-legacy-src/     Visual/reference material only from the pre-migration app; not built, tested, or linted
 ```
 
 - `apps/web/src/routes/` — TanStack Start file-based routes (pages + `api/**` handlers)

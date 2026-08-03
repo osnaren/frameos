@@ -118,9 +118,7 @@ export default tseslint.config(
       '.output/**',
       '.tanstack/**',
       'dist/**',
-      'legacy-src/**',
       'eslint.config.js',
-      'prettier.config.js',
     ],
   }
 )
