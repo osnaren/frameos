@@ -11,9 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+*.tsbuildinfo
 .nitro
 .output
 .tanstack
+.turbo
 .codex-temp
 .playwright-cli/
 output/playwright/
