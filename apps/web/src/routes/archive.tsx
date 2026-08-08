@@ -1,7 +1,7 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 import { z } from 'zod'
 
 import { ArchiveLightbox } from '@/components/archive/ArchiveLightbox'
@@ -77,6 +77,8 @@ function FrameCounter({
     const container = containerRef.current
     if (!container) return
 
+    setCurrent(0)
+
     const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
       threshold: 0.1,
     })
@@ -89,7 +91,7 @@ function FrameCounter({
         const rect = item.getBoundingClientRect()
         if (rect.top < window.innerHeight * 0.7) count++
       }
-      setCurrent(count)
+      setCurrent(Math.min(count, total))
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -98,7 +100,7 @@ function FrameCounter({
       observer.disconnect()
       window.removeEventListener('scroll', onScroll)
     }
-  }, [containerRef, reducedMotion])
+  }, [containerRef, reducedMotion, total])
 
   if (reducedMotion) return null
 
@@ -128,6 +130,7 @@ function ArchiveRoute() {
   const activeWorld = search.world
     ? (worlds.find((world) => world.slug === search.world) ?? null)
     : null
+  const contactSheetKey = activeWorld?.slug ?? 'all-worlds'
 
   const handleLightboxIndexChange = (index: number | null) => {
     setActiveIndex(index)
@@ -294,113 +297,153 @@ function ArchiveRoute() {
           </div>
         ) : null}
 
-        {/* Justified contact-sheet rows with staggered scroll reveal + 3D tilt */}
-        {feed.items.length === 0 ? (
-          <p className="mono-label mt-16 text-center">
-            No frames in {activeWorld ? activeWorld.name : 'this world'} yet — try another world.
+        <section className="archive-sheet-region">
+          <p className="sr-only" role="status" aria-live="polite">
+            Showing {feed.items.length} frames
+            {activeWorld ? ` from ${activeWorld.name}` : ' from all worlds'}.
           </p>
-        ) : (
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-          <ul
-            ref={sheetRef}
-            onKeyDown={handleSheetKeyDown}
-            className="mt-8 flex list-none flex-wrap gap-2 p-0"
-          >
-            {feed.items.map((item, index) => {
-              const photo = item.photo
-              const { width, height } = photo.metadata
-              const ratio = width > 0 && height > 0 ? width / height : 1
-              const world = photo.category
-                ? (worlds.find((entry) => entry.slug === photo.category) ?? null)
-                : null
-
-              return (
-                <motion.li
-                  key={photo.slug}
-                  data-frame-index={index}
-                  className="m-0 grow"
-                  style={{
-                    flexBasis: `${Math.round(ratio * 200)}px`,
-                    flexGrow: Math.round(ratio * 100),
-                  }}
-                  initial={false}
-                  whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: '-40px 0px' }}
-                  transition={{
-                    duration: 0.6,
-                    delay: staggerDelay(index),
-                    ease: focusEase,
-                  }}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={contactSheetKey}
+              initial={
+                reducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 14, scale: 0.995, filter: 'blur(5px)' }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={
+                reducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -8, scale: 0.998, filter: 'blur(3px)' }
+              }
+              transition={{ duration: reducedMotion ? 0.15 : 0.42, ease: focusEase }}
+            >
+              {/* Justified contact-sheet rows with staggered scroll reveal + 3D tilt */}
+              {feed.items.length === 0 ? (
+                <p className="mono-label mt-16 text-center">
+                  No frames in {activeWorld ? activeWorld.name : 'this world'} yet — try another
+                  world.
+                </p>
+              ) : (
+                <motion.ul
+                  ref={sheetRef}
+                  onKeyDown={handleSheetKeyDown}
+                  className="mt-8 flex list-none flex-wrap gap-2 p-0"
+                  layout={!reducedMotion}
                 >
-                  <button
-                    type="button"
-                    data-archive-trigger
-                    aria-label={`Open \u201c${photo.title}\u201d in the image viewer`}
-                    className="pocket-frame depth-frame archive-frame-trigger group block h-full w-full border-0 p-0 text-left"
-                    style={
-                      {
-                        '--glow-color': world?.mood.accent ?? 'var(--accent)',
-                      } as React.CSSProperties
-                    }
-                    onClick={(event) => {
-                      lightboxTriggerRef.current = event.currentTarget
-                      setActiveIndex(index)
-                    }}
-                    onPointerMove={(event) => {
-                      const rect = event.currentTarget.getBoundingClientRect()
-                      event.currentTarget.style.setProperty(
-                        '--cursor-x',
-                        `${event.clientX - rect.left}px`
-                      )
-                      event.currentTarget.style.setProperty(
-                        '--cursor-y',
-                        `${event.clientY - rect.top}px`
-                      )
-                    }}
-                  >
-                    <PhotoImage
-                      publicId={photo.publicId}
-                      alt={photo.alt}
-                      preset="gallery"
-                      sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px"
-                      priority={index < 6}
-                      intrinsicWidth={width || undefined}
-                      intrinsicHeight={height || undefined}
-                      lqip={photo.image?.lqip}
-                      hotspot={photo.image?.hotspot}
-                      className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
-                      style={{
-                        aspectRatio: `${width || 1} / ${height || 1}`,
-                      }}
-                    />
-                    <span aria-hidden="true" className="archive-photo-glow" />
-                    <span aria-hidden="true" className="archive-focus-cursor">
-                      <i />
-                      <i />
-                      <i />
-                      <i />
-                    </span>
-                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--tl" />
-                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--tr" />
-                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--bl" />
-                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--br" />
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-x-0 bottom-0 z-2 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/60 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
-                    >
-                      <span className="truncate text-xs font-medium text-white">{photo.title}</span>
-                      <span className="mono-label shrink-0 text-white/80!">
-                        {world ? world.name : ''}
-                      </span>
-                    </span>
-                  </button>
-                </motion.li>
-              )
-            })}
-          </ul>
-        )}
+                  {feed.items.map((item, index) => {
+                    const photo = item.photo
+                    const { width, height } = photo.metadata
+                    const ratio = width > 0 && height > 0 ? width / height : 1
+                    const world = photo.category
+                      ? (worlds.find((entry) => entry.slug === photo.category) ?? null)
+                      : null
 
-        <p className="mono-label mt-10">Arrow keys move between frames</p>
+                    return (
+                      <motion.li
+                        key={photo.slug}
+                        data-frame-index={index}
+                        className="m-0 grow"
+                        style={{
+                          flexBasis: `${Math.round(ratio * 200)}px`,
+                          flexGrow: Math.round(ratio * 100),
+                        }}
+                        layout={!reducedMotion}
+                        initial={false}
+                        whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+                        viewport={{ once: true, margin: '-40px 0px' }}
+                        transition={{
+                          duration: 0.6,
+                          delay: staggerDelay(index),
+                          ease: focusEase,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          data-archive-trigger
+                          aria-label={`Open \u201c${photo.title}\u201d in the image viewer`}
+                          className="pocket-frame depth-frame archive-frame-trigger group block h-full w-full border-0 p-0 text-left"
+                          style={
+                            {
+                              '--glow-color': world?.mood.accent ?? 'var(--accent)',
+                            } as React.CSSProperties
+                          }
+                          onClick={(event) => {
+                            lightboxTriggerRef.current = event.currentTarget
+                            setActiveIndex(index)
+                          }}
+                          onPointerMove={(event) => {
+                            const rect = event.currentTarget.getBoundingClientRect()
+                            event.currentTarget.style.setProperty(
+                              '--cursor-x',
+                              `${event.clientX - rect.left}px`
+                            )
+                            event.currentTarget.style.setProperty(
+                              '--cursor-y',
+                              `${event.clientY - rect.top}px`
+                            )
+                          }}
+                        >
+                          <PhotoImage
+                            publicId={photo.publicId}
+                            alt={photo.alt}
+                            preset="gallery"
+                            sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px"
+                            priority={index < 6}
+                            intrinsicWidth={width || undefined}
+                            intrinsicHeight={height || undefined}
+                            lqip={photo.image?.lqip}
+                            hotspot={photo.image?.hotspot}
+                            className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
+                            style={{
+                              aspectRatio: `${width || 1} / ${height || 1}`,
+                            }}
+                          />
+                          <span aria-hidden="true" className="archive-photo-glow" />
+                          <span aria-hidden="true" className="archive-focus-cursor">
+                            <i />
+                            <i />
+                            <i />
+                            <i />
+                          </span>
+                          <span
+                            aria-hidden="true"
+                            className="archive-edge-dot archive-edge-dot--tl"
+                          />
+                          <span
+                            aria-hidden="true"
+                            className="archive-edge-dot archive-edge-dot--tr"
+                          />
+                          <span
+                            aria-hidden="true"
+                            className="archive-edge-dot archive-edge-dot--bl"
+                          />
+                          <span
+                            aria-hidden="true"
+                            className="archive-edge-dot archive-edge-dot--br"
+                          />
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-x-0 bottom-0 z-2 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/60 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+                          >
+                            <span className="truncate text-xs font-medium text-white">
+                              {photo.title}
+                            </span>
+                            <span className="mono-label shrink-0 text-white/80!">
+                              {world ? world.name : ''}
+                            </span>
+                          </span>
+                        </button>
+                      </motion.li>
+                    )
+                  })}
+                </motion.ul>
+              )}
+
+              <p className="mono-label mt-10">Arrow keys move between frames</p>
+            </motion.div>
+          </AnimatePresence>
+        </section>
       </div>
 
       {/* Floating frame counter */}

@@ -3679,6 +3679,10 @@ a:focus-visible .frame-corners {
   outline-offset: 4px;
 }
 
+.archive-sheet-region {
+  min-height: clamp(34rem, 72svh, 58rem);
+}
+
 .archive-edge-dot {
   position: absolute;
   z-index: 4;
@@ -3737,20 +3741,6 @@ a:focus-visible .frame-corners {
     transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.archive-focus-cursor::after {
-  content: 'VIEW';
-  position: absolute;
-  top: calc(100% + 7px);
-  left: 50%;
-  color: white;
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  letter-spacing: 0.16em;
-  white-space: nowrap;
-  text-shadow: 0 1px 8px black;
-  transform: translateX(-50%);
-}
-
 .archive-focus-cursor i {
   position: absolute;
   width: 5px;
@@ -3787,6 +3777,12 @@ a:focus-visible .frame-corners {
   .archive-frame-trigger:hover .archive-focus-cursor {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .archive-sheet-region {
+    min-height: 62svh;
   }
 }
 
