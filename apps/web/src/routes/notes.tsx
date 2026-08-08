@@ -1,12 +1,12 @@
 import { useRef } from 'react'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { motion, useReducedMotion, useScroll } from 'framer-motion'
+import { motion, useScroll } from 'framer-motion'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { contactSheet, revealVariants } from '@/lib/motion'
+import { contactSheet, revealVariants, useHydratedReducedMotion } from '@/lib/motion'
 import { getAboutViewServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/notes')({
@@ -35,7 +35,7 @@ const NOTICING = [
 ]
 
 function ReadingProgress({ target }: { target: React.RefObject<HTMLElement | null> }) {
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const { scrollYProgress } = useScroll({ target, offset: ['start start', 'end end'] })
 
   if (reducedMotion) return null
@@ -44,7 +44,7 @@ function ReadingProgress({ target }: { target: React.RefObject<HTMLElement | nul
 
 function FieldNotesRoute() {
   const data = Route.useLoaderData()!
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const pageRef = useRef<HTMLElement>(null)
   const lead = data.gallery.at(0)
   const stills = data.gallery.slice(1)

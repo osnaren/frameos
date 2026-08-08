@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import { createFileRoute } from '@tanstack/react-router'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight, Check, Copy } from 'lucide-react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { contactSheet, revealVariants } from '@/lib/motion'
+import { contactSheet, revealVariants, useHydratedReducedMotion } from '@/lib/motion'
 import { getContactViewServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/signal')({
@@ -76,7 +76,7 @@ function CopyEmailButton({ email }: { email: string }) {
 
 function SignalRoute() {
   const data = Route.useLoaderData()!
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const email = data.page.email
   const socials = data.page.socials.filter((social) => !social.href.startsWith('mailto:'))
 

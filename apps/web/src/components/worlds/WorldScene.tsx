@@ -2,8 +2,9 @@ import { useRef } from 'react'
 
 import { useGSAP } from '@gsap/react'
 import { Link } from '@tanstack/react-router'
-import { useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
+
+import { useHydratedReducedMotion } from '@/lib/motion'
 
 import { WorldDome } from './WorldDome'
 
@@ -33,7 +34,7 @@ export function WorldScene({
   nextWorld: World
 }) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
 
   useGSAP(
     () => {

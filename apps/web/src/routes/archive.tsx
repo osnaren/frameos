@@ -1,13 +1,13 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { z } from 'zod'
 
 import { ArchiveLightbox } from '@/components/archive/ArchiveLightbox'
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { chrome, focusEase } from '@/lib/motion'
+import { chrome, focusEase, useHydratedReducedMotion } from '@/lib/motion'
 import { getGalleryFeedServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 const archiveSearchSchema = z.object({
@@ -68,7 +68,7 @@ function FrameCounter({
   total: number
   containerRef: React.RefObject<HTMLElement | null>
 }) {
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const [visible, setVisible] = useState(false)
   const [current, setCurrent] = useState(0)
 
@@ -123,7 +123,7 @@ function ArchiveRoute() {
   const sheetRef = useRef<HTMLUListElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const lightboxTriggerRef = useRef<HTMLButtonElement>(null)
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const activeWorld = search.world
     ? (worlds.find((world) => world.slug === search.world) ?? null)

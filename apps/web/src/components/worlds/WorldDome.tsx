@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react'
 
 import { Link } from '@tanstack/react-router'
-import { useReducedMotion } from 'framer-motion'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
+import { useHydratedReducedMotion } from '@/lib/motion'
 
 import type { World } from '@/types/content'
 import type { Photo } from '@/types/photo'
@@ -107,7 +107,7 @@ const MIN_TILT = -22
  * lighting rig, no bundle weight, and it actually shows the photographs).
  */
 export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) {
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const frameRefs = useRef<Array<HTMLAnchorElement | null>>([])

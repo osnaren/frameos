@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
 import { useTiltHover } from '@/hooks/use-tilt-hover'
-import { revealVariants } from '@/lib/motion'
+import { revealVariants, useHydratedReducedMotion } from '@/lib/motion'
 
 import type { World } from '@/types/content'
 import type { Photo } from '@/types/photo'
@@ -21,7 +21,7 @@ export function WorldPortal({
   className?: string
   sizes?: string
 }) {
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const tiltRef = useTiltHover<HTMLAnchorElement>(6)
 
   return (

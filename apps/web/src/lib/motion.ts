@@ -6,10 +6,29 @@
  * - `frameEase` — quicker, for interface chrome
  * - reveals resolve from soft blur to sharp, like an image finding focus
  *
- * Reduced motion is handled at the component level with useReducedMotion;
- * a global CSS fallback also collapses durations.
+ * Reduced motion is handled at the component level with an SSR-stable media
+ * query; a global CSS fallback also collapses durations.
  */
+import { useSyncExternalStore } from 'react'
+
 import type { Transition, Variants } from 'framer-motion'
+
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+
+function subscribeToReducedMotion(onStoreChange: () => void) {
+  const media = window.matchMedia(REDUCED_MOTION_QUERY)
+  media.addEventListener('change', onStoreChange)
+  return () => media.removeEventListener('change', onStoreChange)
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches
+}
+
+/** Keeps the server and first client render identical, then applies the OS preference. */
+export function useHydratedReducedMotion() {
+  return useSyncExternalStore(subscribeToReducedMotion, getReducedMotionSnapshot, () => false)
+}
 
 export const focusEase = [0.16, 1, 0.3, 1] as const
 export const frameEase = [0.3, 0.9, 0.4, 1] as const

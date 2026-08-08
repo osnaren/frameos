@@ -1,4 +1,6 @@
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
+
+import { useHydratedReducedMotion } from '@/lib/motion'
 
 import type { PropsWithChildren } from 'react'
 
@@ -7,7 +9,7 @@ export function Reveal({
   delay = 0,
   className,
 }: PropsWithChildren<{ delay?: number; className?: string }>) {
-  const prefersReducedMotion = useReducedMotion()
+  const prefersReducedMotion = useHydratedReducedMotion()
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>

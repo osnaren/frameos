@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 
-import { contactSheet, revealVariants } from '@/lib/motion'
+import { contactSheet, revealVariants, useHydratedReducedMotion } from '@/lib/motion'
 
 /**
  * Root 404: styled like an empty frame rather than a bare router fallback —
@@ -9,7 +9,7 @@ import { contactSheet, revealVariants } from '@/lib/motion'
  * already leans on "it never developed."
  */
 export function NotFound() {
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
 
   return (
     <section className="relative mx-auto flex min-h-[60svh] max-w-2xl items-center justify-center overflow-clip px-6 py-14 sm:px-10">

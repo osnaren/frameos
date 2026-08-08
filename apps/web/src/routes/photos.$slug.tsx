@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type PanInfo,
-} from 'framer-motion'
+import { AnimatePresence, motion, useScroll, useTransform, type PanInfo } from 'framer-motion'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
+import { useHydratedReducedMotion } from '@/lib/motion'
 import {
   getGalleryFeedServer,
   getPhotoDetailServer,
@@ -191,7 +185,7 @@ function MetadataHotspot({ photo }: { photo: Photo }) {
 function PhotoDetailRoute() {
   const { detail, worlds, siblings, position } = Route.useLoaderData()
   const navigate = useNavigate()
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useHydratedReducedMotion()
   const figureRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: figureRef,
