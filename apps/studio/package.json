@@ -12,7 +12,7 @@
     "start": "sanity start",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "schema:extract": "sanity schema extract",
+    "schema:extract": "sanity schema extract --force",
     "seed:production": "sanity exec scripts/seed-production.ts --with-user-token",
     "seed:production:apply": "sanity exec scripts/seed-production.ts --with-user-token -- --apply",
     "typegen": "sanity typegen generate",

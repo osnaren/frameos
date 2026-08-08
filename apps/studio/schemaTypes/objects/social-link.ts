@@ -13,7 +13,7 @@ export const socialLinkType = defineType({
     defineField({
       name: 'href',
       type: 'url',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().uri({scheme: ['http', 'https', 'mailto', 'tel']}),
     }),
   ],
 })
