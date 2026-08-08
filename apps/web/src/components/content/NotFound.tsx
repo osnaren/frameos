@@ -12,7 +12,7 @@ export function NotFound() {
   const reducedMotion = useReducedMotion()
 
   return (
-    <section className="relative mx-auto flex min-h-[60svh] max-w-2xl items-center justify-center px-6 py-14 sm:px-10">
+    <section className="relative mx-auto flex min-h-[60svh] max-w-2xl items-center justify-center overflow-clip px-6 py-14 sm:px-10">
       <span aria-hidden="true" className="not-found-safelight" />
       <motion.div
         className="surface-panel relative flex flex-col items-center gap-7 rounded-3xl px-6 py-14 text-center sm:px-10"

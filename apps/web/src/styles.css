@@ -2485,6 +2485,7 @@ a:focus-visible .frame-corners {
 
 .world-scene {
   position: relative;
+  overflow: clip;
 }
 
 .world-reading-progress {
@@ -3576,7 +3577,7 @@ a:focus-visible .frame-corners {
 }
 
 .archive-focus-cursor::after {
-  content: 'OPEN';
+  content: 'VIEW';
   position: absolute;
   top: calc(100% + 7px);
   left: 50%;
@@ -3584,6 +3585,7 @@ a:focus-visible .frame-corners {
   font-family: var(--font-mono);
   font-size: 0.5rem;
   letter-spacing: 0.16em;
+  white-space: nowrap;
   text-shadow: 0 1px 8px black;
   transform: translateX(-50%);
 }
@@ -4028,7 +4030,7 @@ a:focus-visible .frame-corners {
   align-items: center;
   gap: 0.75rem;
   border-bottom: 1px solid rgba(244, 240, 232, 0.12);
-  padding: 0.65rem max(1rem, calc((100vw - 78rem) / 2));
+  padding: 0.65rem max(1rem, calc((100% - 1240px) / 2));
   color: rgba(244, 240, 232, 0.42);
   font-family: var(--font-mono);
   font-size: 0.55rem;
@@ -4103,7 +4105,7 @@ a:focus-visible .frame-corners {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: baseline;
-  margin-top: clamp(3rem, 8vw, 7rem);
+  margin-top: clamp(2.75rem, 7vw, 6.5rem);
   color: #f4f0e8;
   font-family: 'Fraunces', Georgia, serif;
   font-size: clamp(5rem, 19vw, 16rem);
@@ -4124,7 +4126,7 @@ a:focus-visible .frame-corners {
 .cinematic-footer-nav {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin-top: clamp(3rem, 6vw, 5rem);
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
   border-top: 1px solid rgba(244, 240, 232, 0.17);
   border-bottom: 1px solid rgba(244, 240, 232, 0.17);
 }
@@ -4239,6 +4241,10 @@ a:focus-visible .frame-corners {
 
 .cinematic-footer-credits p:nth-child(2) {
   text-align: center;
+}
+
+.cinematic-footer-credits > span {
+  justify-self: end;
 }
 
 .cinematic-footer-top {
@@ -4600,6 +4606,16 @@ a:focus-visible .frame-corners {
   .signal-transmission {
     width: min(100%, 34rem);
     justify-self: end;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+  .signal-heading {
+    grid-column: 1 / span 7;
+  }
+
+  .signal-transmission {
+    grid-column: 8 / -1;
   }
 }
 

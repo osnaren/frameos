@@ -7,12 +7,13 @@ import gsap from 'gsap'
  * A small viewfinder badge that trails the pointer and locks onto any
  * `.pocket-frame` it crosses — the same corner-bracket motif drawn on every
  * photograph, brought to the cursor itself. Skipped entirely on the home
- * page, touch devices, and under reduced motion.
+ * and Archive pages (Archive owns its more precise four-point cursor), touch
+ * devices, and under reduced motion.
  */
 export function ViewfinderCursor() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
 
-  if (pathname === '/') {
+  if (pathname === '/' || pathname === '/archive') {
     return null
   }
 

@@ -54,7 +54,7 @@ function WorldRoute() {
   const photos = feed.items.map((item) => item.photo)
 
   return (
-    <main className="relative px-4">
+    <main className="relative overflow-clip">
       {feed.isDegraded ? (
         <div className="page-shell pt-6">
           <StatusBanner title="Serving cached content.">
