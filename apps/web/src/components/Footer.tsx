@@ -1,142 +1,17 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 
+import { useGSAP } from '@gsap/react'
 import { Link } from '@tanstack/react-router'
-import { useReducedMotion } from 'framer-motion'
-
-import { pocketWorldJourney } from '@/content/pocket-worlds-journey'
-import { useMagneticHover } from '@/hooks/use-magnetic-hover'
-
-/** A row of small perforations along the footer's top edge — a film-strip echo, not a UI control. */
-function FilmSprockets() {
-  return <div className="footer-sprockets" aria-hidden="true" />
-}
-
-function Keyframe({ scene }: { scene: (typeof pocketWorldJourney)[number] }) {
-  return (
-    <Link
-      to="/worlds/$world"
-      params={{ world: scene.worldSlug }}
-      aria-label={`Enter ${scene.label}`}
-      className="pocket-frame footer-keyframe group block w-28 shrink-0 no-underline sm:w-36"
-    >
-      <img
-        src={scene.fallbackImage}
-        srcSet={scene.fallbackSrcSet}
-        alt=""
-        sizes="144px"
-        className="h-auto w-full rounded-lg"
-        loading="lazy"
-        draggable={false}
-      />
-      <span className="frame-corners" aria-hidden="true" />
-    </Link>
-  )
-}
-
-/** A looping reel of keyframes. The duplicate reel is visual only, not a second tab sequence. */
-function KeyframeStrip() {
-  const stripRef = useRef<HTMLDivElement>(null)
-  const reducedMotion = useReducedMotion()
-  const [visible, setVisible] = useState(Boolean(reducedMotion))
-
-  useEffect(() => {
-    if (reducedMotion) {
-      setVisible(true)
-      return
-    }
-
-    const el = stripRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.2 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [reducedMotion])
-
-  return (
-    <div
-      ref={stripRef}
-      className="footer-reel mt-8 overflow-hidden"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateY(12px)',
-      }}
-      aria-label="Pocket Worlds keyframes"
-    >
-      <div className="scroll-strip-track">
-        <div className="scroll-strip-group">
-          {pocketWorldJourney.map((scene) => (
-            <Keyframe key={scene.id} scene={scene} />
-          ))}
-        </div>
-        <div className="scroll-strip-group" aria-hidden="true">
-          {pocketWorldJourney.map((scene) => (
-            <div
-              key={`echo-${scene.id}`}
-              className="pocket-frame footer-keyframe w-28 shrink-0 sm:w-36"
-            >
-              <img
-                src={scene.fallbackImage}
-                srcSet={scene.fallbackSrcSet}
-                alt=""
-                sizes="144px"
-                className="h-auto w-full rounded-lg"
-                loading="lazy"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
+import gsap from 'gsap'
+import { ArrowUpRight } from 'lucide-react'
 
 const NAV_LINKS = [
-  { to: '/', hash: 'worlds', label: 'Worlds' },
-  { to: '/archive', label: 'Index' },
-  { to: '/notes', label: 'Field Notes' },
-  { to: '/signal', label: 'Signal' },
+  { to: '/', hash: 'worlds', label: 'Worlds', note: 'Enter the collections' },
+  { to: '/archive', label: 'Index', note: 'View every exposure' },
+  { to: '/notes', label: 'Field Notes', note: 'Read the practice' },
+  { to: '/signal', label: 'Signal', note: 'Start a conversation' },
 ] as const
 
-/** A footer nav link with a subtle magnetic pull, matching the site's other CTAs. */
-function FooterNavLink({
-  link,
-  index,
-  visible,
-  reducedMotion,
-}: {
-  link: (typeof NAV_LINKS)[number]
-  index: number
-  visible: boolean
-  reducedMotion: boolean | null
-}) {
-  const magneticRef = useMagneticHover<HTMLAnchorElement>(0.35, 10)
-
-  return (
-    <Link
-      ref={magneticRef}
-      to={link.to}
-      hash={'hash' in link ? link.hash : undefined}
-      className="link-glow no-underline transition-all duration-300 hover:text-(--ink)"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateY(8px)',
-        transitionDelay: reducedMotion ? '0ms' : `${index * 80}ms`,
-      }}
-    >
-      {link.label}
-    </Link>
-  )
-}
-
-/** A minimal iris glyph — the blades draw inward on hover, like an aperture closing a stop. */
 function ApertureIcon() {
   return (
     <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" className="aperture-icon">
@@ -165,76 +40,114 @@ function BackToTop() {
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
         window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
       }}
-      className="back-to-top mono-label inline-flex cursor-pointer items-center gap-2 transition-colors hover:text-(--ink)"
+      className="cinematic-footer-top"
     >
       <ApertureIcon />
-      Back to top
+      Rewind
     </button>
   )
 }
 
 export default function Footer() {
   const year = new Date().getFullYear()
-  const reducedMotion = useReducedMotion()
-  const [linksVisible, setLinksVisible] = useState(Boolean(reducedMotion))
-  const navRef = useRef<HTMLElement>(null)
+  const footerRef = useRef<HTMLElement>(null)
 
-  useEffect(() => {
-    if (reducedMotion) {
-      setLinksVisible(true)
-      return
-    }
+  useGSAP(
+    () => {
+      const root = footerRef.current
+      if (!root) return
 
-    const el = navRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setLinksVisible(true)
+      const reveals = gsap.utils.toArray<HTMLElement>('[data-footer-reveal]', root)
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      if (reducedMotion) {
+        gsap.set(reveals, { clearProps: 'all' })
+        return
+      }
+
+      gsap.set(reveals, { yPercent: 110, filter: 'blur(8px)', opacity: 0 })
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return
           observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [reducedMotion])
+          gsap.to(reveals, {
+            yPercent: 0,
+            filter: 'blur(0px)',
+            opacity: 1,
+            duration: 1.1,
+            stagger: 0.08,
+            ease: 'expo.out',
+            clearProps: 'transform,filter,opacity',
+          })
+        },
+        { threshold: 0.2 }
+      )
+
+      observer.observe(root)
+      return () => observer.disconnect()
+    },
+    { scope: footerRef }
+  )
 
   return (
-    <footer className="site-footer border-t border-(--line) px-4 pb-10 pt-6 text-(--muted)">
-      <FilmSprockets />
-      <KeyframeStrip />
+    <footer ref={footerRef} className="cinematic-footer">
+      <div className="cinematic-footer-rail" aria-hidden="true">
+        <span>36</span>
+        <i />
+        <span>FRAME / OS</span>
+        <i />
+        <span>∞</span>
+      </div>
 
-      <div className="page-shell mt-10 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
-        <div>
-          <p className="footer-brand-statement">An archive of noticing.</p>
-          <p className="mono-label mt-4">FrameOS · Pocket Worlds · {year}</p>
+      <div className="page-shell cinematic-footer-inner">
+        <div className="cinematic-footer-intro">
+          <div className="cinematic-footer-reveal-mask">
+            <p data-footer-reveal>Every photograph closes one moment and opens another.</p>
+          </div>
+          <Link to="/signal" className="cinematic-footer-signal">
+            Leave a signal
+            <ArrowUpRight aria-hidden="true" />
+          </Link>
         </div>
 
-        <div className="space-y-4 text-[0.95rem] leading-7 lg:justify-self-end lg:text-right">
-          <nav
-            ref={navRef}
-            aria-label="Footer"
-            className="flex flex-wrap gap-x-6 gap-y-2 lg:justify-end"
-          >
-            {NAV_LINKS.map((link, index) => (
-              <FooterNavLink
-                key={link.label}
-                link={link}
-                index={index}
-                visible={linksVisible}
-                reducedMotion={reducedMotion}
-              />
-            ))}
-          </nav>
+        <div className="cinematic-footer-wordmark" aria-label="Frame OS">
+          <span className="cinematic-footer-reveal-mask">
+            <span data-footer-reveal>FRAME</span>
+          </span>
+          <span className="cinematic-footer-wordmark-slash" aria-hidden="true">
+            /
+          </span>
+          <span className="cinematic-footer-reveal-mask">
+            <span data-footer-reveal>OS</span>
+          </span>
+        </div>
 
-          <div className="golden-thread my-3" aria-hidden="true" />
-          <p className="mono-label m-0 text-[0.6rem]! tracking-[0.18em]!">
-            Things I noticed, photographed on a phone.
-          </p>
-          <div className="flex flex-wrap items-center gap-3 lg:justify-end">
-            <BackToTop />
-          </div>
+        <nav aria-label="Footer" className="cinematic-footer-nav">
+          {NAV_LINKS.map((link, index) => (
+            <Link
+              key={link.label}
+              to={link.to}
+              hash={'hash' in link ? link.hash : undefined}
+              className="cinematic-footer-link"
+              data-footer-reveal
+            >
+              <span className="cinematic-footer-link-index">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span>
+                <strong>{link.label}</strong>
+                <small>{link.note}</small>
+              </span>
+              <ArrowUpRight aria-hidden="true" />
+            </Link>
+          ))}
+        </nav>
+
+        <div className="cinematic-footer-credits">
+          <p>FrameOS · Pocket Worlds · {year}</p>
+          <p>Things noticed, photographed on a phone.</p>
+          <BackToTop />
         </div>
       </div>
     </footer>
