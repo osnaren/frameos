@@ -37,9 +37,8 @@ The bundled archive is generated from local originals that are **never
 committed** (`apps/web/photo-source/` is git-ignored):
 
 ```bash
-# from apps/web/, put source photos in photo-source/, then:
-cd apps/web
-node scripts/build-photo-assets.mjs
+# from the repository root, put source photos in apps/web/photo-source/, then:
+pnpm photos:build
 ```
 
 This script (`apps/web/scripts/build-photo-assets.mjs`):

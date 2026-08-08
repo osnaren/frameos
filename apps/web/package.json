@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
+    "photos:build": "node scripts/build-photo-assets.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
