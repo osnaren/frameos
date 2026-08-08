@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { AnimatePresence, motion, useScroll, useTransform, type PanInfo } from 'framer-motion'
+import { motion, useScroll, useTransform, type PanInfo } from 'framer-motion'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useHydratedReducedMotion } from '@/lib/motion'
 import {
   getGalleryFeedServer,
@@ -105,80 +113,50 @@ function MetadataHotspot({ photo }: { photo: Photo }) {
     metadata.camera || metadata.lens || metadata.aperture || metadata.shutterSpeed || metadata.iso
   )
 
-  useEffect(() => {
-    if (!open) return
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
-    }
-    window.addEventListener('keydown', closeOnEscape)
-    return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [open])
-
   return (
-    <>
-      <button
-        type="button"
-        className="photo-metadata-hotspot"
-        aria-label="Open photograph information"
-        aria-expanded={open}
-        aria-controls="photo-capture-panel"
-        onClick={() => setOpen((value) => !value)}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="photo-metadata-hotspot"
+          aria-label="Show photograph capture data"
+        >
+          <span aria-hidden="true" />
+          <span className="photo-metadata-hotspot-label">Capture data</span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="left"
+        align="center"
+        sideOffset={14}
+        collisionPadding={16}
+        className="photo-metadata-popover w-[min(22rem,calc(100vw-2rem))] p-0"
       >
-        <span aria-hidden="true" />
-        <span className="photo-metadata-hotspot-label">Capture data</span>
-      </button>
-
-      <AnimatePresence>
-        {open ? (
-          <>
-            <motion.button
-              type="button"
-              className="photo-metadata-backdrop"
-              aria-label="Close photograph information"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOpen(false)}
-            />
-            <motion.aside
-              id="photo-capture-panel"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Photograph information"
-              className="photo-metadata-panel"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="photo-metadata-panel-head">
-                <div>
-                  <p className="mono-label m-0">Digital contact point</p>
-                  <p className="display-font m-0 mt-1 text-2xl font-light">Capture data</p>
-                </div>
-                <button type="button" aria-label="Close" onClick={() => setOpen(false)}>
-                  ×
-                </button>
-              </div>
-              <dl className="photo-metadata-grid">
-                {details.map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-              {!hasExif ? (
-                <p className="display-italic mt-5 text-sm leading-6 text-(--muted-strong)">
-                  This one didn&rsquo;t keep its camera settings — just the frame itself.
-                </p>
-              ) : null}
-              <p className="mono-label m-0 mt-5">Tap outside or press Esc to close</p>
-            </motion.aside>
-          </>
+        <PopoverHeader className="photo-metadata-popover-head">
+          <div>
+            <p className="mono-label m-0">Digital contact point</p>
+            <PopoverTitle className="display-font mt-1 text-2xl font-light">
+              Capture data
+            </PopoverTitle>
+          </div>
+          <PopoverDescription>Metadata embedded in this photograph.</PopoverDescription>
+        </PopoverHeader>
+        <dl className="photo-metadata-grid">
+          {details.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+        {!hasExif ? (
+          <p className="photo-metadata-note display-italic">
+            This one didn&rsquo;t keep its camera settings — just the frame itself.
+          </p>
         ) : null}
-      </AnimatePresence>
-    </>
+        <p className="photo-metadata-dismiss">Esc or click away to close</p>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -203,6 +181,12 @@ function PhotoDetailRoute() {
   const previousSlug = position > 0 ? siblings[position - 1] : null
   const nextSlug = position >= 0 && position < siblings.length - 1 ? siblings[position + 1] : null
   const washColor = photo.metadata.palette?.[0]
+  const orientation =
+    photo.metadata.width > 0 && photo.metadata.height > photo.metadata.width * 1.08
+      ? 'portrait'
+      : photo.metadata.width > photo.metadata.height * 1.08
+        ? 'landscape'
+        : 'square'
 
   useEffect(() => {
     setTouchCapable(window.matchMedia('(pointer: coarse)').matches)
@@ -288,6 +272,7 @@ function PhotoDetailRoute() {
 
         <motion.figure
           ref={figureRef}
+          data-orientation={orientation}
           className="photo-detail-stage relative m-0 mt-6"
           initial={reducedMotion ? undefined : { opacity: 0, scale: 0.985 }}
           animate={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
@@ -297,6 +282,7 @@ function PhotoDetailRoute() {
             {position >= 0 ? String(position + 1).padStart(2, '0') : 'FO'}
           </span>
           <motion.div
+            data-orientation={orientation}
             className="photo-detail-media pocket-frame mx-auto w-fit max-w-full touch-pan-y"
             style={{
               aspectRatio:
@@ -321,7 +307,7 @@ function PhotoDetailRoute() {
               intrinsicHeight={photo.metadata.height || undefined}
               lqip={photo.image?.lqip}
               hotspot={photo.image?.hotspot}
-              className="mx-auto h-auto max-h-[76svh] w-auto max-w-full"
+              className="photo-detail-image mx-auto h-auto w-auto max-w-full"
             />
             <span className="photo-detail-sheen" aria-hidden="true" />
             <span className="frame-corners" aria-hidden="true" />

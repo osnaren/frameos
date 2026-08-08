@@ -2461,6 +2461,18 @@ a:focus-visible .frame-corners {
   box-shadow: 0 2.4rem 6rem color-mix(in srgb, var(--shadow) 88%, transparent);
 }
 
+.photo-detail-stage[data-orientation='portrait'] {
+  min-height: 0;
+}
+
+.photo-detail-image {
+  max-height: min(72svh, 52rem);
+}
+
+.photo-detail-media[data-orientation='portrait'] .photo-detail-image {
+  max-height: min(58svh, 40rem);
+}
+
 .photo-detail-media::before {
   content: '';
   position: absolute;
@@ -3166,8 +3178,7 @@ a:focus-visible .frame-corners {
 }
 
 .photo-metadata-hotspot[aria-expanded='true'] {
-  opacity: 0;
-  pointer-events: none;
+  color: #fff;
 }
 
 .photo-metadata-hotspot > span:first-child {
@@ -3206,6 +3217,12 @@ a:focus-visible .frame-corners {
   transform: none;
 }
 
+.photo-metadata-hotspot[aria-expanded='true'] > span:first-child {
+  box-shadow:
+    0 0 0 0.7rem rgba(255, 255, 255, 0.08),
+    0 0 2.5rem color-mix(in srgb, var(--world-accent, #ffd58a) 84%, transparent);
+}
+
 @keyframes metadata-pulse {
   50% {
     box-shadow:
@@ -3214,77 +3231,72 @@ a:focus-visible .frame-corners {
   }
 }
 
-.photo-metadata-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  border: 0;
-  background: rgba(8, 10, 11, 0.4);
-  backdrop-filter: blur(3px) saturate(0.85);
-  cursor: default;
-}
-
-/* Docked to the viewport edge (not the photo) so the capture data never
-   covers the photograph it describes -- it used to float on top of it. */
-.photo-metadata-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 41;
-  width: min(23rem, 100%);
+.photo-metadata-popover {
+  max-height: min(72svh, 32rem);
   overflow: auto;
-  border: 0;
-  border-left: 1px solid var(--line);
-  padding: clamp(1.5rem, 3vw, 2rem);
-  background: color-mix(in srgb, var(--bg) 96%, transparent);
-  color: var(--ink);
-  box-shadow: -2rem 0 6rem rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(28px) saturate(1.15);
+  border-color: rgba(244, 240, 232, 0.18);
+  border-radius: 1rem;
+  background:
+    linear-gradient(135deg, rgba(134, 195, 202, 0.09), transparent 42%), rgba(8, 11, 12, 0.94);
+  color: #f4f0e8;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 1.5rem 5rem rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(24px) saturate(0.82);
 }
 
-.photo-metadata-panel-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 1rem;
+.photo-metadata-popover::before {
+  content: '';
+  position: absolute;
+  inset: 0.55rem;
+  border-top: 1px solid rgba(134, 195, 202, 0.5);
+  border-left: 1px solid rgba(134, 195, 202, 0.5);
+  clip-path: polygon(0 0, 1.25rem 0, 1.25rem 1px, 1px 1px, 1px 1.25rem, 0 1.25rem);
+  pointer-events: none;
 }
 
-.photo-metadata-panel-head > button {
+.photo-metadata-popover-head {
+  position: relative;
   display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: var(--panel);
-  color: var(--ink);
-  font-size: 1.25rem;
-  cursor: pointer;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+  padding: 1.35rem 1.35rem 1rem;
+  border-bottom: 1px solid rgba(244, 240, 232, 0.14);
+}
+
+.photo-metadata-popover-head [data-slot='popover-title'] {
+  margin: 0;
+  color: #f4f0e8;
+}
+
+.photo-metadata-popover-head [data-slot='popover-description'] {
+  margin: 0;
+  color: rgba(244, 240, 232, 0.5);
+  font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .photo-metadata-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 1px;
-  margin: 1.25rem 0 0;
+  margin: 0;
+  padding: 1px 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  background: var(--line);
+  background: rgba(244, 240, 232, 0.12);
 }
 
 .photo-metadata-grid > div {
   flex: 1 1 40%;
   min-width: 0;
   padding: 0.9rem 1rem;
-  background: var(--panel-strong);
+  background: rgba(8, 11, 12, 0.92);
 }
 
 .photo-metadata-grid dt {
-  color: var(--muted);
+  color: rgba(244, 240, 232, 0.43);
   font-family: var(--font-mono);
   font-size: 0.57rem;
   letter-spacing: 0.12em;
@@ -3294,10 +3306,29 @@ a:focus-visible .frame-corners {
 .photo-metadata-grid dd {
   margin: 0.28rem 0 0;
   overflow: hidden;
-  color: var(--ink);
+  color: #f4f0e8;
   font-size: 0.82rem;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.photo-metadata-note {
+  margin: 0;
+  padding: 1rem 1.35rem;
+  color: rgba(244, 240, 232, 0.66);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.photo-metadata-dismiss {
+  margin: 0;
+  border-top: 1px solid rgba(244, 240, 232, 0.12);
+  padding: 0.7rem 1.35rem;
+  color: rgba(244, 240, 232, 0.36);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
 }
 
 /* ---- Orbitable world archive ---- */
@@ -3425,20 +3456,14 @@ a:focus-visible .frame-corners {
 
 @media (max-width: 640px) {
   .photo-metadata-hotspot-label {
-    display: none;
+    padding: 0.42rem 0.58rem;
+    font-size: 0.52rem;
+    opacity: 1;
+    transform: none;
   }
 
-  /* A bottom sheet reads more naturally than a right drawer at thumb width. */
-  .photo-metadata-panel {
-    top: auto;
-    right: 0;
-    left: 0;
-    width: 100%;
-    max-height: 82svh;
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    border-radius: 1.25rem 1.25rem 0 0;
-    box-shadow: 0 -1.5rem 4rem rgba(0, 0, 0, 0.25);
+  .photo-detail-media[data-orientation='portrait'] .photo-detail-image {
+    max-height: min(54svh, 32rem);
   }
 
   .photo-metadata-grid > div {
