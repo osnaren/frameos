@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from 'react'
 
@@ -459,7 +460,7 @@ export default function WanderScene({
               <Link
                 to="/worlds/$world"
                 params={{ world: 'wander' }}
-                onClick={(event) => {
+                onClick={(event: ReactMouseEvent<HTMLAnchorElement>) => {
                   if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) {
                     return
                   }

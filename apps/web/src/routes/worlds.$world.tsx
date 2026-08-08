@@ -2,35 +2,44 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { WorldScene } from '@/components/worlds/WorldScene'
-import { getPublicWorlds, getWorld } from '@/content/worlds'
-import { getGalleryFeedServer } from '@/server/server-functions/portfolio'
+import { getGalleryFeedServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/worlds/$world')({
   loader: async ({ params }) => {
-    const world = getWorld(params.world)
+    const worlds = await getWorldsServer()
+    const world = worlds!.find((entry) => entry.slug === params.world)
 
-    if (!world || world.hidden) {
+    if (!world) {
       throw notFound()
     }
 
     const feed = await getGalleryFeedServer({ data: { category: world.slug, limit: 48 } })
-    return { worldSlug: world.slug, feed }
+    return { world, worlds: worlds!, feed }
   },
   staleTime: 60_000,
   gcTime: 300_000,
   head: ({ loaderData }) => {
-    const world = loaderData ? getWorld(loaderData.worldSlug) : null
+    const world = loaderData?.world
+    const canonicalUrl = world
+      ? new URL(
+          `/worlds/${encodeURIComponent(world.slug)}`,
+          loaderData.feed.canonicalUrl
+        ).toString()
+      : undefined
 
     return world
       ? {
           meta: [
-            { title: `${world.name} — FrameOS Pocket Worlds` },
+            { title: world.seo?.title ?? `${world.name} — FrameOS Pocket Worlds` },
             {
               name: 'description',
-              content: `${world.line} Photographs from the ${world.name} world, all made on a phone.`,
+              content:
+                world.seo?.description ??
+                world.description ??
+                `${world.line} Photographs from the ${world.name} world, all made on a phone.`,
             },
           ],
-          links: [{ rel: 'canonical', href: loaderData!.feed.canonicalUrl }],
+          links: [{ rel: 'canonical', href: canonicalUrl }],
         }
       : {}
   },
@@ -38,9 +47,7 @@ export const Route = createFileRoute('/worlds/$world')({
 })
 
 function WorldRoute() {
-  const { worldSlug, feed } = Route.useLoaderData()
-  const world = getWorld(worldSlug)!
-  const worlds = getPublicWorlds()
+  const { world, worlds, feed } = Route.useLoaderData()
   const index = worlds.findIndex((entry) => entry.slug === world.slug)
   const previousWorld = worlds[(index - 1 + worlds.length) % worlds.length]
   const nextWorld = worlds[(index + 1) % worlds.length]
@@ -58,6 +65,8 @@ function WorldRoute() {
       <WorldScene
         world={world}
         photos={photos}
+        worldIndex={index}
+        worldCount={worlds.length}
         previousWorld={previousWorld}
         nextWorld={nextWorld}
       />

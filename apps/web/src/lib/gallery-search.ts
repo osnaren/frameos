@@ -60,3 +60,13 @@ export function buildCanonicalGallerySearch(search: GallerySearchState) {
 
   return params.toString()
 }
+
+export function buildCanonicalArchiveSearch(search: Pick<GallerySearchState, 'category'>) {
+  const params = new URLSearchParams()
+
+  if (search.category) {
+    params.set('world', search.category)
+  }
+
+  return params.toString()
+}

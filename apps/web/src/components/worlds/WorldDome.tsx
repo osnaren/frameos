@@ -5,7 +5,7 @@ import { useReducedMotion } from 'framer-motion'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
 
-import type { WorldDefinition } from '@/content/worlds'
+import type { World } from '@/types/content'
 import type { Photo } from '@/types/photo'
 
 interface DomeTile {
@@ -106,7 +106,7 @@ const MIN_TILT = -22
  * a DOM/CSS-only replacement for the old WebGL "planet" (no shaders, no
  * lighting rig, no bundle weight, and it actually shows the photographs).
  */
-export function WorldDome({ world, photos }: { world: WorldDefinition; photos: Photo[] }) {
+export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) {
   const reducedMotion = useReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -287,67 +287,84 @@ export function WorldDome({ world, photos }: { world: WorldDefinition; photos: P
   }
 
   return (
-    <div
-      ref={rootRef}
-      className="world-dome"
-      style={
-        {
-          '--dome-tile-size': tileSize,
-          '--dome-radius-factor': radiusFactor,
-        } as React.CSSProperties
-      }
-      role="group"
-      aria-label={`${world.name} photographs — drag to look around`}
-      onClickCapture={(event) => {
-        if (draggedRef.current) {
-          event.preventDefault()
-          event.stopPropagation()
+    <div className="world-dome-block">
+      <div
+        ref={rootRef}
+        className="world-dome"
+        style={
+          {
+            '--dome-tile-size': tileSize,
+            '--dome-radius-factor': radiusFactor,
+          } as React.CSSProperties
         }
-      }}
-    >
-      <span aria-hidden="true" className="world-dome__ground" />
-      <div className="world-dome__stage" ref={stageRef}>
-        {tiles.map((tile, index) => (
-          <div
-            key={tile.key}
-            className="world-dome__tile"
-            style={{ transform: `rotateY(${tile.rotateY}deg) rotateX(${tile.rotateX}deg)` }}
-          >
-            <Link
-              ref={(el) => {
-                frameRefs.current[index] = el
-              }}
-              to="/photos/$slug"
-              params={{ slug: tile.photo.slug }}
-              aria-label={`View “${tile.photo.title}”`}
-              className="world-dome__frame group block no-underline"
-              draggable={false}
+        role="group"
+        aria-label={`${world.name} photographs — drag to look around, then use the frame links below to open a photograph`}
+        onClickCapture={(event) => {
+          if (draggedRef.current) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        }}
+      >
+        <span aria-hidden="true" className="world-dome__ground" />
+        <div className="world-dome__stage" ref={stageRef}>
+          {tiles.map((tile, index) => (
+            <div
+              key={tile.key}
+              className="world-dome__tile"
+              style={{ transform: `rotateY(${tile.rotateY}deg) rotateX(${tile.rotateX}deg)` }}
             >
-              {/* Rounded clip lives on its own layer, separate from the translateZ push
+              <Link
+                ref={(el: HTMLAnchorElement | null) => {
+                  frameRefs.current[index] = el
+                }}
+                to="/photos/$slug"
+                params={{ slug: tile.photo.slug }}
+                aria-hidden="true"
+                tabIndex={-1}
+                className="world-dome__frame group block no-underline"
+                draggable={false}
+              >
+                {/* Rounded clip lives on its own layer, separate from the translateZ push
                   above — combining overflow:hidden/border-radius with a large 3D offset
                   on one element is what caused Chromium to intermittently paint a tile
                   blank mid-spin. */}
-              <span className="pocket-frame world-dome__clip">
-                <PhotoImage
-                  publicId={tile.photo.publicId}
-                  alt={tile.photo.alt}
-                  preset="gallery"
-                  sizes="220px"
-                  lqip={tile.photo.image?.lqip}
-                  hotspot={tile.photo.image?.hotspot}
-                  className="h-full w-full object-cover"
-                />
-                <span aria-hidden="true" className="frame-corners" />
-              </span>
-              <span className="world-dome__caption">{tile.photo.title}</span>
-            </Link>
-          </div>
-        ))}
+                <span className="pocket-frame world-dome__clip">
+                  <PhotoImage
+                    publicId={tile.photo.publicId}
+                    alt=""
+                    preset="gallery"
+                    sizes="220px"
+                    lqip={tile.photo.image?.lqip}
+                    hotspot={tile.photo.image?.hotspot}
+                    className="h-full w-full object-cover"
+                  />
+                  <span aria-hidden="true" className="frame-corners" />
+                </span>
+                <span className="world-dome__caption">{tile.photo.title}</span>
+              </Link>
+            </div>
+          ))}
+        </div>
+        <span aria-hidden="true" className="world-dome__vignette" />
+        <span aria-hidden="true" className="world-dome__hint">
+          ‹ drag to look around ›
+        </span>
       </div>
-      <span aria-hidden="true" className="world-dome__vignette" />
-      <span aria-hidden="true" className="world-dome__hint">
-        ‹ drag to look around ›
-      </span>
+      <nav className="world-dome__index" aria-label={`${world.name} frames`}>
+        {photos.map((photo, index) => (
+          <Link
+            key={photo.slug}
+            to="/photos/$slug"
+            params={{ slug: photo.slug }}
+            viewTransition
+            className="world-dome__index-link no-underline"
+          >
+            <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <span>{photo.title}</span>
+          </Link>
+        ))}
+      </nav>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_GALLERY_LIMIT,
   MAX_GALLERY_LIMIT,
+  buildCanonicalArchiveSearch,
   buildCanonicalGallerySearch,
   validateGallerySearch,
 } from '@/lib/gallery-search'
@@ -34,5 +35,10 @@ describe('gallery search helpers', () => {
     })
 
     expect(query).toBe('category=street&series=night-walks&tag=featured&after=cursor-token')
+  })
+
+  it('maps the internal category filter to the public Index world parameter', () => {
+    expect(buildCanonicalArchiveSearch({ category: 'wander' })).toBe('world=wander')
+    expect(buildCanonicalArchiveSearch({})).toBe('')
   })
 })

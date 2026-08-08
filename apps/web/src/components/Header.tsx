@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 
 import ThemeToggle from './ThemeToggle'
 
@@ -13,6 +13,7 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8)
@@ -34,21 +35,30 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="order-3 flex w-full flex-wrap gap-x-6 gap-y-1 text-[0.8rem] font-semibold tracking-[0.16em] uppercase max-[520px]:flex-nowrap max-[520px]:justify-between max-[520px]:gap-x-3 max-[520px]:text-[0.68rem] max-[520px]:tracking-widest sm:order-2 sm:ml-auto sm:w-auto">
-          {NAV_LINKS.map((link, index) => (
-            <Link
-              key={link.label}
-              to={link.to}
-              className="site-nav-link"
-              activeOptions={'exact' in link ? { exact: link.exact } : undefined}
-              activeProps={{ className: 'site-nav-link is-active' }}
-            >
-              <span aria-hidden="true" className="site-nav-index">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              {link.label}
-            </Link>
-          ))}
+        <div className="site-nav-list order-3 flex w-full flex-wrap gap-x-6 gap-y-1 text-[0.8rem] font-semibold tracking-[0.16em] uppercase max-[520px]:flex-nowrap max-[520px]:text-[0.68rem] max-[520px]:tracking-widest sm:order-2 sm:ml-auto sm:w-auto">
+          {NAV_LINKS.map((link, index) => {
+            const isActive =
+              link.to === '/'
+                ? pathname === '/' || pathname.startsWith('/worlds/')
+                : link.to === '/archive'
+                  ? pathname === '/archive' || pathname.startsWith('/photos/')
+                  : pathname === link.to
+
+            return (
+              <Link
+                key={link.label}
+                to={link.to}
+                viewTransition
+                aria-current={isActive ? 'page' : undefined}
+                className={`site-nav-link${isActive ? ' is-active' : ''}`}
+              >
+                <span aria-hidden="true" className="site-nav-index">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                {link.label}
+              </Link>
+            )
+          })}
         </div>
 
         <div className="order-2 ml-auto flex items-center gap-2 sm:order-3 sm:ml-0">

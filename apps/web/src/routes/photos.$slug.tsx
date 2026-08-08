@@ -12,14 +12,20 @@ import {
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { getWorld } from '@/content/worlds'
-import { getGalleryFeedServer, getPhotoDetailServer } from '@/server/server-functions/portfolio'
+import {
+  getGalleryFeedServer,
+  getPhotoDetailServer,
+  getWorldsServer,
+} from '@/server/server-functions/portfolio'
 
 import type { Photo } from '@/types/photo'
 
 export const Route = createFileRoute('/photos/$slug')({
   loader: async ({ params }) => {
-    const detail = await getPhotoDetailServer({ data: { slug: params.slug } })
+    const [detail, worlds] = await Promise.all([
+      getPhotoDetailServer({ data: { slug: params.slug } }),
+      getWorldsServer(),
+    ])
     const photo = detail!.photo
     const feed = photo.category
       ? await getGalleryFeedServer({ data: { category: photo.category, limit: 48 } })
@@ -29,6 +35,7 @@ export const Route = createFileRoute('/photos/$slug')({
 
     return {
       detail: detail!,
+      worlds: worlds!,
       siblings,
       position,
     }
@@ -182,7 +189,7 @@ function MetadataHotspot({ photo }: { photo: Photo }) {
 }
 
 function PhotoDetailRoute() {
-  const { detail, siblings, position } = Route.useLoaderData()
+  const { detail, worlds, siblings, position } = Route.useLoaderData()
   const navigate = useNavigate()
   const reducedMotion = useReducedMotion()
   const figureRef = useRef<HTMLElement>(null)
@@ -196,7 +203,9 @@ function PhotoDetailRoute() {
   /* The photograph settles first; words arrive second. */
   const settleDelay = reducedMotion ? 0 : 0.38
   const photo = detail.photo
-  const world = photo.category ? getWorld(photo.category) : null
+  const world = photo.category
+    ? (worlds.find((entry) => entry.slug === photo.category) ?? null)
+    : null
   const previousSlug = position > 0 ? siblings[position - 1] : null
   const nextSlug = position >= 0 && position < siblings.length - 1 ? siblings[position + 1] : null
   const washColor = photo.metadata.palette?.[0]

@@ -6,23 +6,31 @@ import { z } from 'zod'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { getPublicWorlds, getWorld } from '@/content/worlds'
 import { chrome, focusEase } from '@/lib/motion'
-import { getGalleryFeedServer } from '@/server/server-functions/portfolio'
-
-const publicWorldSlugs = getPublicWorlds().map((world) => world.slug)
+import { getGalleryFeedServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 const archiveSearchSchema = z.object({
   world: z
     .string()
+    .trim()
+    .min(1)
+    .max(72)
+    .regex(/^[a-z0-9-]+$/)
     .optional()
-    .transform((value) => (value && publicWorldSlugs.includes(value as never) ? value : undefined)),
+    .catch(undefined),
 })
 
 export const Route = createFileRoute('/archive')({
   validateSearch: archiveSearchSchema,
   loaderDeps: ({ search }) => ({ world: search.world }),
-  loader: ({ deps }) => getGalleryFeedServer({ data: { category: deps.world, limit: 48 } }),
+  loader: async ({ deps }) => {
+    const worlds = await getWorldsServer()
+    const activeWorld = worlds!.find((world) => world.slug === deps.world)
+    const feed = await getGalleryFeedServer({
+      data: { category: activeWorld?.slug, limit: 48 },
+    })
+    return { feed, worlds: worlds! }
+  },
   staleTime: 30_000,
   gcTime: 300_000,
   head: ({ loaderData }) =>
@@ -35,9 +43,9 @@ export const Route = createFileRoute('/archive')({
               content:
                 'The full FrameOS archive as a contact sheet: every published frame, photographed on a phone.',
             },
-            { name: 'robots', content: loaderData.robots },
+            { name: 'robots', content: loaderData.feed.robots },
           ],
-          links: [{ rel: 'canonical', href: loaderData.canonicalUrl }],
+          links: [{ rel: 'canonical', href: loaderData.feed.canonicalUrl }],
         }
       : {},
   component: ArchiveRoute,
@@ -84,6 +92,7 @@ function FrameCounter({
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
     return () => {
       observer.disconnect()
       window.removeEventListener('scroll', onScroll)
@@ -154,13 +163,14 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
  * atmospheric depth, and world-accent hover glow.
  */
 function ArchiveRoute() {
-  const feed = Route.useLoaderData()
+  const { feed, worlds } = Route.useLoaderData()
   const search = Route.useSearch()
   const sheetRef = useRef<HTMLUListElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const reducedMotion = useReducedMotion()
-  const worlds = getPublicWorlds()
-  const activeWorld = search.world ? getWorld(search.world) : null
+  const activeWorld = search.world
+    ? (worlds.find((world) => world.slug === search.world) ?? null)
+    : null
 
   /* Parallax wash that shifts with scroll */
   const { scrollYProgress } = useScroll()
@@ -334,7 +344,9 @@ function ArchiveRoute() {
               const photo = item.photo
               const { width, height } = photo.metadata
               const ratio = width > 0 && height > 0 ? width / height : 1
-              const world = photo.category ? getWorld(photo.category) : null
+              const world = photo.category
+                ? (worlds.find((entry) => entry.slug === photo.category) ?? null)
+                : null
 
               return (
                 <motion.li
@@ -345,7 +357,7 @@ function ArchiveRoute() {
                     flexBasis: `${Math.round(ratio * 200)}px`,
                     flexGrow: Math.round(ratio * 100),
                   }}
-                  initial={reducedMotion ? undefined : { opacity: 0, y: 20, scale: 0.96 }}
+                  initial={false}
                   whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: true, margin: '-40px 0px' }}
                   transition={{
@@ -361,11 +373,9 @@ function ArchiveRoute() {
                       viewTransition={false}
                       aria-label={`View \u201c${photo.title}\u201d`}
                       className="pocket-frame depth-frame group block h-full no-underline"
-                      style={
-                        {
-                          '--glow-color': world?.mood.accent ?? 'var(--accent)',
-                        } as React.CSSProperties
-                      }
+                      style={{
+                        '--glow-color': world?.mood.accent ?? 'var(--accent)',
+                      }}
                     >
                       <PhotoImage
                         publicId={photo.publicId}

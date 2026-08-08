@@ -148,7 +148,7 @@ export function Clouds({
           key={seed.key}
           position={seed.position}
           scale={seed.scale}
-          ref={(node) => {
+          ref={(node: THREE.Sprite | null) => {
             refs.current[index] = node
           }}
         >

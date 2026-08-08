@@ -349,7 +349,7 @@ function LightRoute({ progress }: { progress: WanderProgress }) {
     if (introStart.current === null) {
       introStart.current = time
     }
-    const introT = Math.min((time - introStart.current) / 2.4, 1)
+    const introT = Math.min((time - (introStart.current ?? time)) / 2.4, 1)
     const intro = (1 - Math.pow(1 - introT, 3)) * 0.14
 
     const head = Math.max(THREE.MathUtils.clamp(progress.routeHead, 0, 1), intro)
@@ -552,7 +552,7 @@ function Clouds({ quality }: { quality: 'full' | 'lite' }) {
           key={seed.key}
           position={seed.position}
           scale={seed.scale}
-          ref={(node) => {
+          ref={(node: THREE.Sprite | null) => {
             refs.current[index] = node
           }}
         >

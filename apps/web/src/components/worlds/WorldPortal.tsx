@@ -5,7 +5,7 @@ import { PhotoImage } from '@/components/photo/PhotoImage'
 import { useTiltHover } from '@/hooks/use-tilt-hover'
 import { revealVariants } from '@/lib/motion'
 
-import type { WorldDefinition } from '@/content/worlds'
+import type { World } from '@/types/content'
 import type { Photo } from '@/types/photo'
 
 export function WorldPortal({
@@ -15,7 +15,7 @@ export function WorldPortal({
   className,
   sizes,
 }: {
-  world: WorldDefinition
+  world: World
   hero: Photo | undefined
   count: number
   className?: string
