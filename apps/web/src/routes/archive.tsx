@@ -122,11 +122,19 @@ function ArchiveRoute() {
   const search = Route.useSearch()
   const sheetRef = useRef<HTMLUListElement>(null)
   const mainRef = useRef<HTMLElement>(null)
+  const lightboxTriggerRef = useRef<HTMLButtonElement>(null)
   const reducedMotion = useReducedMotion()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const activeWorld = search.world
     ? (worlds.find((world) => world.slug === search.world) ?? null)
     : null
+
+  const handleLightboxIndexChange = (index: number | null) => {
+    setActiveIndex(index)
+    if (index === null) {
+      requestAnimationFrame(() => lightboxTriggerRef.current?.focus())
+    }
+  }
 
   /* Parallax wash that shifts with scroll */
   const { scrollYProgress } = useScroll()
@@ -334,7 +342,10 @@ function ArchiveRoute() {
                         '--glow-color': world?.mood.accent ?? 'var(--accent)',
                       } as React.CSSProperties
                     }
-                    onClick={() => setActiveIndex(index)}
+                    onClick={(event) => {
+                      lightboxTriggerRef.current = event.currentTarget
+                      setActiveIndex(index)
+                    }}
                     onPointerMove={(event) => {
                       const rect = event.currentTarget.getBoundingClientRect()
                       event.currentTarget.style.setProperty(
@@ -398,7 +409,7 @@ function ArchiveRoute() {
         items={feed.items}
         worlds={worlds}
         activeIndex={activeIndex}
-        onIndexChange={setActiveIndex}
+        onIndexChange={handleLightboxIndexChange}
       />
     </main>
   )
