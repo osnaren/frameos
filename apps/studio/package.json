@@ -12,16 +12,19 @@
     "start": "sanity start",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "schema:extract": "sanity schema extract",
+    "typegen": "sanity typegen generate",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^6.8.0",
+    "@sanity/icons": "^5.2.1",
+    "@sanity/vision": "^6.9.1",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sanity": "^6.8.0",
+    "sanity": "^6.9.1",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {

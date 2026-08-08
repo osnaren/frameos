@@ -1,4 +1,4 @@
-import { buildCanonicalGallerySearch } from '@/lib/gallery-search'
+import { buildCanonicalArchiveSearch, buildCanonicalGallerySearch } from '@/lib/gallery-search'
 import { buildCanonicalUrl } from '@/lib/url'
 import { readSnapshot, rememberSnapshot } from '@/server/cache/snapshots'
 import { getPageTags, getPhotoTags } from '@/server/cache/tags'
@@ -8,7 +8,7 @@ import { logInfo, logWarn, recordMetric } from '@/server/observability/logger'
 import { createSanityProvider, invalidateAllPhotosCache } from '@/server/providers/sanity'
 
 import type { PortfolioRepository, SanityDocumentId } from '@/server/contracts'
-import type { AboutView, ContactView, HomeView, SiteSettings } from '@/types/content'
+import type { AboutView, ContactView, HomeView, SiteSettings, World } from '@/types/content'
 import type { GalleryFeed, Photo, PhotoDetailView } from '@/types/photo'
 
 class ServiceUnavailableError extends Error {
@@ -112,6 +112,27 @@ export function createPortfolioRepository(): PortfolioRepository {
   }
 
   return {
+    async getWorlds() {
+      const snapshotKey = getSnapshotKey('worlds')
+
+      try {
+        const worlds = (await sanityProvider.listWorlds())
+          .filter((world) => world.status === 'active')
+          .sort(
+            (left, right) => left.sortOrder - right.sortOrder || left.name.localeCompare(right.name)
+          )
+        return rememberSnapshot(snapshotKey, worlds)
+      } catch (error) {
+        captureException(error, { route: 'worlds', outcome: 'failure' })
+        const snapshot = readSnapshot<World[]>(snapshotKey)
+        if (snapshot) {
+          return snapshot
+        }
+        throw new ServiceUnavailableError(
+          'The worlds are temporarily unavailable while Sanity is recovering.'
+        )
+      }
+    },
     async getGalleryFeed(filters, options) {
       const query = buildCanonicalGallerySearch({
         category: filters.category,
@@ -121,6 +142,7 @@ export function createPortfolioRepository(): PortfolioRepository {
         limit: filters.limit ?? 24,
       })
       const snapshotKey = getSnapshotKey('gallery', query || 'default')
+      const canonicalQuery = buildCanonicalArchiveSearch({ category: filters.category })
       const startedAt = Date.now()
 
       try {
@@ -135,7 +157,7 @@ export function createPortfolioRepository(): PortfolioRepository {
             href: `/photos/${photo.slug}`,
           })),
           nextCursor: response.nextCursor,
-          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/gallery', query),
+          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/archive', canonicalQuery),
           robots: filters.after ? 'noindex,follow' : 'index,follow',
           appliedFilters: {
             category: filters.category ?? '',
@@ -175,7 +197,7 @@ export function createPortfolioRepository(): PortfolioRepository {
         return {
           items: [],
           nextCursor: undefined,
-          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/gallery'),
+          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/archive', canonicalQuery),
           robots: 'index,follow',
           appliedFilters: {
             category: filters.category ?? '',
@@ -385,7 +407,7 @@ export function createPortfolioRepository(): PortfolioRepository {
           return {
             title: 'Gallery | FrameOS',
             description: 'Photography gallery filtered by category, series, and tag.',
-            canonicalUrl: buildCanonicalUrl(options.baseUrl, '/gallery'),
+            canonicalUrl: buildCanonicalUrl(options.baseUrl, '/archive'),
             robots: options.slug ? 'noindex,follow' : 'index,follow',
           }
         case 'photo': {
@@ -431,6 +453,10 @@ export function createPortfolioRepository(): PortfolioRepository {
         } else {
           degraded = true
         }
+      } else if (documentId === 'world') {
+        tags.add('worlds')
+        tags.add('gallery')
+        tags.add('page:home')
       } else if (documentId) {
         getPageTags(documentId).forEach((tag) => tags.add(tag))
       } else {
@@ -465,6 +491,10 @@ export function createPortfolioRepository(): PortfolioRepository {
         changedDocuments.forEach((documentId) => {
           if (documentId === 'photo') {
             tags.add('gallery')
+          } else if (documentId === 'world') {
+            tags.add('worlds')
+            tags.add('gallery')
+            tags.add('page:home')
           } else {
             getPageTags(documentId).forEach((tag) => tags.add(tag))
           }

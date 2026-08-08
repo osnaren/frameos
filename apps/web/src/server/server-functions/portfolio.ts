@@ -71,6 +71,16 @@ export const getContactViewServer = createServerFn({ method: 'GET' }).handler(as
   }
 })
 
+export const getWorldsServer = createServerFn({ method: 'GET' }).handler(async () => {
+  try {
+    const worlds = await repository.getWorlds()
+    applyCacheResponse('page', ['worlds'])
+    return worlds
+  } catch (error) {
+    handleUnavailable(error)
+  }
+})
+
 export const getGalleryFeedServer = createServerFn({ method: 'GET' })
   .validator(galleryInputSchema)
   .handler(async ({ data }) => {

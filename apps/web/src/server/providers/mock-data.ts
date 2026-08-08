@@ -6,7 +6,7 @@
  * editorial page copy. Once Sanity credentials exist, the provider layer
  * switches to live data automatically and this module is ignored.
  */
-import { curatedPhotos, getPublicWorlds } from '@/content/worlds'
+import { curatedPhotos, getPublicWorlds, worlds } from '@/content/worlds'
 
 import type {
   AboutPageContent,
@@ -14,10 +14,12 @@ import type {
   HomePageContent,
   PhotoRef,
   SiteSettings,
+  World,
 } from '@/types/content'
 import type { Photo } from '@/types/photo'
 
 export const fixturePhotos: Photo[] = curatedPhotos
+export const fixtureWorlds: World[] = worlds
 
 const publishedPhotos = curatedPhotos.filter((photo) => photo.status === 'published')
 

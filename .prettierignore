@@ -4,3 +4,4 @@ supabase/.temp
 .env
 *.lock
 pnpm-lock.yaml
+apps/web/src/sanity.types.ts

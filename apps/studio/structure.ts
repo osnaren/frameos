@@ -33,5 +33,21 @@ export const structure: StructureResolver = (S) =>
         .id('contactPage')
         .child(S.document().schemaType('contactPage').documentId('contactPage')),
       S.divider(),
-      ...S.documentTypeListItems().filter((item) => !isSingletonType(item.getId() ?? '')),
+      S.listItem()
+        .title('Worlds')
+        .schemaType('world')
+        .child(
+          S.documentTypeList('world')
+            .title('Worlds')
+            .defaultOrdering([{field: 'sortOrder', direction: 'asc'}]),
+        ),
+      S.listItem()
+        .title('Photos')
+        .schemaType('photo')
+        .child(S.documentTypeList('photo').title('Photos')),
+      S.divider(),
+      ...S.documentTypeListItems().filter(
+        (item) =>
+          !isSingletonType(item.getId() ?? '') && !['world', 'photo'].includes(item.getId() ?? ''),
+      ),
     ])

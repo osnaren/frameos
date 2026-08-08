@@ -16,6 +16,9 @@ export type {
   SeoFields,
   SiteSettings,
   SocialLink,
+  World,
+  WorldMood,
+  WorldStatus,
 } from '@frameos/content-schema'
 
 export interface HomeView {

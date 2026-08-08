@@ -1,5 +1,6 @@
 import { createClient } from '@sanity/client'
 import { SIGNATURE_HEADER_NAME, isValidSignature } from '@sanity/webhook'
+import { defineQuery } from 'groq'
 
 import { getServerEnv, hasSanityConfig } from '@/server/env'
 import { captureException, emitAlert } from '@/server/observability/error-tracker'
@@ -10,8 +11,16 @@ import {
   fixtureHomePage,
   fixturePhotos,
   fixtureSiteSettings,
+  fixtureWorlds,
 } from '@/server/providers/mock-data'
 
+import type {
+  AboutPageQueryResult,
+  ContactPageQueryResult,
+  HomePageQueryResult,
+  SiteSettingsQueryResult,
+  WorldsQueryResult,
+} from '@/sanity.types'
 import type { SanityDocumentId, SanityProvider } from '@/server/contracts'
 import type {
   AboutPageContent,
@@ -19,49 +28,18 @@ import type {
   HomePageContent,
   PhotoRef,
   SiteSettings,
+  World,
 } from '@/types/content'
 import type { Photo, PhotoFilters, PhotoStatus } from '@/types/photo'
 
 /** Bounds how often a warm lambda instance re-hits Sanity's API for the full photo list. */
 const PHOTO_CACHE_TTL_MS = 30_000
 
-type SanitySeo = {
-  title?: string
-  description?: string
-  imagePublicId?: string
-}
-
-type SanityPageBase = {
-  seo?: SanitySeo
-}
-
-type SanityPhotoRefValue = {
-  slug?: string
-}
-
-type SanityHomeDocument = SanityPageBase & {
-  eyebrow?: string
-  headline?: string
-  intro?: string
-  cta?: {
-    label?: string
-    href?: string
-  }
-  featuredPhotos?: SanityPhotoRefValue[]
-}
-
-type SanityAboutDocument = SanityPageBase & {
-  headline?: string
-  body?: string[]
-  photoHighlights?: SanityPhotoRefValue[]
-}
-
-type SanityContactDocument = SanityPageBase & {
-  headline?: string
-  body?: string[]
-  email?: string
-  socials?: Array<{ label?: string; href?: string }>
-}
+type SanitySeo = NonNullable<NonNullable<SiteSettingsQueryResult>['seo']>
+type SanityPhotoRefValue = { slug: string | null }
+type SanityHomeDocument = NonNullable<HomePageQueryResult>
+type SanityAboutDocument = NonNullable<AboutPageQueryResult>
+type SanityContactDocument = NonNullable<ContactPageQueryResult>
 
 type SanityPaletteSwatch = {
   background?: string
@@ -105,12 +83,16 @@ type SanityRawPhoto = {
   _updatedAt?: string
 }
 
+type SanityRawWorld = WorldsQueryResult[number]
+
 let sanityClient: ReturnType<typeof createClient> | null = null
 let allPhotosCache: { photos: Photo[]; expiresAt: number } | null = null
+let allWorldsCache: { worlds: World[]; expiresAt: number } | null = null
 
 /** Call after any webhook/reconcile write so the next read can't serve a pre-change snapshot. */
 export function invalidateAllPhotosCache() {
   allPhotosCache = null
+  allWorldsCache = null
 }
 
 function getSanityClient() {
@@ -141,7 +123,7 @@ function isLocalArchiveMode() {
   return !hasSanityConfig()
 }
 
-function mapPhotoRefs(values: SanityPhotoRefValue[] | undefined): PhotoRef[] {
+function mapPhotoRefs(values: SanityPhotoRefValue[] | null | undefined): PhotoRef[] {
   return (values ?? [])
     .map((value) => value.slug)
     .filter((slug): slug is string => typeof slug === 'string' && slug.length > 0)
@@ -149,7 +131,7 @@ function mapPhotoRefs(values: SanityPhotoRefValue[] | undefined): PhotoRef[] {
 }
 
 function normalizeSeo(
-  input: SanitySeo | undefined,
+  input: SanitySeo | null | undefined,
   fallbackTitle: string,
   fallbackDescription: string
 ) {
@@ -297,6 +279,34 @@ function normalizeSanityPhoto(raw: SanityRawPhoto): Photo | null {
   }
 }
 
+function normalizeSanityWorld(raw: SanityRawWorld): World | null {
+  const slug = raw.slug?.trim()
+  const name = raw.name?.trim()
+
+  if (!slug || !name) {
+    return null
+  }
+
+  const line = raw.line?.trim() || `Photographs collected in ${name}.`
+  const mood = {
+    wash: raw.mood?.wash?.trim() || '#e8edef',
+    deep: raw.mood?.deep?.trim() || '#1c2830',
+    accent: raw.mood?.accent?.trim() || '#5c6f78',
+  }
+
+  return {
+    slug,
+    name,
+    line,
+    description: raw.description?.trim() || undefined,
+    sortOrder: raw.sortOrder ?? 100,
+    status: raw.status === 'hidden' ? 'hidden' : 'active',
+    heroPhoto: raw.heroPhoto?.slug ? { slug: raw.heroPhoto.slug } : undefined,
+    mood,
+    seo: raw.seo ? normalizeSeo(raw.seo, `${name} — FrameOS`, raw.description || line) : undefined,
+  }
+}
+
 function comparePhotos(left: Photo, right: Photo) {
   if (left.sortOrder !== right.sortOrder) {
     return right.sortOrder - left.sortOrder
@@ -394,7 +404,7 @@ const photoFieldsProjection = `
   alt,
   description,
   caption,
-  "category": world,
+  "category": coalesce(worldRef->slug.current, world),
   series,
   locationLabel,
   captureDate,
@@ -421,7 +431,7 @@ const photoFieldsProjection = `
   _updatedAt
 `
 
-const siteSettingsQuery = `*[_type == "siteSettings"][0]{
+const siteSettingsQuery = defineQuery(`*[_type == "siteSettings"][0]{
   brandMark,
   title,
   description,
@@ -436,9 +446,9 @@ const siteSettingsQuery = `*[_type == "siteSettings"][0]{
     description,
     imagePublicId
   }
-}`
+}`)
 
-const homePageQuery = `*[_type == "homePage"][0]{
+const homePageQuery = defineQuery(`*[_type == "homePage"][0]{
   eyebrow,
   headline,
   intro,
@@ -454,9 +464,9 @@ const homePageQuery = `*[_type == "homePage"][0]{
     description,
     imagePublicId
   }
-}`
+}`)
 
-const aboutPageQuery = `*[_type == "aboutPage"][0]{
+const aboutPageQuery = defineQuery(`*[_type == "aboutPage"][0]{
   headline,
   body,
   photoHighlights[]->{
@@ -467,9 +477,9 @@ const aboutPageQuery = `*[_type == "aboutPage"][0]{
     description,
     imagePublicId
   }
-}`
+}`)
 
-const contactPageQuery = `*[_type == "contactPage"][0]{
+const contactPageQuery = defineQuery(`*[_type == "contactPage"][0]{
   headline,
   body,
   email,
@@ -482,7 +492,29 @@ const contactPageQuery = `*[_type == "contactPage"][0]{
     description,
     imagePublicId
   }
-}`
+}`)
+
+const worldsQuery = defineQuery(`*[_type == "world"] | order(sortOrder asc, name asc){
+  "slug": slug.current,
+  name,
+  line,
+  description,
+  sortOrder,
+  status,
+  heroPhoto->{
+    "slug": slug.current
+  },
+  mood{
+    wash,
+    deep,
+    accent
+  },
+  seo{
+    title,
+    description,
+    imagePublicId
+  }
+}`)
 
 const allPhotosQuery = `*[_type == "photo"]{${photoFieldsProjection}}`
 const photoBySlugQuery = `*[_type == "photo" && slug.current == $slug][0]{${photoFieldsProjection}}`
@@ -539,6 +571,28 @@ async function getAllPhotos(): Promise<Photo[]> {
   return photos
 }
 
+async function getAllWorlds(): Promise<World[]> {
+  if (isLocalArchiveMode()) {
+    return fixtureWorlds
+  }
+
+  if (allWorldsCache && allWorldsCache.expiresAt > Date.now()) {
+    return allWorldsCache.worlds
+  }
+
+  const rows = await fetchSanityDocument<WorldsQueryResult>(worldsQuery)
+  const worlds = (rows ?? [])
+    .map((row) => normalizeSanityWorld(row))
+    .filter((world): world is World => Boolean(world))
+    .sort((left, right) => left.sortOrder - right.sortOrder || left.name.localeCompare(right.name))
+
+  // Migration-safe: a connected dataset created before the world document type
+  // was introduced keeps its existing navigation until editors publish worlds.
+  const resolved = worlds.length > 0 ? worlds : fixtureWorlds
+  allWorldsCache = { worlds: resolved, expiresAt: Date.now() + PHOTO_CACHE_TTL_MS }
+  return resolved
+}
+
 export function createSanityProvider(): SanityProvider {
   return {
     async getSiteSettings() {
@@ -546,21 +600,29 @@ export function createSanityProvider(): SanityProvider {
         return fixtureSiteSettings
       }
 
-      const document = await fetchSanityDocument<SiteSettings>(siteSettingsQuery)
+      const document = await fetchSanityDocument<SiteSettingsQueryResult>(siteSettingsQuery)
 
       if (!document) {
         return null
       }
 
+      const title = document.title?.trim() || fixtureSiteSettings.title
+      const description = document.description?.trim() || fixtureSiteSettings.description
+
       return {
-        brandMark: document.brandMark,
-        title: document.title,
-        description: document.description,
-        location: document.location,
-        email: document.email,
-        socials: document.socials,
-        seo: normalizeSeo(document.seo, document.title, document.description),
-      }
+        brandMark: document.brandMark?.trim() || fixtureSiteSettings.brandMark,
+        title,
+        description,
+        location: document.location?.trim() || undefined,
+        email: document.email?.trim() || undefined,
+        socials:
+          document.socials
+            ?.filter((item): item is { label: string; href: string } =>
+              Boolean(item.label && item.href)
+            )
+            .map((item) => ({ label: item.label, href: item.href })) ?? [],
+        seo: normalizeSeo(document.seo, title, description),
+      } satisfies SiteSettings
     },
     async getHomePage() {
       if (isLocalArchiveMode()) {
@@ -642,6 +704,13 @@ export function createSanityProvider(): SanityProvider {
         seo: normalizeSeo(document.seo, fallbackTitle, fallbackDescription),
       } satisfies ContactPageContent
     },
+    async listWorlds() {
+      return getAllWorlds()
+    },
+    async getWorldBySlug(slug) {
+      const worlds = await getAllWorlds()
+      return worlds.find((world) => world.slug === slug) ?? null
+    },
     async searchPhotos(filters) {
       const photos = await getAllPhotos()
       return paginatePhotos(photos, filters)
@@ -665,7 +734,7 @@ export function createSanityProvider(): SanityProvider {
     },
     async listChangedDocuments(sinceIso) {
       if (isLocalArchiveMode()) {
-        return ['siteSettings', 'homePage', 'aboutPage', 'contactPage']
+        return ['siteSettings', 'homePage', 'aboutPage', 'contactPage', 'world']
       }
 
       const client = getSanityClient()
@@ -675,7 +744,7 @@ export function createSanityProvider(): SanityProvider {
       }
 
       const rows = await client.fetch<Array<{ _type: SanityDocumentId }>>(
-        `*[_type in ["siteSettings", "homePage", "aboutPage", "contactPage", "photo"] && _updatedAt > $since]{
+        `*[_type in ["siteSettings", "homePage", "aboutPage", "contactPage", "photo", "world"] && _updatedAt > $since]{
           _type
         }`,
         { since: sinceIso }
@@ -722,7 +791,8 @@ export function createSanityProvider(): SanityProvider {
         documentType === 'homePage' ||
         documentType === 'aboutPage' ||
         documentType === 'contactPage' ||
-        documentType === 'photo'
+        documentType === 'photo' ||
+        documentType === 'world'
           ? documentType
           : undefined
 

@@ -15,6 +15,7 @@
  */
 import manifest from './photo-manifest.json'
 
+import type { World } from '@/types/content'
 import type { Photo } from '@/types/photo'
 
 export type WorldSlug =
@@ -28,78 +29,74 @@ export type WorldSlug =
  * - quiet: slow breathing reveals, stillness (Living Things)
  * - gather: warm radial arrangement (At the Table)
  */
-export type MotionSignature = 'drift' | 'rise' | 'macro' | 'quiet' | 'gather'
-
-export interface WorldMood {
-  /** Pale ambient wash behind the scene */
-  wash: string
-  /** Deep tone for immersive/dark passages */
-  deep: string
-  /** Accent for labels, rules, focus marks */
-  accent: string
-}
-
-export interface WorldDefinition {
-  slug: WorldSlug
-  name: string
-  /** One-line world statement, set in the display serif */
-  line: string
-  signature: MotionSignature
-  mood: WorldMood
-  heroId: string
-  /** Hidden worlds never appear in public navigation */
-  hidden?: boolean
-}
+export type WorldDefinition = World & { slug: WorldSlug; heroId: string }
 
 export const worlds: WorldDefinition[] = [
   {
     slug: 'wander',
     name: 'Wander',
     line: 'Places passed through, horizons kept.',
-    signature: 'drift',
+    description: 'Open horizons, movement, and places passed through slowly enough to keep.',
+    sortOrder: 10,
+    status: 'active',
     mood: { wash: '#e3edf1', deep: '#16303c', accent: '#3e7284' },
     heroId: 'the-sea',
+    heroPhoto: { slug: 'the-sea' },
   },
   {
     slug: 'sacred-geometry',
     name: 'Sacred Geometry',
     line: 'Stone, sky, ritual, and repetition.',
-    signature: 'rise',
+    description: 'Architecture, ritual, repetition, and the geometry that holds them together.',
+    sortOrder: 20,
+    status: 'active',
     mood: { wash: '#e4ebf4', deep: '#0e2334', accent: '#2c5c9c' },
     heroId: 'tower-and-sky',
+    heroPhoto: { slug: 'tower-and-sky' },
   },
   {
     slug: 'small-wonders',
     name: 'Small Wonders',
     line: 'The closer you look, the larger it gets.',
-    signature: 'macro',
+    description: 'Small subjects that become entire landscapes when the frame moves closer.',
+    sortOrder: 30,
+    status: 'active',
     mood: { wash: '#ecf1e2', deep: '#1d2f16', accent: '#4d7a38' },
     heroId: 'leaf-after-rain',
+    heroPhoto: { slug: 'leaf-after-rain' },
   },
   {
     slug: 'living-things',
     name: 'Living Things',
     line: 'Company that chooses its own distance.',
-    signature: 'quiet',
+    description: 'Living company, photographed at the distance each subject allowed.',
+    sortOrder: 40,
+    status: 'active',
     mood: { wash: '#e7eee7', deep: '#122019', accent: '#2f5d43' },
     heroId: 'parakeet',
+    heroPhoto: { slug: 'parakeet' },
   },
   {
     slug: 'at-the-table',
     name: 'Table Notes',
     line: 'Meals worth interrupting.',
-    signature: 'gather',
+    description: 'Meals, ingredients, and the traces of gathering around a table.',
+    sortOrder: 50,
+    status: 'active',
     mood: { wash: '#f4ead9', deep: '#33210f', accent: '#b05c2a' },
     heroId: 'banana-leaf-meal',
+    heroPhoto: { slug: 'banana-leaf-meal' },
   },
   {
     slug: 'people',
     name: 'People',
     line: 'Kept close, shown with permission.',
-    signature: 'quiet',
+    description: 'Portraits kept private until every person in the frame has said yes.',
+    sortOrder: 60,
+    status: 'hidden',
     mood: { wash: '#f0e6e2', deep: '#2c1a16', accent: '#a05548' },
     heroId: 'heart-frame',
-    hidden: true,
+    heroPhoto: { slug: 'heart-frame' },
   },
 ]
 
@@ -385,7 +382,7 @@ export function getWorld(slug: string): WorldDefinition | null {
 }
 
 export function getPublicWorlds() {
-  return worlds.filter((world) => !world.hidden)
+  return worlds.filter((world) => world.status === 'active')
 }
 
 export function getWorldPhotoIds(slug: WorldSlug) {

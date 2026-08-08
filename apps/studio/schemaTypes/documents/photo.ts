@@ -1,17 +1,11 @@
+import ImageIcon from '@sanity/icons/Image'
 import {defineField, defineType} from 'sanity'
-
-const WORLD_OPTIONS = [
-  {title: 'Wander', value: 'wander'},
-  {title: 'Sacred Geometry', value: 'sacred-geometry'},
-  {title: 'Small Wonders', value: 'small-wonders'},
-  {title: 'Living Things', value: 'living-things'},
-  {title: 'Table Notes', value: 'at-the-table'},
-]
 
 export const photoType = defineType({
   name: 'photo',
   title: 'Photo',
   type: 'document',
+  icon: ImageIcon,
   groups: [
     {name: 'editorial', title: 'Editorial', default: true},
     {name: 'capture', title: 'Capture data'},
@@ -77,11 +71,27 @@ export const photoType = defineType({
       group: 'organization',
     }),
     defineField({
-      name: 'world',
+      name: 'worldRef',
       title: 'World',
+      description: 'The collection this photograph belongs to.',
+      type: 'reference',
+      to: [{type: 'world'}],
+      group: 'organization',
+      validation: (rule) =>
+        rule.custom((value, context) =>
+          value || context.document?.world ? true : 'Select a world before publishing.',
+        ),
+    }),
+    defineField({
+      name: 'world',
+      title: 'World slug (legacy)',
+      description: 'Preserved while existing documents move to the World reference above.',
       type: 'string',
       group: 'organization',
-      options: {list: WORLD_OPTIONS, layout: 'radio'},
+      deprecated: {reason: 'Use the World reference. This value remains available for migration.'},
+      readOnly: true,
+      hidden: ({value}) => value === undefined,
+      initialValue: undefined,
     }),
     defineField({
       name: 'series',
@@ -160,13 +170,16 @@ export const photoType = defineType({
     select: {
       title: 'title',
       subtitle: 'world',
+      worldTitle: 'worldRef.name',
       media: 'image',
       archived: 'archived',
     },
-    prepare({title, subtitle, media, archived}) {
+    prepare({title, subtitle, worldTitle, media, archived}) {
       return {
         title: title || 'Untitled photo',
-        subtitle: [subtitle, archived ? 'archived' : undefined].filter(Boolean).join(' \u00b7 '),
+        subtitle: [worldTitle || subtitle, archived ? 'archived' : undefined]
+          .filter(Boolean)
+          .join(' \u00b7 '),
         media,
       }
     },

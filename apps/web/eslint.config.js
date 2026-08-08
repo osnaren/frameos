@@ -119,6 +119,7 @@ export default tseslint.config(
       '.tanstack/**',
       'dist/**',
       'eslint.config.js',
+      'src/sanity.types.ts',
     ],
   }
 )

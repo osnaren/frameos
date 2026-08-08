@@ -1,11 +1,9 @@
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import {
   HeadContent,
   Scripts,
   createRootRoute,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 import { NotFound } from '@/components/content/NotFound'
 import { ServiceState } from '@/components/content/ServiceState'
@@ -67,19 +65,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </div>
         <Footer />
         <ViewfinderCursor />
-        {import.meta.env.DEV ? (
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-            ]}
-          />
-        ) : null}
         <Scripts />
       </body>
     </html>

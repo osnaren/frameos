@@ -7,16 +7,19 @@ import type {
   HomePageContent,
   PageDocumentId,
   SiteSettings,
+  World,
 } from '@/types/content'
 import type { GalleryFeed, Photo, PhotoDetailView, PhotoFilters } from '@/types/photo'
 
-export type SanityDocumentId = PageDocumentId | 'photo'
+export type SanityDocumentId = PageDocumentId | 'photo' | 'world'
 
 export interface SanityProvider {
   getSiteSettings: () => Promise<SiteSettings | null>
   getHomePage: () => Promise<HomePageContent | null>
   getAboutPage: () => Promise<AboutPageContent | null>
   getContactPage: () => Promise<ContactPageContent | null>
+  listWorlds: () => Promise<World[]>
+  getWorldBySlug: (slug: string) => Promise<World | null>
   searchPhotos: (filters: PhotoFilters) => Promise<{ photos: Photo[]; nextCursor?: string }>
   getPhotoBySlug: (slug: string) => Promise<Photo | null>
   listChangedPhotos: (sinceIso: string) => Promise<Photo[]>
@@ -39,6 +42,7 @@ export interface PortfolioRepository {
   getHomeView: (options: { baseUrl: string }) => Promise<HomeView>
   getAboutView: (options: { baseUrl: string }) => Promise<AboutView>
   getContactView: (options: { baseUrl: string }) => Promise<ContactView>
+  getWorlds: () => Promise<World[]>
   getSeoPayload: (
     routeId: PageDocumentId | 'gallery' | 'photo',
     options: { slug?: string; baseUrl: string }

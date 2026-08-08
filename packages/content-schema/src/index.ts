@@ -19,6 +19,30 @@ export interface Cta {
   href: string
 }
 
+export type WorldStatus = 'active' | 'hidden'
+
+export interface WorldMood {
+  /** Pale atmospheric wash used behind the world experience. */
+  wash: string
+  /** Deep companion tone used for legible overlays and depth. */
+  deep: string
+  /** Focus, progress, and interaction accent. */
+  accent: string
+}
+
+/** A CMS-managed photographic collection. Photos reference this document by slug. */
+export interface World {
+  slug: string
+  name: string
+  line: string
+  description?: string
+  sortOrder: number
+  status: WorldStatus
+  heroPhoto?: PhotoRef
+  mood: WorldMood
+  seo?: SeoFields
+}
+
 export interface SiteSettings {
   brandMark?: string
   title: string
