@@ -54,3 +54,4 @@ media-production/pocket-worlds-flow/handoffs/*.png
 .playwright-mcp/
 
 .playwright-mcp/
+.vercel
