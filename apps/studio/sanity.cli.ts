@@ -5,6 +5,7 @@ export default defineCliConfig({
     projectId: '1tyt8kvt',
     dataset: 'production',
   },
+  studioHost: 'frameos',
   deployment: {
     /**
      * Enable auto-updates for studios.
