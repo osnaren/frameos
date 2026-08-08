@@ -58,30 +58,69 @@ export default function Footer() {
       if (!root) return
 
       const reveals = gsap.utils.toArray<HTMLElement>('[data-footer-reveal]', root)
+      const railLines = gsap.utils.toArray<HTMLElement>('.cinematic-footer-rail i', root)
+      const railLabels = gsap.utils.toArray<HTMLElement>('.cinematic-footer-rail span', root)
+      const slash = root.querySelector<HTMLElement>('.cinematic-footer-wordmark-slash')
+      const credits = gsap.utils.toArray<HTMLElement>('[data-footer-credit]', root)
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
       if (reducedMotion) {
-        gsap.set(reveals, { clearProps: 'all' })
+        gsap.set([...reveals, ...railLines, ...railLabels, ...credits, slash], {
+          clearProps: 'all',
+        })
         return
       }
 
-      gsap.set(reveals, { yPercent: 110, filter: 'blur(8px)', opacity: 0 })
+      gsap.set(reveals, { yPercent: 115, filter: 'blur(10px)', autoAlpha: 0 })
+      gsap.set(railLines, { scaleX: 0, transformOrigin: 'center' })
+      gsap.set(railLabels, { y: 8, autoAlpha: 0 })
+      gsap.set(slash, { scaleY: 0, transformOrigin: 'bottom', autoAlpha: 0 })
+      gsap.set(credits, { y: 12, autoAlpha: 0 })
 
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (!entry.isIntersecting) return
           observer.disconnect()
-          gsap.to(reveals, {
-            yPercent: 0,
-            filter: 'blur(0px)',
-            opacity: 1,
-            duration: 1.1,
-            stagger: 0.08,
-            ease: 'expo.out',
-            clearProps: 'transform,filter,opacity',
-          })
+
+          const timeline = gsap.timeline({ defaults: { ease: 'expo.out' } })
+          timeline
+            .to(railLines, { scaleX: 1, duration: 1.1, stagger: 0.08 })
+            .to(railLabels, { y: 0, autoAlpha: 1, duration: 0.65, stagger: 0.08 }, '<0.1')
+            .to(
+              reveals,
+              {
+                yPercent: 0,
+                filter: 'blur(0px)',
+                autoAlpha: 1,
+                duration: 1.15,
+                stagger: 0.075,
+                clearProps: 'transform,filter,opacity,visibility',
+              },
+              '-=0.72'
+            )
+            .to(
+              slash,
+              {
+                scaleY: 1,
+                autoAlpha: 1,
+                duration: 0.9,
+                clearProps: 'transform,opacity,visibility',
+              },
+              '<0.18'
+            )
+            .to(
+              credits,
+              {
+                y: 0,
+                autoAlpha: 1,
+                duration: 0.75,
+                stagger: 0.08,
+                clearProps: 'transform,opacity,visibility',
+              },
+              '-=0.58'
+            )
         },
-        { threshold: 0.2 }
+        { threshold: 0.12 }
       )
 
       observer.observe(root)
@@ -105,7 +144,7 @@ export default function Footer() {
           <div className="cinematic-footer-reveal-mask">
             <p data-footer-reveal>Every photograph closes one moment and opens another.</p>
           </div>
-          <Link to="/signal" className="cinematic-footer-signal">
+          <Link to="/signal" className="cinematic-footer-signal" data-footer-reveal>
             Leave a signal
             <ArrowUpRight aria-hidden="true" />
           </Link>
@@ -145,9 +184,11 @@ export default function Footer() {
         </nav>
 
         <div className="cinematic-footer-credits">
-          <p>FrameOS · Pocket Worlds · {year}</p>
-          <p>Things noticed, photographed on a phone.</p>
-          <BackToTop />
+          <p data-footer-credit>FrameOS · Pocket Worlds · {year}</p>
+          <p data-footer-credit>Things noticed, photographed on a phone.</p>
+          <span data-footer-credit>
+            <BackToTop />
+          </span>
         </div>
       </div>
     </footer>
