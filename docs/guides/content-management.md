@@ -113,6 +113,15 @@ The migration is idempotent. It only removes a legacy string after it finds a
 matching published world, so unmatched photos remain readable and can be
 retried later.
 
+## Seeding the curated launch archive
+
+For a new production dataset, preview the idempotent launch seed from the
+repository root with `pnpm --filter @frameos/studio seed:production`. After
+reviewing the reported counts and exporting a dataset backup, apply it with
+`pnpm --filter @frameos/studio seed:production:apply`. Existing documents are
+preserved; the seed only creates missing worlds, photos, image assets, and
+singleton pages.
+
 ## Real-time invalidation
 
 If you want page/gallery changes to appear immediately (rather than waiting

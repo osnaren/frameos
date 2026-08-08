@@ -13,6 +13,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "schema:extract": "sanity schema extract",
+    "seed:production": "sanity exec scripts/seed-production.ts --with-user-token",
+    "seed:production:apply": "sanity exec scripts/seed-production.ts --with-user-token -- --apply",
     "typegen": "sanity typegen generate",
     "typecheck": "tsc --noEmit"
   },
