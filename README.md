@@ -18,7 +18,7 @@ data layer switches to live Sanity data automatically, with no code changes.
 ## Stack
 
 - **App**: TanStack Start, React 19, TypeScript (strict), Tailwind CSS v4
-- **Content + photos**: Sanity (site settings, Home/About/Contact pages, the photo library — one provider for everything)
+- **Content + photos**: Sanity (site settings, editable worlds, Home/About/Contact pages, and the photo library — one provider for everything)
 - **Caching/invalidation**: Vercel CDN cache tags + webhooks + a scheduled reconcile job
 - **Idempotency**: Upstash Redis (optional; degrades gracefully to in-memory)
 - **Hosting**: Vercel (app), Sanity (Studio)
@@ -86,3 +86,5 @@ media-production/  Creative-production inputs/outputs for the Pocket Worlds phot
   fixture content, and shared utilities (image policy, gallery search, etc.)
 - `apps/studio/schemaTypes/` — Sanity schema (documents + reusable objects);
   `apps/studio/structure.ts` — the desk structure pinning singleton pages
+- `apps/studio/schema.json` + `apps/web/src/sanity.types.ts` — extracted schema
+  and generated GROQ result types

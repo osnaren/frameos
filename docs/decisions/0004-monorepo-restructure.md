@@ -76,11 +76,10 @@ the existing app moved to `apps/web`:
   Root Directory must point at `apps/web` (a one-time manual dashboard
   change, documented in [../guides/deployment.md](../guides/deployment.md));
   Studio still deploys independently via `pnpm --filter @frameos/studio deploy`.
-- `packages/content-schema` is hand-maintained, not generated from
-  `apps/studio`'s schema — adding a field in Studio still requires a manual,
-  matching edit here. A future improvement would be generating this package
-  from Sanity's schema (`sanity schema extract` + typegen) instead; not done
-  now to keep this change scoped to structure, not tooling.
+- `packages/content-schema` remains the hand-maintained, provider-independent
+  UI contract. Sanity schema extraction and TypeGen now generate raw GROQ
+  result types in `apps/web/src/sanity.types.ts`, so the CMS boundary can be
+  checked against the Studio schema without coupling UI models to Sanity.
 - The original standalone `studio-frameos` checkout has been deleted —
   `apps/studio`'s history (preserved via the squashed subtree merge) is now
   the only copy, and `apps/studio` in this repo is the sole source of truth.

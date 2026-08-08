@@ -51,20 +51,20 @@ Source: `src/server/repository/portfolio.ts`
 
 ### `Photo`
 
-| Field                                                                 | Notes                                                                                                                                                                                                                                               |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `publicId`                                                            | Local fixture id (`local/<id>`) or a Sanity image CDN base URL — the identity `PhotoImage` renders from. Not a Cloudinary artifact despite the name (kept for historical/minimal-diff reasons).                                                     |
-| `slug`                                                                | Sanity's native `slug` field — human-readable, editor-controlled.                                                                                                                                                                                   |
-| `status`                                                              | `'draft' \| 'published' \| 'archived'`. `draft` is enforced by Sanity's own draft/publish workflow (never returned by a `published`-perspective query). `archived` is an explicit boolean field for retiring a published photo without deleting it. |
-| `title`, `alt`, `caption`, `description`                              | Editorial fields. `alt` is required by Sanity schema validation — a photo cannot be published without it.                                                                                                                                           |
-| `category` (Sanity field: `world`), `series`, `locationLabel`, `tags` | Organization/filtering fields.                                                                                                                                                                                                                      |
-| `captureDate`, `sortOrder`                                            | Ordering and display.                                                                                                                                                                                                                               |
-| `metadataVersion`                                                     | Currently `v2` — see [decisions/0002-remove-cloudinary.md](../decisions/0002-remove-cloudinary.md) for why it was bumped from `v1`.                                                                                                                 |
-| `metadata.{width,height,format,bytes}`                                | Sourced from the Sanity asset's own metadata.                                                                                                                                                                                                       |
-| `metadata.{camera,lens,focalLength,iso,shutterSpeed,aperture,gps}`    | Sourced from the photo document's own fields when an editor has set them, falling back to the asset's auto-extracted EXIF/GPS. Never invented — absent EXIF just stays absent.                                                                      |
-| `metadata.palette`                                                    | Up to 5 hex colors extracted from Sanity's palette swatches (`dominant`, `vibrant`, `darkMuted`, `muted`, `lightVibrant`), used for ambient wash effects.                                                                                           |
-| `image?.lqip`                                                         | Base64 blur-placeholder data URI, used directly as the `<img>` background — no extra network request.                                                                                                                                               |
-| `image?.hotspot`                                                      | Editor-set focal point (`{x, y}`, 0–1), used for hotspot-aware cropping in cropped presets.                                                                                                                                                         |
+| Field                                                                    | Notes                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicId`                                                               | Local fixture id (`local/<id>`) or a Sanity image CDN base URL — the identity `PhotoImage` renders from. Not a Cloudinary artifact despite the name (kept for historical/minimal-diff reasons).                                                     |
+| `slug`                                                                   | Sanity's native `slug` field — human-readable, editor-controlled.                                                                                                                                                                                   |
+| `status`                                                                 | `'draft' \| 'published' \| 'archived'`. `draft` is enforced by Sanity's own draft/publish workflow (never returned by a `published`-perspective query). `archived` is an explicit boolean field for retiring a published photo without deleting it. |
+| `title`, `alt`, `caption`, `description`                                 | Editorial fields. `alt` is required by Sanity schema validation — a photo cannot be published without it.                                                                                                                                           |
+| `category` (Sanity field: `worldRef`), `series`, `locationLabel`, `tags` | Organization/filtering fields. `worldRef` points to a reusable `world` document; the provider still reads the legacy `world` string during migration.                                                                                               |
+| `captureDate`, `sortOrder`                                               | Ordering and display.                                                                                                                                                                                                                               |
+| `metadataVersion`                                                        | Currently `v2` — see [decisions/0002-remove-cloudinary.md](../decisions/0002-remove-cloudinary.md) for why it was bumped from `v1`.                                                                                                                 |
+| `metadata.{width,height,format,bytes}`                                   | Sourced from the Sanity asset's own metadata.                                                                                                                                                                                                       |
+| `metadata.{camera,lens,focalLength,iso,shutterSpeed,aperture,gps}`       | Sourced from the photo document's own fields when an editor has set them, falling back to the asset's auto-extracted EXIF/GPS. Never invented — absent EXIF just stays absent.                                                                      |
+| `metadata.palette`                                                       | Up to 5 hex colors extracted from Sanity's palette swatches (`dominant`, `vibrant`, `darkMuted`, `muted`, `lightVibrant`), used for ambient wash effects.                                                                                           |
+| `image?.lqip`                                                            | Base64 blur-placeholder data URI, used directly as the `<img>` background — no extra network request.                                                                                                                                               |
+| `image?.hotspot`                                                         | Editor-set focal point (`{x, y}`, 0–1), used for hotspot-aware cropping in cropped presets.                                                                                                                                                         |
 
 ### Sanity documents
 
@@ -74,9 +74,16 @@ erDiagram
         string slug PK
         string title
         string alt
-        string world
+        reference worldRef
         boolean archived
         image image
+    }
+    WORLD {
+        string slug PK
+        string name
+        string line
+        string status
+        number sortOrder
     }
     HOME_PAGE {
         string headline
@@ -86,6 +93,7 @@ erDiagram
     }
     HOME_PAGE ||--o{ PHOTO : featuredPhotos
     ABOUT_PAGE ||--o{ PHOTO : photoHighlights
+    WORLD ||--o{ PHOTO : contains
 ```
 
 `siteSettings` and `contactPage` are singletons with no photo references, so
@@ -99,6 +107,8 @@ they're omitted from the diagram above — see the field tables in
   (`hotspot: true`, `metadata: ['exif', 'location', 'palette', 'lqip',
 'blurhash']`), a native `slug` field, editorial fields, and an `archived`
   boolean.
+- `world` — reusable name, slug, editorial description, public status,
+  ordering, hero-photo reference, photographic color mood, and SEO metadata.
 - `homePage.featuredPhotos` / `aboutPage.photoHighlights` are arrays of
   `reference` to `photo` documents — curate by picking existing photos, not
   re-uploading.
