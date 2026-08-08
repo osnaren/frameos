@@ -4558,7 +4558,7 @@ a:focus-visible .frame-corners {
 }
 
 .signal-heading {
-  grid-column: 1 / span 8;
+  grid-column: 1 / span 7;
   align-self: center;
 }
 
@@ -4584,12 +4584,71 @@ a:focus-visible .frame-corners {
 }
 
 .signal-transmission {
-  grid-column: 9 / -1;
+  position: relative;
+  grid-column: 8 / -1;
+  width: min(100%, 31rem);
   align-self: center;
-  border-top: 1px solid rgba(244, 240, 232, 0.24);
-  border-bottom: 1px solid rgba(244, 240, 232, 0.24);
-  background: rgba(7, 9, 9, 0.42);
-  padding: clamp(1.3rem, 2.4vw, 2.25rem) 0;
+  justify-self: end;
+  overflow: hidden;
+  border: 1px solid rgba(244, 240, 232, 0.22);
+  border-radius: 0.25rem;
+  padding: clamp(1.5rem, 3.2vw, 2.75rem);
+  background: rgba(7, 9, 9, 0.58);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 2.5rem 7rem rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(18px) saturate(0.82);
+}
+
+.signal-transmission::before,
+.signal-transmission::after {
+  content: '';
+  position: absolute;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-color: rgba(134, 195, 202, 0.78);
+  pointer-events: none;
+}
+
+.signal-transmission::before {
+  top: 0.55rem;
+  left: 0.55rem;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.signal-transmission::after {
+  right: 0.55rem;
+  bottom: 0.55rem;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.signal-transmission-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+  color: rgba(244, 240, 232, 0.42);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.signal-transmission-meta span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.signal-transmission-meta span:last-child::before {
+  content: '';
+  width: 0.36rem;
+  height: 0.36rem;
+  border-radius: 50%;
+  background: #86c3ca;
+  box-shadow: 0 0 0.8rem rgba(134, 195, 202, 0.72);
 }
 
 .signal-transmission-line {
@@ -4619,7 +4678,8 @@ a:focus-visible .frame-corners {
 }
 
 .signal-copy-block {
-  margin-top: 1.75rem;
+  margin-top: 1.55rem;
+  max-width: 36ch;
   color: rgba(244, 240, 232, 0.72);
   font-size: 0.92rem;
   line-height: 1.75;
@@ -4634,7 +4694,7 @@ a:focus-visible .frame-corners {
 }
 
 .signal-address-block {
-  margin-top: clamp(2rem, 5vh, 3.5rem);
+  margin-top: clamp(1.8rem, 4vh, 3rem);
 }
 
 .signal-address-block > span {
@@ -4780,11 +4840,11 @@ a:focus-visible .frame-corners {
 
 @media (min-width: 901px) and (max-width: 1100px) {
   .signal-heading {
-    grid-column: 1 / span 7;
+    grid-column: 1 / span 6;
   }
 
   .signal-transmission {
-    grid-column: 8 / -1;
+    grid-column: 7 / -1;
   }
 }
 
@@ -4796,7 +4856,11 @@ a:focus-visible .frame-corners {
 
   .signal-layout {
     gap: 2rem;
-    padding-top: 6.5rem;
+    padding-top: 4rem;
+  }
+
+  .signal-transmission {
+    padding: 1.3rem;
   }
 
   .signal-heading h1 {

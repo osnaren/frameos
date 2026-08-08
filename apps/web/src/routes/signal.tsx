@@ -106,6 +106,10 @@ function SignalRoute() {
         </motion.div>
 
         <motion.div className="signal-transmission" variants={revealVariants(reducedMotion)}>
+          <div className="signal-transmission-meta" aria-hidden="true">
+            <span>Receiver 01</span>
+            <span>Channel open</span>
+          </div>
           <div className="signal-transmission-line" aria-hidden="true">
             <span />
           </div>
