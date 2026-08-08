@@ -1,7 +1,8 @@
-﻿import { useRef } from 'react'
+import { useRef } from 'react'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { motion, useReducedMotion, useScroll } from 'framer-motion'
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
@@ -33,331 +34,190 @@ const NOTICING = [
   'food that looks like where it came from',
 ]
 
-/** A thin reading-progress bar that fills as the user scrolls through the essay. */
-function ReadingProgress({ target }: { target: React.RefObject<HTMLDivElement | null> }) {
+function ReadingProgress({ target }: { target: React.RefObject<HTMLElement | null> }) {
   const reducedMotion = useReducedMotion()
-  const { scrollYProgress } = useScroll({
-    target,
-    offset: ['start start', 'end start'],
-  })
+  const { scrollYProgress } = useScroll({ target, offset: ['start start', 'end end'] })
 
   if (reducedMotion) return null
-
-  return (
-    <motion.div
-      className="reading-progress"
-      style={{ scaleX: scrollYProgress }}
-      aria-hidden="true"
-    />
-  )
+  return <motion.div className="reading-progress" style={{ scaleX: scrollYProgress }} />
 }
 
-/** Floating ambient particles that add atmospheric depth to the page. */
-function AmbientParticles() {
-  const particles = [
-    { x: '12%', y: '18%', size: 3, delay: 0, duration: 9 },
-    { x: '78%', y: '25%', size: 4, delay: 1.2, duration: 11 },
-    { x: '45%', y: '55%', size: 3, delay: 2.8, duration: 8 },
-    { x: '88%', y: '70%', size: 5, delay: 0.5, duration: 10 },
-    { x: '22%', y: '80%', size: 3, delay: 3.2, duration: 12 },
-  ]
-
-  return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-      {particles.map((p, i) => (
-        <div
-          key={i}
-          className="ambient-particle"
-          style={{
-            left: p.x,
-            top: p.y,
-            width: p.size,
-            height: p.size,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
-/**
- * Field Notes as a visual essay with:
- * - reading progress bar
- * - floating ambient particles
- * - pull-quote with animated border
- * - staggered noticing-list reveal
- * - scroll-linked photo scale parallax
- * - contact-strip hover depth
- * - decorative golden thread divider
- */
 function FieldNotesRoute() {
   const data = Route.useLoaderData()!
   const reducedMotion = useReducedMotion()
-  const essayRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: essayRef,
-    offset: ['start end', 'end start'],
-  })
-  const crossingY = useTransform(scrollYProgress, [0, 1], [60, -160])
-  const slowY = useTransform(scrollYProgress, [0, 1], [40, -40])
-  const fastY = useTransform(scrollYProgress, [0, 1], [110, -110])
-  const slowScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.95, 1, 1, 0.97])
-  const fastScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.92, 1, 1, 0.94])
-
-  const crossing = data.gallery.at(0)
-  const column = data.gallery.slice(1)
+  const pageRef = useRef<HTMLElement>(null)
+  const lead = data.gallery.at(0)
+  const stills = data.gallery.slice(1)
   const slugOf = (href: string) => href.split('/').at(-1) ?? ''
 
   return (
-    <main className="relative overflow-x-clip px-4 pt-12 pb-20">
-      {/* Reading progress indicator */}
-      <ReadingProgress target={essayRef} />
+    <main ref={pageRef} className="field-notes-page">
+      <ReadingProgress target={pageRef} />
 
-      {/* Atmospheric ambient particles */}
-      <AmbientParticles />
+      <motion.header
+        className="page-shell field-notes-hero"
+        initial="hidden"
+        animate="visible"
+        variants={contactSheet}
+      >
+        <motion.div className="field-notes-title" variants={revealVariants(reducedMotion)}>
+          <p>Field Notes · an essay on attention</p>
+          <h1>{data.page.headline}</h1>
+        </motion.div>
+        <motion.aside className="field-notes-intro" variants={revealVariants(reducedMotion)}>
+          <p>
+            A small manifesto for carrying less, looking longer, and letting the camera arrive after
+            the moment has already asked to be seen.
+          </p>
+          <a href="#essay">
+            Read the note
+            <ArrowDownRight aria-hidden="true" />
+          </a>
+        </motion.aside>
+      </motion.header>
 
-      {/* A quiet green wash from the Small Wonders world opens the chapter */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[52vh]"
-        style={{
-          background:
-            'linear-gradient(180deg, color-mix(in srgb, #ecf1e2 var(--wash-strength), transparent), transparent)',
-        }}
-      />
-
-      {/* Decorative radial glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-[30vh] right-0 -z-10 h-[60vh] w-[60vh] opacity-20 blur-3xl"
-        style={{
-          background:
-            'radial-gradient(circle, color-mix(in srgb, var(--accent) 25%, transparent), transparent 70%)',
-        }}
-      />
-
-      {/* Subtle dot grid texture */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 opacity-30 dot-grid-bg-soft"
-      />
-
-      <motion.div className="page-shell" initial="hidden" animate="visible" variants={contactSheet}>
-        <motion.p className="mono-label" variants={revealVariants(reducedMotion)}>
-          Field Notes
-        </motion.p>
-        <motion.h1
-          className="display-font text-balance mt-4 max-w-3xl text-[clamp(2.2rem,5.5vw,4rem)] leading-[1.05] font-light text-(--ink)"
-          variants={revealVariants(reducedMotion)}
+      {lead ? (
+        <motion.figure
+          className="field-notes-lead"
+          initial={reducedMotion ? undefined : { clipPath: 'inset(7% 5% 7% 5%)', opacity: 0.7 }}
+          animate={reducedMotion ? undefined : { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 }}
+          transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          {data.page.headline}
-        </motion.h1>
+          <Link to="/photos/$slug" params={{ slug: slugOf(lead.photoHref) }}>
+            <PhotoImage
+              publicId={lead.imagePublicId}
+              alt={lead.alt}
+              preset="hero"
+              sizes="100vw"
+              priority
+              lqip={lead.imageLqip}
+              hotspot={lead.imageHotspot}
+              className="field-notes-lead-image"
+            />
+          </Link>
+          <figcaption>
+            <span>Opening frame</span>
+            <em>{lead.title}</em>
+          </figcaption>
+        </motion.figure>
+      ) : null}
 
-        <div
-          ref={essayRef}
-          className="relative mt-14 grid gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]"
-        >
-          {/* One frame crosses slowly behind the reading column */}
-          {crossing ? (
-            <motion.div
-              aria-hidden="true"
-              className="pointer-events-none absolute top-[14%] -left-16 -z-10 hidden w-75 opacity-[0.16] lg:block"
-              style={reducedMotion ? undefined : { y: crossingY }}
-            >
-              <PhotoImage
-                publicId={crossing.imagePublicId}
-                alt=""
-                preset="card"
-                sizes="300px"
-                lqip={crossing.imageLqip}
-                hotspot={crossing.imageHotspot}
-                className="h-auto w-full rounded-xl"
-              />
-            </motion.div>
-          ) : null}
+      <section id="essay" className="page-shell field-notes-essay">
+        <aside className="field-notes-margin">
+          <div>
+            <span>Method</span>
+            <strong>Mobile only</strong>
+          </div>
+          <div>
+            <span>Sequence</span>
+            <strong>Notice → frame → keep</strong>
+          </div>
+          <div>
+            <span>Archive</span>
+            <strong>Ongoing</strong>
+          </div>
+        </aside>
 
-          <motion.div variants={revealVariants(reducedMotion)}>
-            <div className="space-y-6 text-base leading-8 text-(--muted-strong) lg:sticky lg:top-28">
-              {data.page.body.map((paragraph) => (
-                <p key={paragraph.slice(0, 32)} className="m-0 max-w-prose">
-                  {paragraph}
-                </p>
-              ))}
-
-              {/* Pull quote */}
-              <motion.blockquote
-                className="pull-quote m-0 mt-8"
-                initial={reducedMotion ? undefined : { opacity: 0 }}
-                whileInView={reducedMotion ? undefined : { opacity: 1 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <motion.span
-                  aria-hidden="true"
-                  className="pull-quote-line"
-                  initial={reducedMotion ? false : { scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true, amount: 0.6 }}
-                  transition={{ duration: reducedMotion ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] }}
-                />
-                The phone is the camera that is present when something worth noticing happens.
-              </motion.blockquote>
-
-              <div className="border-t border-(--line) pt-6">
-                <p className="mono-label m-0">What tends to get noticed</p>
-                <ul className="mt-4 list-none space-y-3 p-0">
-                  {NOTICING.map((item, index) => (
-                    <motion.li
-                      key={item}
-                      className="display-italic text-lg text-(--muted-strong)"
-                      initial={reducedMotion ? undefined : { opacity: 0, x: -12 }}
-                      whileInView={reducedMotion ? undefined : { opacity: 1, x: 0 }}
-                      viewport={{ once: true, amount: 0.5 }}
-                      transition={{
-                        duration: 0.6,
-                        delay: index * 0.1,
-                        ease: [0.16, 1, 0.3, 1],
-                      }}
-                    >
-                      <span
-                        className="mr-2 inline-block h-px w-4 align-middle"
-                        style={{ background: 'var(--accent)' }}
-                      />
-                      {item}
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Golden thread divider */}
-              <div className="golden-thread my-6" aria-hidden="true" />
-
-              <p className="m-0 text-sm leading-7 text-(--muted)">
-                The archive runs on a small pipeline: photographs stay canonical in one place,
-                editorial words in another, and this site reads both. Portraits of people stay
-                unpublished until each person has said yes.
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.aside aria-label="Selected frames" variants={revealVariants(reducedMotion)}>
-            <div className="flex flex-col gap-16">
-              {column.map((item, index) => (
-                <motion.figure
-                  key={item.imagePublicId}
-                  className={`m-0 ${index % 2 === 1 ? 'lg:ml-16' : 'lg:mr-10'}`}
-                  style={
-                    reducedMotion
-                      ? undefined
-                      : {
-                          y: index % 2 === 0 ? slowY : fastY,
-                          scale: index % 2 === 0 ? slowScale : fastScale,
-                        }
-                  }
-                >
-                  <Link
-                    to="/photos/$slug"
-                    params={{ slug: slugOf(item.photoHref) }}
-                    className="pocket-frame depth-frame group block no-underline"
-                  >
-                    <PhotoImage
-                      publicId={item.imagePublicId}
-                      alt={item.alt}
-                      preset="card"
-                      sizes="(max-width: 1024px) 92vw, 420px"
-                      lqip={item.imageLqip}
-                      hotspot={item.imageHotspot}
-                      className="h-auto w-full transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
-                    />
-                    <span aria-hidden="true" className="frame-corners" />
-                  </Link>
-                  <figcaption className="mt-3 flex items-baseline gap-3">
-                    <span className="mono-label shrink-0">
-                      note {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className="display-italic text-base text-(--muted-strong)">
-                      {item.title}
-                    </span>
-                  </figcaption>
-                </motion.figure>
-              ))}
-            </div>
-          </motion.aside>
-        </div>
-
-        {/* Chapter close: a strip from the contact sheet */}
-        <motion.div
-          className="mt-24 border-t border-(--line) pt-8"
+        <motion.article
+          className="field-notes-copy"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.4 }}
-          variants={revealVariants(reducedMotion)}
+          viewport={{ once: true, amount: 0.15 }}
+          variants={contactSheet}
         >
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <p className="mono-label m-0">Contact sheet</p>
-            <Link
-              to="/archive"
-              className="link-glow px-2 py-2 text-sm font-semibold text-(--muted-strong)"
+          {data.page.body.map((paragraph, index) => (
+            <motion.p key={paragraph.slice(0, 32)} variants={revealVariants(reducedMotion)}>
+              {index === 0 ? (
+                <span className="field-notes-dropcap">{paragraph.charAt(0)}</span>
+              ) : null}
+              {index === 0 ? paragraph.slice(1) : paragraph}
+            </motion.p>
+          ))}
+
+          <motion.blockquote variants={revealVariants(reducedMotion)}>
+            The phone is the camera that is present when something worth noticing happens.
+          </motion.blockquote>
+        </motion.article>
+      </section>
+
+      <section className="page-shell field-notes-observations" aria-labelledby="noticing-heading">
+        <div>
+          <p>Recurring subjects</p>
+          <h2 id="noticing-heading">What keeps asking to be photographed.</h2>
+        </div>
+        <ol>
+          {NOTICING.map((item, index) => (
+            <motion.li
+              key={item}
+              initial={reducedMotion ? undefined : { opacity: 0, x: 24 }}
+              whileInView={reducedMotion ? undefined : { opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.7, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
             >
-              See every frame →
-            </Link>
-          </div>
-          <div className="mt-5 flex flex-wrap gap-3">
-            {data.gallery.map((item) => (
-              <Link
-                key={`strip-${item.imagePublicId}`}
-                to="/photos/$slug"
-                params={{ slug: slugOf(item.photoHref) }}
-                aria-label={`View \u201c${item.title}\u201d`}
-                className="pocket-frame contact-strip-item block w-24 no-underline sm:w-32"
-              >
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <em>{item}</em>
+            </motion.li>
+          ))}
+        </ol>
+      </section>
+
+      {stills.length > 0 ? (
+        <section className="field-notes-stills" aria-label="Selected field notes">
+          {stills.map((item, index) => (
+            <motion.figure
+              key={item.imagePublicId}
+              className={
+                index % 2 === 1
+                  ? 'field-notes-still field-notes-still--offset'
+                  : 'field-notes-still'
+              }
+              initial={reducedMotion ? undefined : { opacity: 0, y: 48, filter: 'blur(8px)' }}
+              whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+              viewport={{ once: true, amount: 0.18 }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link to="/photos/$slug" params={{ slug: slugOf(item.photoHref) }}>
                 <PhotoImage
                   publicId={item.imagePublicId}
-                  alt=""
-                  preset="thumb"
-                  sizes="128px"
+                  alt={item.alt}
+                  preset="card"
+                  sizes="(max-width: 760px) 92vw, 54vw"
                   lqip={item.imageLqip}
                   hotspot={item.imageHotspot}
-                  className="h-auto w-full"
+                  className="field-notes-still-image"
                 />
-                <span aria-hidden="true" className="frame-corners" />
               </Link>
-            ))}
-          </div>
-        </motion.div>
+              <figcaption>
+                <span>{String(index + 2).padStart(2, '0')}</span>
+                <em>{item.title}</em>
+                <span>Field note</span>
+              </figcaption>
+            </motion.figure>
+          ))}
+        </section>
+      ) : null}
 
-        <motion.div
-          className="mt-16 flex flex-wrap gap-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.6 }}
-          variants={revealVariants(reducedMotion)}
-        >
-          <Link
-            to="/"
-            hash="worlds"
-            className="rounded-full bg-(--ink) px-6 py-3.5 text-sm font-semibold text-(--bg) no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            Step into the worlds
+      <section className="page-shell field-notes-closing">
+        <p>The noticing came first.</p>
+        <div>
+          <Link to="/archive">
+            Open the full index
+            <ArrowUpRight aria-hidden="true" />
           </Link>
-          <Link
-            to="/signal"
-            className="rounded-full border border-(--line) bg-(--panel) px-6 py-3.5 text-sm font-semibold text-(--ink) no-underline transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-          >
+          <Link to="/signal">
             Send a signal
+            <ArrowUpRight aria-hidden="true" />
           </Link>
-        </motion.div>
+        </div>
+      </section>
 
-        {data.isDegraded ? (
-          <div className="mt-8">
-            <StatusBanner title="Serving cached content.">
-              This page is showing its last successful snapshot.
-            </StatusBanner>
-          </div>
-        ) : null}
-      </motion.div>
+      {data.isDegraded ? (
+        <div className="page-shell pb-12">
+          <StatusBanner title="Serving cached content.">
+            This page is showing its last successful snapshot.
+          </StatusBanner>
+        </div>
+      ) : null}
     </main>
   )
 }
