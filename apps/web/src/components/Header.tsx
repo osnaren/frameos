@@ -1,32 +1,36 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react'
 
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Aperture, ArrowUpRight } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { isNavigationLinkActive, NAV_LINKS } from '@/components/navigation'
 
 import ThemeToggle from './ThemeToggle'
 
-const NAV_LINKS = [
-  { to: '/', label: 'Worlds', exact: true },
-  { to: '/archive', label: 'Index' },
-  { to: '/notes', label: 'Field Notes' },
-  { to: '/signal', label: 'Signal' },
-] as const
+const MobileNavigation = lazy(() => import('./MobileNavigation'))
+const COMPACT_NAV_QUERY = '(max-width: 767px)'
+
+function subscribeToCompactNavigation(onStoreChange: () => void) {
+  const media = window.matchMedia(COMPACT_NAV_QUERY)
+  media.addEventListener('change', onStoreChange)
+  return () => media.removeEventListener('change', onStoreChange)
+}
+
+function getCompactNavigationSnapshot() {
+  return window.matchMedia(COMPACT_NAV_QUERY).matches
+}
+
+function MobileNavigationPlaceholder() {
+  return <span aria-hidden="true" className="site-mobile-menu-placeholder" />
+}
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const compactNavigation = useSyncExternalStore(
+    subscribeToCompactNavigation,
+    getCompactNavigationSnapshot,
+    () => false
+  )
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8)
@@ -53,12 +57,7 @@ export default function Header() {
 
         <div className="site-nav-list ml-auto hidden items-center gap-x-6 text-[0.8rem] font-semibold tracking-[0.16em] uppercase md:flex">
           {NAV_LINKS.map((link, index) => {
-            const isActive =
-              link.to === '/'
-                ? pathname === '/' || pathname.startsWith('/worlds/')
-                : link.to === '/archive'
-                  ? pathname === '/archive' || pathname.startsWith('/photos/')
-                  : pathname === link.to
+            const isActive = isNavigationLinkActive(pathname, link.to)
 
             return (
               <Link
@@ -79,58 +78,13 @@ export default function Header() {
 
         <div className="ml-auto flex items-center gap-2 md:ml-0">
           <ThemeToggle />
-          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                className="site-mobile-menu-trigger rounded-full md:hidden"
-                aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              >
-                <Aperture aria-hidden="true" data-icon="inline-start" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              sideOffset={10}
-              collisionPadding={12}
-              className="mobile-nav-menu w-[min(20rem,calc(100vw-1.5rem))] p-2 md:hidden"
-            >
-              <DropdownMenuLabel className="mobile-nav-menu-label">
-                Pocket Worlds <span>Navigate the archive</span>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                {NAV_LINKS.map((link, index) => {
-                  const isActive =
-                    link.to === '/'
-                      ? pathname === '/' || pathname.startsWith('/worlds/')
-                      : link.to === '/archive'
-                        ? pathname === '/archive' || pathname.startsWith('/photos/')
-                        : pathname === link.to
-
-                  return (
-                    <DropdownMenuItem key={link.label} asChild>
-                      <Link
-                        to={link.to}
-                        viewTransition
-                        aria-current={isActive ? 'page' : undefined}
-                        className="mobile-nav-menu-link"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <span>{String(index + 1).padStart(2, '0')}</span>
-                        <strong>{link.label}</strong>
-                        <ArrowUpRight aria-hidden="true" />
-                      </Link>
-                    </DropdownMenuItem>
-                  )
-                })}
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <p className="mobile-nav-menu-foot">FrameOS · Things noticed on a phone</p>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {compactNavigation ? (
+            <Suspense fallback={<MobileNavigationPlaceholder />}>
+              <MobileNavigation pathname={pathname} />
+            </Suspense>
+          ) : (
+            <MobileNavigationPlaceholder />
+          )}
         </div>
       </nav>
     </header>

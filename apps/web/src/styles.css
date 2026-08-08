@@ -2298,12 +2298,18 @@ a:focus-visible .frame-corners {
 }
 
 .theme-toggle {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
   flex: none;
-  border-color: var(--line);
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
   background: color-mix(in srgb, var(--panel-strong) 88%, transparent);
   color: var(--ink);
   box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--shadow) 45%, transparent);
   backdrop-filter: blur(14px);
+  cursor: pointer;
 }
 
 .theme-toggle:hover,
@@ -3053,6 +3059,19 @@ a:focus-visible .frame-corners {
   border-color: var(--line);
   background: var(--ink);
   color: var(--bg);
+}
+
+.site-mobile-menu-placeholder {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .site-mobile-menu-placeholder {
+    display: block;
+    width: 2.4rem;
+    height: 2.4rem;
+    flex: none;
+  }
 }
 
 .site-mobile-menu-trigger:hover,
