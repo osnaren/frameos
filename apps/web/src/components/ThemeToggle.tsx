@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 
 import { Monitor, Moon, Sun } from 'lucide-react'
 
+import { Button } from '@/components/ui/button'
+
 type ThemeMode = 'light' | 'dark' | 'auto'
 
 const ORDER: ThemeMode[] = ['light', 'dark', 'auto']
@@ -110,15 +112,16 @@ export default function ThemeToggle() {
   const Glyph = mode === 'light' ? Sun : mode === 'dark' ? Moon : Monitor
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="icon"
       onClick={cycleMode}
       aria-label={label}
       title={label}
-      className="theme-toggle inline-flex cursor-pointer items-center gap-2 rounded-full border border-(--line) bg-(--panel) px-4 py-2.5 text-[0.72rem] font-semibold tracking-[0.16em] uppercase text-(--ink) transition hover:-translate-y-0.5 hover:border-(--accent) active:scale-95 active:translate-y-0"
+      className="theme-toggle rounded-full"
     >
-      <Glyph aria-hidden="true" className="theme-toggle__icon" size={13} strokeWidth={1.7} />
-      {mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}
-    </button>
+      <Glyph aria-hidden="true" className="theme-toggle__icon" strokeWidth={1.7} />
+    </Button>
   )
 }

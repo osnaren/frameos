@@ -77,54 +77,57 @@ export default function Footer() {
       gsap.set(slash, { scaleY: 0, transformOrigin: 'bottom', autoAlpha: 0 })
       gsap.set(credits, { y: 12, autoAlpha: 0 })
 
+      const timeline = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+      timeline
+        .to(railLines, { scaleX: 1, duration: 1.1, stagger: 0.08 })
+        .to(railLabels, { y: 0, autoAlpha: 1, duration: 0.65, stagger: 0.08 }, '<0.1')
+        .to(
+          reveals,
+          {
+            yPercent: 0,
+            filter: 'blur(0px)',
+            autoAlpha: 1,
+            duration: 1.15,
+            stagger: 0.075,
+          },
+          '-=0.72'
+        )
+        .to(
+          slash,
+          {
+            scaleY: 1,
+            autoAlpha: 1,
+            duration: 0.9,
+          },
+          '<0.18'
+        )
+        .to(
+          credits,
+          {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.75,
+            stagger: 0.08,
+          },
+          '-=0.58'
+        )
+
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (!entry.isIntersecting) return
-          observer.disconnect()
-
-          const timeline = gsap.timeline({ defaults: { ease: 'expo.out' } })
-          timeline
-            .to(railLines, { scaleX: 1, duration: 1.1, stagger: 0.08 })
-            .to(railLabels, { y: 0, autoAlpha: 1, duration: 0.65, stagger: 0.08 }, '<0.1')
-            .to(
-              reveals,
-              {
-                yPercent: 0,
-                filter: 'blur(0px)',
-                autoAlpha: 1,
-                duration: 1.15,
-                stagger: 0.075,
-                clearProps: 'transform,filter,opacity,visibility',
-              },
-              '-=0.72'
-            )
-            .to(
-              slash,
-              {
-                scaleY: 1,
-                autoAlpha: 1,
-                duration: 0.9,
-                clearProps: 'transform,opacity,visibility',
-              },
-              '<0.18'
-            )
-            .to(
-              credits,
-              {
-                y: 0,
-                autoAlpha: 1,
-                duration: 0.75,
-                stagger: 0.08,
-                clearProps: 'transform,opacity,visibility',
-              },
-              '-=0.58'
-            )
+          if (entry.isIntersecting) {
+            timeline.play()
+          } else {
+            timeline.reverse()
+          }
         },
         { threshold: 0.12 }
       )
 
       observer.observe(root)
-      return () => observer.disconnect()
+      return () => {
+        observer.disconnect()
+        timeline.kill()
+      }
     },
     { scope: footerRef }
   )
