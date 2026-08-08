@@ -1,9 +1,10 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { z } from 'zod'
 
+import { ArchiveLightbox } from '@/components/archive/ArchiveLightbox'
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
 import { chrome, focusEase } from '@/lib/motion'
@@ -111,55 +112,9 @@ function FrameCounter({
   )
 }
 
-/** 3D perspective tilt effect on hover. */
-function useTilt(ref: React.RefObject<HTMLElement | null>) {
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const el = ref.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const x = (e.clientX - rect.left) / rect.width - 0.5
-      const y = (e.clientY - rect.top) / rect.height - 0.5
-      el.style.setProperty('--tilt-x', `${-y * 6}deg`)
-      el.style.setProperty('--tilt-y', `${x * 6}deg`)
-    },
-    [ref]
-  )
-
-  const handleMouseLeave = useCallback(() => {
-    const el = ref.current
-    if (!el) return
-    el.style.setProperty('--tilt-x', '0deg')
-    el.style.setProperty('--tilt-y', '0deg')
-  }, [ref])
-
-  return { handleMouseMove, handleMouseLeave }
-}
-
-function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const reducedMotion = useReducedMotion()
-  const { handleMouseMove, handleMouseLeave } = useTilt(ref)
-
-  if (reducedMotion) {
-    return <div className={className}>{children}</div>
-  }
-
-  return (
-    <div
-      ref={ref}
-      className={`tilt-card ${className ?? ''}`}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className="tilt-card-inner h-full">{children}</div>
-    </div>
-  )
-}
-
 /**
  * The Index: an editorial contact sheet with scroll-triggered reveals,
- * staggered grid animation, 3D perspective hover, frame counter,
+ * staggered grid animation, focus-frame hover, frame counter,
  * atmospheric depth, and world-accent hover glow.
  */
 function ArchiveRoute() {
@@ -168,6 +123,7 @@ function ArchiveRoute() {
   const sheetRef = useRef<HTMLUListElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const reducedMotion = useReducedMotion()
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const activeWorld = search.world
     ? (worlds.find((world) => world.slug === search.world) ?? null)
     : null
@@ -182,8 +138,10 @@ function ArchiveRoute() {
       return
     }
 
-    const links = Array.from(sheetRef.current?.querySelectorAll('a') ?? [])
-    const currentIndex = links.indexOf(document.activeElement as HTMLAnchorElement)
+    const triggers = Array.from(
+      sheetRef.current?.querySelectorAll<HTMLButtonElement>('[data-archive-trigger]') ?? []
+    )
+    const currentIndex = triggers.indexOf(document.activeElement as HTMLButtonElement)
 
     if (currentIndex === -1) {
       return
@@ -191,7 +149,7 @@ function ArchiveRoute() {
 
     event.preventDefault()
     const delta = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1
-    const next = links[(currentIndex + delta + links.length) % links.length]
+    const next = triggers[(currentIndex + delta + triggers.length) % triggers.length]
     next.focus()
   }
 
@@ -366,47 +324,65 @@ function ArchiveRoute() {
                     ease: focusEase,
                   }}
                 >
-                  <TiltCard className="h-full">
-                    <Link
-                      to="/photos/$slug"
-                      params={{ slug: photo.slug }}
-                      viewTransition={false}
-                      aria-label={`View \u201c${photo.title}\u201d`}
-                      className="pocket-frame depth-frame group block h-full no-underline"
-                      style={{
+                  <button
+                    type="button"
+                    data-archive-trigger
+                    aria-label={`Open \u201c${photo.title}\u201d in the image viewer`}
+                    className="pocket-frame depth-frame archive-frame-trigger group block h-full w-full border-0 p-0 text-left"
+                    style={
+                      {
                         '--glow-color': world?.mood.accent ?? 'var(--accent)',
+                      } as React.CSSProperties
+                    }
+                    onClick={() => setActiveIndex(index)}
+                    onPointerMove={(event) => {
+                      const rect = event.currentTarget.getBoundingClientRect()
+                      event.currentTarget.style.setProperty(
+                        '--cursor-x',
+                        `${event.clientX - rect.left}px`
+                      )
+                      event.currentTarget.style.setProperty(
+                        '--cursor-y',
+                        `${event.clientY - rect.top}px`
+                      )
+                    }}
+                  >
+                    <PhotoImage
+                      publicId={photo.publicId}
+                      alt={photo.alt}
+                      preset="gallery"
+                      sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px"
+                      priority={index < 6}
+                      intrinsicWidth={width || undefined}
+                      intrinsicHeight={height || undefined}
+                      lqip={photo.image?.lqip}
+                      hotspot={photo.image?.hotspot}
+                      className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
+                      style={{
+                        aspectRatio: `${width || 1} / ${height || 1}`,
                       }}
+                    />
+                    <span aria-hidden="true" className="archive-photo-glow" />
+                    <span aria-hidden="true" className="archive-focus-cursor">
+                      <i />
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--tl" />
+                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--tr" />
+                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--bl" />
+                    <span aria-hidden="true" className="archive-edge-dot archive-edge-dot--br" />
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-x-0 bottom-0 z-2 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/60 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
                     >
-                      <PhotoImage
-                        publicId={photo.publicId}
-                        alt={photo.alt}
-                        preset="gallery"
-                        sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 300px"
-                        priority={index < 6}
-                        intrinsicWidth={width || undefined}
-                        intrinsicHeight={height || undefined}
-                        lqip={photo.image?.lqip}
-                        hotspot={photo.image?.hotspot}
-                        className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
-                        style={{
-                          aspectRatio: `${width || 1} / ${height || 1}`,
-                        }}
-                      />
-                      <span aria-hidden="true" className="archive-photo-glow" />
-                      <span aria-hidden="true" className="frame-corners" />
-                      <span
-                        aria-hidden="true"
-                        className="absolute inset-x-0 bottom-0 z-2 flex items-baseline justify-between gap-2 bg-linear-to-t from-black/60 to-transparent px-3 pt-8 pb-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
-                      >
-                        <span className="truncate text-xs font-medium text-white">
-                          {photo.title}
-                        </span>
-                        <span className="mono-label shrink-0 text-white/80!">
-                          {world ? world.name : ''}
-                        </span>
+                      <span className="truncate text-xs font-medium text-white">{photo.title}</span>
+                      <span className="mono-label shrink-0 text-white/80!">
+                        {world ? world.name : ''}
                       </span>
-                    </Link>
-                  </TiltCard>
+                    </span>
+                  </button>
                 </motion.li>
               )
             })}
@@ -418,6 +394,12 @@ function ArchiveRoute() {
 
       {/* Floating frame counter */}
       <FrameCounter total={feed.items.length} containerRef={mainRef} />
+      <ArchiveLightbox
+        items={feed.items}
+        worlds={worlds}
+        activeIndex={activeIndex}
+        onIndexChange={setActiveIndex}
+      />
     </main>
   )
 }

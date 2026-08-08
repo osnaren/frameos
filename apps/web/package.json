@@ -33,6 +33,7 @@
     "gsap": "^3.15.0",
     "lucide-react": "^1.24.0",
     "nitro": "npm:nitro-nightly@latest",
+    "radix-ui": "^1.6.7",
     "react": "catalog:",
     "react-dom": "catalog:",
     "shadcn": "^4.13.0",
