@@ -13,6 +13,10 @@
  * Only the latin and latin-ext subsets ship; unicode-range keeps latin-ext
  * from downloading unless a page actually needs it. The two files used above
  * the fold (Fraunces roman, Plex Sans) are preloaded in routes/__root.tsx.
+ *
+ * The "… Fallback" faces at the end stand in during font-display: swap.
+ * They are local system fonts resized to the web fonts' metrics, so text
+ * keeps its line breaks when the real face arrives (no layout shift).
  */
 
 /* Fraunces — roman */
@@ -194,4 +198,108 @@
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Metric-matched fallbacks (used in the --font-display / --font-sans /
+ * --font-mono stacks right after the web font).
+ *
+ * Each pairs a font found on macOS, iOS and Windows with its metric-compatible
+ * Liberation twin (Linux/ChromeOS), so one set of overrides fits both; where
+ * neither exists (e.g. Android) the stack simply moves on to the next font.
+ * - size-adjust: measured as rendered text width, web font ÷ fallback, at the
+ *   settings the app uses (Fraunces roman at wght 340 / opsz 100 — the home
+ *   headline; italic at wght 330 / opsz 60; Plex Sans 400 and 600)
+ * - ascent/descent/line-gap: the web font's own metrics (Fraunces 1956/510/0
+ *   per 2000 upm; Plex 1025/275/0 per 1000 upm), divided by size-adjust
+ *
+ * Re-measure if the headline's weight or optical size changes a lot.
+ */
+@font-face {
+  font-family: 'Fraunces Fallback';
+  font-style: normal;
+  src:
+    local('Times New Roman'), local('TimesNewRomanPSMT'), local('Liberation Serif'),
+    local('LiberationSerif');
+  size-adjust: 92.2%;
+  ascent-override: 106.07%;
+  descent-override: 27.66%;
+  line-gap-override: 0%;
+  /* Only what the web fonts cover; other glyphs keep their old system fallback. */
+  unicode-range:
+    U+0000-00FF, U+0100-02BA, U+02BB-02BC, U+02BD-02C5, U+02C6, U+02C7-02CC, U+02CE-02D7, U+02DA,
+    U+02DC, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2000-206F,
+    U+20A0-20AB, U+20AC, U+20AD-20C0, U+2113, U+2122, U+2191, U+2193, U+2212, U+2215, U+2C60-2C7F,
+    U+A720-A7FF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Fraunces Fallback';
+  font-style: italic;
+  src:
+    local('Times New Roman Italic'), local('TimesNewRomanPS-ItalicMT'),
+    local('Liberation Serif Italic'), local('LiberationSerif-Italic');
+  size-adjust: 98.7%;
+  ascent-override: 99.09%;
+  descent-override: 25.84%;
+  line-gap-override: 0%;
+  /* Only what the web fonts cover; other glyphs keep their old system fallback. */
+  unicode-range:
+    U+0000-00FF, U+0100-02BA, U+02BB-02BC, U+02BD-02C5, U+02C6, U+02C7-02CC, U+02CE-02D7, U+02DA,
+    U+02DC, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2000-206F,
+    U+20A0-20AB, U+20AC, U+20AD-20C0, U+2113, U+2122, U+2191, U+2193, U+2212, U+2215, U+2C60-2C7F,
+    U+A720-A7FF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Fallback';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans');
+  size-adjust: 100%;
+  ascent-override: 102.5%;
+  descent-override: 27.5%;
+  line-gap-override: 0%;
+  /* Only what the web fonts cover; other glyphs keep their old system fallback. */
+  unicode-range:
+    U+0000-00FF, U+0100-02BA, U+02BB-02BC, U+02BD-02C5, U+02C6, U+02C7-02CC, U+02CE-02D7, U+02DA,
+    U+02DC, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2000-206F,
+    U+20A0-20AB, U+20AC, U+20AD-20C0, U+2113, U+2122, U+2191, U+2193, U+2212, U+2215, U+2C60-2C7F,
+    U+A720-A7FF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Fallback';
+  font-style: normal;
+  font-weight: 600 700;
+  src:
+    local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'),
+    local('LiberationSans-Bold');
+  size-adjust: 94.4%;
+  ascent-override: 108.58%;
+  descent-override: 29.13%;
+  line-gap-override: 0%;
+  /* Only what the web fonts cover; other glyphs keep their old system fallback. */
+  unicode-range:
+    U+0000-00FF, U+0100-02BA, U+02BB-02BC, U+02BD-02C5, U+02C6, U+02C7-02CC, U+02CE-02D7, U+02DA,
+    U+02DC, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2000-206F,
+    U+20A0-20AB, U+20AC, U+20AD-20C0, U+2113, U+2122, U+2191, U+2193, U+2212, U+2215, U+2C60-2C7F,
+    U+A720-A7FF, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono Fallback';
+  font-style: normal;
+  src:
+    local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'), local('LiberationMono');
+  size-adjust: 100%;
+  ascent-override: 102.5%;
+  descent-override: 27.5%;
+  line-gap-override: 0%;
+  /* Only what the web fonts cover; other glyphs keep their old system fallback. */
+  unicode-range:
+    U+0000-00FF, U+0100-02BA, U+02BB-02BC, U+02BD-02C5, U+02C6, U+02C7-02CC, U+02CE-02D7, U+02DA,
+    U+02DC, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2000-206F,
+    U+20A0-20AB, U+20AC, U+20AD-20C0, U+2113, U+2122, U+2191, U+2193, U+2212, U+2215, U+2C60-2C7F,
+    U+A720-A7FF, U+FEFF, U+FFFD;
 }

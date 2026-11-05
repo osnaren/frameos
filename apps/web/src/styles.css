@@ -7,8 +7,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* Each web font is followed by its metric-matched fallback (styles/fonts.css). */
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'IBM Plex Mono Fallback', ui-monospace, monospace;
+  --font-display: 'Fraunces', 'Fraunces Fallback', Georgia, serif;
 }
 
 @theme inline {
@@ -195,13 +197,13 @@ body::after {
 }
 
 .display-font {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-variation-settings: 'opsz' 100;
   letter-spacing: -0.015em;
 }
 
 .display-italic {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-variation-settings: 'opsz' 60;
 }
@@ -1050,7 +1052,7 @@ a:focus-visible .frame-corners {
   position: relative;
   padding-left: 1.5rem;
   border-left: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-variation-settings: 'opsz' 60;
   font-size: clamp(1.15rem, 2vw, 1.5rem);
@@ -1109,7 +1111,7 @@ a:focus-visible .frame-corners {
 
 /* ---- Footer editorial brand ---- */
 .footer-brand-statement {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-variation-settings: 'opsz' 144;
   font-weight: 350;
   font-size: clamp(2.5rem, 6vw, 5rem);
@@ -1561,7 +1563,7 @@ a:focus-visible .frame-corners {
   left: 50%;
   z-index: -1;
   color: color-mix(in srgb, var(--ink) 5%, transparent);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(9rem, 28vw, 28rem);
   font-weight: 300;
   line-height: 0.7;
@@ -1651,7 +1653,7 @@ a:focus-visible .frame-corners {
   left: 50%;
   z-index: -1;
   color: color-mix(in srgb, var(--world-accent) 8%, transparent);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(10rem, 26vw, 24rem);
   font-weight: 300;
   line-height: 0.8;
@@ -2242,7 +2244,7 @@ a:focus-visible .frame-corners {
 }
 
 .mobile-nav-menu-link strong {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 400;
 }
@@ -3110,7 +3112,7 @@ a:focus-visible .frame-corners {
 
 .archive-lightbox-title {
   max-width: 12ch;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 4.5rem);
   font-weight: 350;
   font-variation-settings: 'opsz' 144;
@@ -3368,7 +3370,7 @@ a:focus-visible .frame-corners {
   max-width: 30ch;
   margin: 0;
   color: rgba(244, 240, 232, 0.62);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.25rem, 2.4vw, 2rem);
   font-style: italic;
   line-height: 1.25;
@@ -3423,7 +3425,7 @@ a:focus-visible .frame-corners {
   align-items: baseline;
   margin-top: clamp(2.75rem, 7vw, 6.5rem);
   color: #f4f0e8;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(5rem, 19vw, 16rem);
   font-weight: 350;
   font-variation-settings: 'opsz' 144;
@@ -3511,7 +3513,7 @@ a:focus-visible .frame-corners {
 }
 
 .cinematic-footer-link strong {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.15rem, 2vw, 1.55rem);
   font-weight: 400;
 }
@@ -3721,7 +3723,7 @@ a:focus-visible .frame-corners {
 .signal-heading h1 {
   max-width: 11ch;
   margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(3.4rem, 7.5vw, 7.5rem);
   font-weight: 350;
   font-variation-settings: 'opsz' 144;
@@ -3860,7 +3862,7 @@ a:focus-visible .frame-corners {
   gap: 0.55rem;
   margin-top: 0.65rem;
   color: #f4f0e8;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.35rem, 2.25vw, 2.1rem);
   font-weight: 400;
   overflow-wrap: anywhere;
@@ -4060,7 +4062,7 @@ a:focus-visible .frame-corners {
 .field-notes-title h1 {
   max-width: 13ch;
   margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(3.4rem, 8vw, 8rem);
   font-weight: 350;
   font-variation-settings: 'opsz' 144;
@@ -4150,7 +4152,7 @@ a:focus-visible .frame-corners {
 
 .field-notes-lead figcaption em {
   color: white;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: 0.8rem;
 }
 
@@ -4199,7 +4201,7 @@ a:focus-visible .frame-corners {
 .field-notes-copy > p {
   margin: 0;
   color: var(--muted-strong);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.25rem, 2.1vw, 1.75rem);
   font-weight: 380;
   line-height: 1.72;
@@ -4221,7 +4223,7 @@ a:focus-visible .frame-corners {
   max-width: 18ch;
   margin: clamp(4rem, 9vw, 8rem) 0 0 auto;
   color: var(--ink);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(2.4rem, 5vw, 5rem);
   font-style: italic;
   font-weight: 330;
@@ -4241,7 +4243,7 @@ a:focus-visible .frame-corners {
 .field-notes-observations h2 {
   max-width: 12ch;
   margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(2.3rem, 4.5vw, 4.5rem);
   font-weight: 350;
   line-height: 0.98;
@@ -4274,7 +4276,7 @@ a:focus-visible .frame-corners {
 
 .field-notes-observations li em {
   color: var(--muted-strong);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.2rem, 2vw, 1.6rem);
 }
 
@@ -4331,7 +4333,7 @@ a:focus-visible .frame-corners {
 
 .field-notes-still figcaption em {
   color: var(--muted-strong);
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: 1rem;
   letter-spacing: 0;
   text-transform: none;
@@ -4350,7 +4352,7 @@ a:focus-visible .frame-corners {
 .field-notes-closing > p {
   max-width: 8ch;
   margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(4rem, 10vw, 10rem);
   font-style: italic;
   font-weight: 320;

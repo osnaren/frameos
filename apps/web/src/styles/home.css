@@ -746,7 +746,7 @@
 
 .chapter__caption-text {
   margin: 0.9rem 0 0;
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-display);
   font-style: italic;
   font-size: 1.05rem;
   line-height: 1.5;
