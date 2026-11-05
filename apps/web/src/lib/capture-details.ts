@@ -153,7 +153,17 @@ export function hasCameraExif(photo: Pick<Photo, 'metadata'>) {
   return [camera, lens, focalLength, aperture, shutterSpeed, iso].some(present)
 }
 
-/** The measured palette, limited to well-formed colours. */
+/**
+ * The measured palette, limited to well-formed colours, each listed once.
+ * Sanity's swatches (dominant, vibrant, muted…) often land on the same colour.
+ */
 export function capturePalette(photo: Pick<Photo, 'metadata'>) {
-  return (photo.metadata.palette ?? []).filter(isSafeColour)
+  const seen = new Set<string>()
+  return (photo.metadata.palette ?? []).filter((colour) => {
+    if (!isSafeColour(colour)) return false
+    const key = colour.toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }

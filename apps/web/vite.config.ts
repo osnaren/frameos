@@ -34,7 +34,9 @@ export default defineConfig({
       routeRules: {
         '/**': { headers: securityHeaders },
         '/assets/**': { headers: { ...securityHeaders, 'cache-control': immutable } },
-        '/photos/**': { headers: { ...securityHeaders, 'cache-control': longLived } },
+        // Only the image files (/photos/<id>/w<width>.webp). A deeper wildcard
+        // would also catch the /photos/<slug> pages and pin their HTML for a day.
+        '/photos/:id/:file': { headers: { ...securityHeaders, 'cache-control': longLived } },
         '/favicon/**': { headers: { ...securityHeaders, 'cache-control': longLived } },
         '/og-default.jpg': { headers: { ...securityHeaders, 'cache-control': longLived } },
       },

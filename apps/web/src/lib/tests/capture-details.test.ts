@@ -92,4 +92,12 @@ describe('capture details', () => {
   it('keeps only well-formed palette colours', () => {
     expect(capturePalette(fileOnly)).toEqual(['#cabca5', '#7b7773'])
   })
+
+  it('lists a colour once when several swatches share it', () => {
+    const repeated = {
+      ...fileOnly,
+      metadata: { ...fileOnly.metadata, palette: ['#0588f2', '#0588F2', '#555250', '#0588f2'] },
+    }
+    expect(capturePalette(repeated)).toEqual(['#0588f2', '#555250'])
+  })
 })

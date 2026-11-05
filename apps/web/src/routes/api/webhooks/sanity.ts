@@ -109,6 +109,15 @@ export const Route = createFileRoute('/api/webhooks/sanity')({
           invalidatedTags: result.invalidatedTags,
         })
       },
+      // Without this, a GET falls through to the page renderer and answers 200 with HTML.
+      GET: () => methodNotAllowed(),
     },
   },
 })
+
+function methodNotAllowed() {
+  return Response.json(
+    { ok: false, message: 'Use POST.' },
+    { status: 405, headers: { allow: 'POST' } }
+  )
+}
