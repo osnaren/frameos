@@ -34,6 +34,7 @@ export type WorldDefinition = World & { slug: WorldSlug; heroId: string }
 export const worlds: WorldDefinition[] = [
   {
     slug: 'wander',
+    form: 'coast',
     name: 'Wander',
     line: 'Places passed through, horizons kept.',
     description: 'Open horizons, movement, and places passed through slowly enough to keep.',
@@ -45,6 +46,7 @@ export const worlds: WorldDefinition[] = [
   },
   {
     slug: 'sacred-geometry',
+    form: 'plateau',
     name: 'Sacred Geometry',
     line: 'Stone, sky, ritual, and repetition.',
     description: 'Architecture, ritual, repetition, and the geometry that holds them together.',
@@ -56,6 +58,7 @@ export const worlds: WorldDefinition[] = [
   },
   {
     slug: 'small-wonders',
+    form: 'basin',
     name: 'Small Wonders',
     line: 'The closer you look, the larger it gets.',
     description: 'Small subjects that become entire landscapes when the frame moves closer.',
@@ -67,6 +70,7 @@ export const worlds: WorldDefinition[] = [
   },
   {
     slug: 'living-things',
+    form: 'wetland',
     name: 'Living Things',
     line: 'Company that chooses its own distance.',
     description: 'Living company, photographed at the distance each subject allowed.',
@@ -78,6 +82,7 @@ export const worlds: WorldDefinition[] = [
   },
   {
     slug: 'at-the-table',
+    form: 'table',
     name: 'Table Notes',
     line: 'Meals worth interrupting.',
     description: 'Meals, ingredients, and the traces of gathering around a table.',
@@ -383,6 +388,20 @@ export function getWorld(slug: string): WorldDefinition | null {
 
 export function getPublicWorlds() {
   return worlds.filter((world) => world.status === 'active')
+}
+
+/**
+ * The worlds the home journey builds a scene for, in navigation order.
+ *
+ * A world needs a `form` to appear here — that is the CMS switch that decides
+ * whether it gets a miniature model or only a card in the index. Portraits
+ * are excluded the same way they are everywhere else: by never being marked
+ * active.
+ */
+export function getJourneyWorlds() {
+  return getPublicWorlds()
+    .filter((world) => Boolean(world.form))
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name))
 }
 
 export function getWorldPhotoIds(slug: WorldSlug) {

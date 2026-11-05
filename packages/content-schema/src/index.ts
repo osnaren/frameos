@@ -40,6 +40,13 @@ export interface World {
   status: WorldStatus
   heroPhoto?: PhotoRef
   mood: WorldMood
+  /**
+   * Which miniature landform the home journey builds this world on.
+   *
+   * Names a form in the web app's form registry. Absent means the world has
+   * no scene: it still appears in the index and has its own collection.
+   */
+  form?: string
   seo?: SeoFields
 }
 

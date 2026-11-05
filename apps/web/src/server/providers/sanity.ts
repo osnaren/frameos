@@ -501,6 +501,7 @@ const worldsQuery = defineQuery(`*[_type == "world"] | order(sortOrder asc, name
   description,
   sortOrder,
   status,
+  form,
   heroPhoto->{
     "slug": slug.current
   },

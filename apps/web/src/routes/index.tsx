@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
-import { PocketWorldsExperience } from '@/components/worlds/cinematic/PocketWorldsExperience'
+import { PocketWorldsHome } from '@/components/worlds/PocketWorldsHome'
 import { getGalleryFeedServer, getHomeViewServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/')({
@@ -39,7 +39,7 @@ function HomeRoute() {
 
   return (
     <main id="worlds">
-      <PocketWorldsExperience frameCount={photos.length} worldCounts={worldCounts} />
+      <PocketWorldsHome frameCount={photos.length} worldCounts={worldCounts} />
 
       {feed.isDegraded || home?.isDegraded ? (
         <div className="page-shell px-4 py-8">

@@ -103,3 +103,39 @@ traceparent
 underfilled
 unrs
 visibilitychange
+
+# Three.js maths & shading (Wander diorama)
+Catmull
+fract
+glsl
+heightfield
+metalness
+smootherstep
+beachness
+
+# British spellings used throughout the copy and comments
+colour
+colours
+kilometres
+normalises
+retuned
+travelled
+travelling
+
+# Rendering and post-processing (Wander model world)
+bokeh
+MSAA
+SMAA
+multisampling
+softbox
+quantise
+quantised
+quantises
+quantisation
+
+# Model-making and survey vocabulary
+bathymetric
+stripwood
+backgrounded
+kilometre
+recolouring

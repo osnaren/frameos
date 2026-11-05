@@ -5369,3 +5369,255 @@ a:focus-visible .frame-corners {
     min-width: 0;
   }
 }
+
+/* ---- Wander journey: the WebGL Pocket World ---- */
+
+/* Every world is one of these, stacked. Only the first pulls up under the
+   sticky header; the rest simply follow on. */
+.wander-journey {
+  position: relative;
+  display: block;
+  height: var(--journey-height, 420svh);
+  background: var(--bg-strong);
+  isolation: isolate;
+}
+
+.wander-journey[data-first='true'] {
+  margin-top: calc(-1 * var(--journey-header, 0px));
+}
+
+.wander-journey__stage {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100svh;
+  isolation: isolate;
+}
+
+.wander-journey__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.wander-journey__canvas.is-pointing canvas {
+  cursor: crosshair;
+}
+
+/* --- chrome --- */
+
+.wander-journey__chrome {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--journey-header, 0px) + 1.1rem);
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-inline: clamp(1rem, 4vw, 2.6rem);
+  pointer-events: none;
+}
+
+.wander-journey__mark,
+.wander-journey__index {
+  pointer-events: auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel-strong) 78%, transparent);
+  padding: 0.5rem 0.9rem;
+  backdrop-filter: blur(10px);
+  color: var(--muted-strong);
+}
+
+.wander-journey__index {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+/* --- copy blocks --- */
+
+.wander-journey__copy {
+  position: absolute;
+  z-index: 2;
+  bottom: clamp(2rem, 7vh, 5rem);
+  left: clamp(1rem, 4vw, 2.6rem);
+  max-width: min(30rem, 82vw);
+  border-radius: 1.4rem;
+  background: color-mix(in srgb, var(--panel-strong) 74%, transparent);
+  padding: clamp(1.2rem, 2.4vw, 1.9rem);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 60px color-mix(in srgb, var(--shadow) 55%, transparent);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition:
+    opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 620ms;
+}
+
+.wander-journey[data-phase='opening'] .wander-journey__copy--opening,
+.wander-journey[data-phase='arrived'] .wander-journey__copy--world,
+.wander-journey[data-phase='onward'] .wander-journey__copy--onward {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s, 0s, 0s;
+}
+
+.wander-journey__copy--opening {
+  max-width: min(34rem, 86vw);
+}
+
+.wander-journey__title {
+  margin: 0;
+  font-size: clamp(2.1rem, 4.4vw, 4rem);
+  font-weight: 350;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+.wander-journey__world-name {
+  margin: 0.35rem 0 0;
+  font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+  font-weight: 350;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.wander-journey__line {
+  margin: 0.85rem 0 0;
+  max-width: 32ch;
+  color: var(--muted-strong);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  line-height: 1.6;
+}
+
+.wander-journey__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.4rem;
+}
+
+.wander-journey__copy .pw-action {
+  margin-top: 1.4rem;
+}
+
+.wander-journey__actions .pw-action {
+  margin-top: 0;
+}
+
+/* the glass action is designed for a dark hero; on the bright coast it needs ink */
+.wander-journey .pw-action--glass {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  color: var(--ink);
+}
+
+.wander-journey__copy--world {
+  border-left: 3px solid var(--world-accent, var(--accent));
+}
+
+.wander-journey__copy--world.is-lit {
+  background: color-mix(in srgb, var(--panel-strong) 88%, transparent);
+}
+
+.wander-journey__copy--onward {
+  right: clamp(1rem, 4vw, 2.6rem);
+  left: auto;
+}
+
+/* --- scroll hint --- */
+
+.wander-journey__hint {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 1.4rem;
+  left: 0;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.wander-journey[data-phase='opening'] .wander-journey__hint {
+  opacity: 0.8;
+}
+
+/* --- the photograph resolving as the world opens --- */
+
+.wander-journey__resolve {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 560ms ease;
+}
+
+.wander-journey__resolve img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  filter: blur(12px);
+  transition:
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wander-journey__resolve.is-resolving {
+  opacity: 1;
+}
+
+.wander-journey__resolve.is-resolving img {
+  transform: none;
+  filter: none;
+}
+
+@media (max-width: 760px) {
+  /* the identity mark is already in the site header on small screens */
+  .wander-journey__mark {
+    display: none;
+  }
+
+  .wander-journey__chrome {
+    justify-content: flex-end;
+  }
+
+  .wander-journey__copy {
+    right: clamp(1rem, 4vw, 2.6rem);
+    bottom: clamp(1.2rem, 4vh, 2.4rem);
+    max-width: none;
+  }
+
+  .wander-journey__copy--onward {
+    left: clamp(1rem, 4vw, 2.6rem);
+  }
+
+  .wander-journey__hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wander-journey__copy,
+  .wander-journey__resolve,
+  .wander-journey__resolve img {
+    transition-duration: 200ms;
+  }
+}

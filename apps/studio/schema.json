@@ -504,6 +504,35 @@
         },
         "optional": true
       },
+      "form": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "coast"
+            },
+            {
+              "type": "string",
+              "value": "plateau"
+            },
+            {
+              "type": "string",
+              "value": "basin"
+            },
+            {
+              "type": "string",
+              "value": "wetland"
+            },
+            {
+              "type": "string",
+              "value": "table"
+            }
+          ]
+        },
+        "optional": true
+      },
       "mood": {
         "type": "objectAttribute",
         "value": {

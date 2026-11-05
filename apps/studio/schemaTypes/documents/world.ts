@@ -80,6 +80,26 @@ export const worldType = defineType({
       validation: (rule) => rule.required().integer().min(0),
     }),
     defineField({
+      name: 'form',
+      title: 'Model form',
+      description:
+        'Which miniature landform this world is built on. The three tones below colour it; ' +
+        'this decides its shape, its destination and what is scattered across it. Leave empty ' +
+        'and the world appears in the index and its own collection, but has no scene on the ' +
+        'home journey.',
+      type: 'string',
+      group: 'atmosphere',
+      options: {
+        list: [
+          {title: 'Coast — headland and lighthouse', value: 'coast'},
+          {title: 'Plateau — a stepped mesa and a temple', value: 'plateau'},
+          {title: 'Basin — a shallow bowl and a lens', value: 'basin'},
+          {title: 'Wetland — braided channels and a hide', value: 'wetland'},
+          {title: 'Table — a cloth and a place laid', value: 'table'},
+        ],
+      },
+    }),
+    defineField({
       name: 'mood',
       title: 'Photographic atmosphere',
       description: 'A restrained three-tone palette sampled or art-directed for this world.',
