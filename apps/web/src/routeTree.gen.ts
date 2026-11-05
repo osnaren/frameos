@@ -9,53 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SignalRouteImport } from './routes/signal'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
-import { Route as NotesRouteImport } from './routes/notes'
-import { Route as GalleryRouteImport } from './routes/gallery'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ArchiveRouteImport } from './routes/archive'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorldsWorldRouteImport } from './routes/worlds.$world'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ArchiveRouteImport } from './routes/archive'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as NotesRouteImport } from './routes/notes'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SignalRouteImport } from './routes/signal'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PhotosSlugRouteImport } from './routes/photos.$slug'
-import { Route as ApiWebhooksSanityRouteImport } from './routes/api/webhooks/sanity'
+import { Route as WorldsWorldRouteImport } from './routes/worlds.$world'
 import { Route as ApiReconcileContentRouteImport } from './routes/api/reconcile/content'
+import { Route as ApiWebhooksSanityRouteImport } from './routes/api/webhooks/sanity'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignalRoute = SignalRouteImport.update({
-  id: '/signal',
-  path: '/signal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotesRoute = NotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GalleryRoute = GalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArchiveRoute = ArchiveRouteImport.update({
-  id: '/archive',
-  path: '/archive',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -63,14 +33,39 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ArchiveRoute = ArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorldsWorldRoute = WorldsWorldRouteImport.update({
-  id: '/worlds/$world',
-  path: '/worlds/$world',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotesRoute = NotesRouteImport.update({
+  id: '/notes',
+  path: '/notes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignalRoute = SignalRouteImport.update({
+  id: '/signal',
+  path: '/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PhotosSlugRoute = PhotosSlugRouteImport.update({
@@ -78,14 +73,19 @@ const PhotosSlugRoute = PhotosSlugRouteImport.update({
   path: '/photos/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWebhooksSanityRoute = ApiWebhooksSanityRouteImport.update({
-  id: '/api/webhooks/sanity',
-  path: '/api/webhooks/sanity',
+const WorldsWorldRoute = WorldsWorldRouteImport.update({
+  id: '/worlds/$world',
+  path: '/worlds/$world',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiReconcileContentRoute = ApiReconcileContentRouteImport.update({
   id: '/api/reconcile/content',
   path: '/api/reconcile/content',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksSanityRoute = ApiWebhooksSanityRouteImport.update({
+  id: '/api/webhooks/sanity',
+  path: '/api/webhooks/sanity',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -201,53 +201,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signal': {
-      id: '/signal'
-      path: '/signal'
-      fullPath: '/signal'
-      preLoaderRoute: typeof SignalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notes': {
-      id: '/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof NotesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/archive': {
-      id: '/archive'
-      path: '/archive'
-      fullPath: '/archive'
-      preLoaderRoute: typeof ArchiveRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -257,18 +215,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/archive': {
+      id: '/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof ArchiveRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/worlds/$world': {
-      id: '/worlds/$world'
-      path: '/worlds/$world'
-      fullPath: '/worlds/$world'
-      preLoaderRoute: typeof WorldsWorldRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notes': {
+      id: '/notes'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signal': {
+      id: '/signal'
+      path: '/signal'
+      fullPath: '/signal'
+      preLoaderRoute: typeof SignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/photos/$slug': {
@@ -278,11 +271,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PhotosSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhooks/sanity': {
-      id: '/api/webhooks/sanity'
-      path: '/api/webhooks/sanity'
-      fullPath: '/api/webhooks/sanity'
-      preLoaderRoute: typeof ApiWebhooksSanityRouteImport
+    '/worlds/$world': {
+      id: '/worlds/$world'
+      path: '/worlds/$world'
+      fullPath: '/worlds/$world'
+      preLoaderRoute: typeof WorldsWorldRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/reconcile/content': {
@@ -290,6 +283,13 @@ declare module '@tanstack/react-router' {
       path: '/api/reconcile/content'
       fullPath: '/api/reconcile/content'
       preLoaderRoute: typeof ApiReconcileContentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/sanity': {
+      id: '/api/webhooks/sanity'
+      path: '/api/webhooks/sanity'
+      fullPath: '/api/webhooks/sanity'
+      preLoaderRoute: typeof ApiWebhooksSanityRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
