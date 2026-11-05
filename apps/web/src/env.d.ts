@@ -1,7 +1,5 @@
 /// <reference types="vite/client" />
 
-import type { ThreeElements } from '@react-three/fiber'
-
 interface ImportMetaEnv {
   readonly VITE_SITE_URL?: string
   readonly DEV?: boolean
@@ -30,24 +28,6 @@ declare global {
       readonly CRON_SECRET?: string
       readonly SENTRY_DSN?: string
     }
-  }
-}
-
-declare module 'react' {
-  namespace JSX {
-    interface IntrinsicElements extends ThreeElements {}
-  }
-}
-
-declare module 'react/jsx-runtime' {
-  namespace JSX {
-    interface IntrinsicElements extends ThreeElements {}
-  }
-}
-
-declare module 'react/jsx-dev-runtime' {
-  namespace JSX {
-    interface IntrinsicElements extends ThreeElements {}
   }
 }
 
