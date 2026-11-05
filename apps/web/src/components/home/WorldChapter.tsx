@@ -43,6 +43,9 @@ function stageGeometry(width: number, height: number): Geometry {
   return { width, height, centerX: width * 0.5, centerY: height * 0.38, radius }
 }
 
+/* one texture per chapter, shared by the WebGL unfold and the still planet */
+const STAGE_TEXTURE_WIDTH = 1600
+
 const SPIN_RATE = 0.06 /* radians per second, at rest on the planet */
 
 export function WorldChapter({
@@ -163,7 +166,7 @@ export function WorldChapter({
         return
       }
       renderer.resize(canvas.clientWidth, canvas.clientHeight, 1.75)
-      loadPlanetImage(photoTextureUrl(stage, 1600))
+      loadPlanetImage(photoTextureUrl(stage, STAGE_TEXTURE_WIDTH))
         .then((image) => {
           if (disposed || !renderer) {
             return
@@ -253,6 +256,7 @@ export function WorldChapter({
               horizon={planet.horizon}
               glow={world.mood.wash}
               cssSize={720}
+              textureWidth={STAGE_TEXTURE_WIDTH}
               className="chapter__planet-still"
             />
           ) : null}

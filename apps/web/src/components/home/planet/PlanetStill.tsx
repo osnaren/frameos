@@ -19,6 +19,7 @@ export function PlanetStill({
   horizon,
   glow,
   cssSize,
+  textureWidth,
   className,
   eager = false,
   onPainted,
@@ -28,6 +29,8 @@ export function PlanetStill({
   glow?: string
   /** Render resolution in CSS px; the element itself is sized by CSS. */
   cssSize: number
+  /** Texture width to load. Pass the same width as a WebGL stage drawing this photo, so both share one download. */
+  textureWidth?: number
   className?: string
   eager?: boolean
   onPainted?: () => void
@@ -43,7 +46,7 @@ export function PlanetStill({
 
     let cancelled = false
     const paint = () => {
-      const width = Math.min(1024, Math.max(480, Math.round(cssSize * 2.4)))
+      const width = textureWidth ?? Math.min(1024, Math.max(480, Math.round(cssSize * 2.4)))
       loadPlanetImage(photoTextureUrl(photo, width))
         .then((image) => {
           if (cancelled) {
@@ -80,7 +83,7 @@ export function PlanetStill({
       cancelled = true
       observer.disconnect()
     }
-  }, [photo, horizon, glow, cssSize, eager, onPainted])
+  }, [photo, horizon, glow, cssSize, textureWidth, eager, onPainted])
 
   return (
     <span className={cn('planet-still', className)} data-painted={painted}>
