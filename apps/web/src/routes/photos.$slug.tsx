@@ -1,25 +1,39 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { motion, useScroll, useTransform, type PanInfo } from 'framer-motion'
+import {
+  Link,
+  createFileRoute,
+  notFound,
+  useNavigate,
+  useRouter,
+  useRouterState,
+} from '@tanstack/react-router'
+import { motion, useScroll, useTransform, type MotionStyle, type PanInfo } from 'framer-motion'
+import { ArrowLeft, ArrowRight, Maximize2 } from 'lucide-react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
+import { PhotoSkeleton } from '@/components/layout/RouteSkeletons'
+import { CaptureDataPopover } from '@/components/photo/CaptureDataPopover'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import {
-  Popover,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { PhotoViewerDialog } from '@/components/photo/PhotoViewerDialog'
+import { ShareButton } from '@/components/photo/ShareButton'
+import { useHydrated } from '@/hooks/use-hydrated'
+import { formatCaptureDate } from '@/lib/capture-details'
+import { loadCompleteGalleryFeed } from '@/lib/gallery-feed'
+import { isInPublicWorld } from '@/lib/gallery-search'
+import { resolveSwipe } from '@/lib/gestures'
+import { containedImageSizes } from '@/lib/image-policy'
 import { useHydratedReducedMotion } from '@/lib/motion'
 import { buildSeoHead, getPhotoShareImage, photographJsonLd } from '@/lib/seo'
 import {
-  getGalleryFeedServer,
-  getPhotoDetailServer,
-  getWorldsServer,
-} from '@/server/server-functions/portfolio'
+  carryPhotoOrigin,
+  describePhotoOrigin,
+  fallbackPhotoOrigin,
+  readPhotoOrigin,
+  type PhotoOrigin,
+} from '@/lib/photo-origin'
+import { preloadPhoto, resolvePhotoSources } from '@/lib/photo-sources'
+import { getPhotoDetailServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 import type { Photo } from '@/types/photo'
 
@@ -30,18 +44,21 @@ export const Route = createFileRoute('/photos/$slug')({
       getWorldsServer(),
     ])
     const photo = detail!.photo
-    const feed = photo.category
-      ? await getGalleryFeedServer({ data: { category: photo.category, limit: 48 } })
-      : null
-    const siblings = feed?.items.map((item) => item.photo.slug) ?? []
-    const position = siblings.indexOf(photo.slug)
+    const worldSlugs = worlds!.map((world) => world.slug)
 
-    return {
-      detail: detail!,
-      worlds: worlds!,
-      siblings,
-      position,
+    // Fail closed: a photo filed under a world that isn't public stays private.
+    if (!isInPublicWorld(photo, worldSlugs)) {
+      throw notFound()
     }
+
+    // The whole world (every cursor page), so prev/next and "more from this
+    // world" never stop at the feed's page size.
+    const feed = await loadCompleteGalleryFeed(photo.category ? { category: photo.category } : {})
+    const sequence = feed.items
+      .map((item) => item.photo)
+      .filter((entry) => isInPublicWorld(entry, worldSlugs))
+
+    return { detail: detail!, worlds: worlds!, sequence }
   },
   staleTime: 60_000,
   gcTime: 300_000,
@@ -64,163 +81,240 @@ export const Route = createFileRoute('/photos/$slug')({
       jsonLd: [photographJsonLd({ canonicalUrl, photo, world })],
     })
   },
+  pendingComponent: PhotoSkeleton,
   component: PhotoDetailRoute,
 })
 
-function CopyLinkButton({ canonicalUrl }: { canonicalUrl: string }) {
-  const [copied, setCopied] = useState(false)
+function pad(value: number) {
+  return String(value).padStart(2, '0')
+}
 
-  useEffect(() => {
-    if (!copied) {
-      return
-    }
+function orientationOf(photo: Photo) {
+  const { width, height } = photo.metadata
+  if (width > 0 && height > width * 1.08) return 'portrait'
+  if (width > height * 1.08) return 'landscape'
+  return 'square'
+}
 
-    const timer = window.setTimeout(() => setCopied(false), 2000)
-    return () => window.clearTimeout(timer)
-  }, [copied])
+/** Mirrors the .photo-detail-media sizing rules in styles.css. */
+function detailSizes(photo: Photo) {
+  const portrait = orientationOf(photo) === 'portrait'
+  return containedImageSizes(photo.metadata.width, photo.metadata.height, [
+    {
+      media: '(max-width: 640px)',
+      maxWidths: ['calc(100vw - 4rem)'],
+      maxHeights: [portrait ? '54vh' : '72vh'],
+    },
+    {
+      maxWidths: ['1240px', 'calc(100vw - 4rem)'],
+      maxHeights: portrait ? ['58vh', '40rem'] : ['72vh', '52rem'],
+    },
+  ])
+}
 
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        void navigator.clipboard.writeText(canonicalUrl).then(() => setCopied(true))
-      }}
-      className="mono-label cursor-pointer rounded-full border border-(--line) bg-(--panel) px-4 py-2 transition-all duration-300 hover:border-(--accent) hover:shadow-md focus-visible:border-(--accent) active:scale-95"
-    >
-      <span>{copied ? 'Link copied' : 'Copy link'}</span>
-      <span className="sr-only" aria-live="polite">
-        {copied ? 'Link copied to the clipboard' : ''}
-      </span>
-    </button>
+/** True while a popover or dialog owns the keyboard (its own Esc/arrows win). */
+function overlayIsOpen() {
+  return Boolean(
+    document.querySelector(
+      '[data-radix-popper-content-wrapper], [role="dialog"][data-state="open"]'
+    )
   )
 }
 
-function MetadataHotspot({ photo }: { photo: Photo }) {
-  const [open, setOpen] = useState(false)
-  const metadata = photo.metadata
-  const aspectRatio =
-    metadata.width > 0 && metadata.height > 0 ? metadata.width / metadata.height : null
-  const details = [
-    ['Camera', metadata.camera],
-    ['Lens', metadata.lens],
-    ['Focal length', metadata.focalLength],
-    ['Aperture', metadata.aperture],
-    ['Shutter', metadata.shutterSpeed],
-    ['ISO', metadata.iso],
-    [
-      'Dimensions',
-      metadata.width > 0 && metadata.height > 0
-        ? `${metadata.width.toLocaleString()} × ${metadata.height.toLocaleString()}`
-        : undefined,
-    ],
-    ['Aspect', aspectRatio ? `${aspectRatio.toFixed(2)} : 1` : undefined],
-    ['Format', metadata.format.toUpperCase()],
-  ].filter((entry): entry is [string, string] => Boolean(entry[1]))
-  const hasExif = Boolean(
-    metadata.camera || metadata.lens || metadata.aperture || metadata.shutterSpeed || metadata.iso
+function isTypingTarget(target: EventTarget | null) {
+  return (
+    target instanceof HTMLElement &&
+    Boolean(target.closest('input, textarea, select, [contenteditable="true"]'))
+  )
+}
+
+/** The way back: a real history step when we know the previous entry is the origin. */
+function OriginLink({
+  origin,
+  label,
+  onReturn,
+}: {
+  origin: PhotoOrigin
+  label: string
+  onReturn?: () => void
+}) {
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!onReturn || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) {
+      return
+    }
+    event.preventDefault()
+    onReturn()
+  }
+
+  const content = (
+    <>
+      <ArrowLeft aria-hidden="true" />
+      <span>
+        <span className="sr-only">Back to </span>
+        {label}
+      </span>
+    </>
   )
 
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          className="photo-metadata-hotspot"
-          aria-label="Show photograph capture data"
-        >
-          <span aria-hidden="true" />
-          <span className="photo-metadata-hotspot-label">Capture data</span>
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        side="left"
-        align="center"
-        sideOffset={14}
-        collisionPadding={16}
-        className="photo-metadata-popover w-[min(22rem,calc(100vw-2rem))] p-0"
-      >
-        <PopoverHeader className="photo-metadata-popover-head">
-          <div>
-            <p className="mono-label m-0">Digital contact point</p>
-            <PopoverTitle className="display-font mt-1 text-2xl font-light">
-              Capture data
-            </PopoverTitle>
-          </div>
-          <PopoverDescription>Metadata embedded in this photograph.</PopoverDescription>
-        </PopoverHeader>
-        <dl className="photo-metadata-grid">
-          {details.map(([label, value]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
-        {!hasExif ? (
-          <p className="photo-metadata-note display-italic">
-            This one didn&rsquo;t keep its camera settings — just the frame itself.
-          </p>
-        ) : null}
-        <p className="photo-metadata-dismiss">Esc or click away to close</p>
-      </PopoverContent>
-    </Popover>
+  return origin.kind === 'world' ? (
+    <Link
+      to="/worlds/$world"
+      params={{ world: origin.world }}
+      className="photo-detail-back"
+      onClick={handleClick}
+    >
+      {content}
+    </Link>
+  ) : (
+    <Link to="/archive" search={origin.filters} className="photo-detail-back" onClick={handleClick}>
+      {content}
+    </Link>
   )
 }
 
 function PhotoDetailRoute() {
-  const { detail, worlds, siblings, position } = Route.useLoaderData()
+  const { detail, worlds, sequence } = Route.useLoaderData()
   const navigate = useNavigate()
+  const router = useRouter()
+  const hydrated = useHydrated()
+  const historyState = useRouterState({ select: (state) => state.location.state })
   const reducedMotion = useHydratedReducedMotion()
   const figureRef = useRef<HTMLElement>(null)
+  const [touchCapable, setTouchCapable] = useState(false)
+  const [viewerOpen, setViewerOpen] = useState(false)
   const { scrollYProgress } = useScroll({
     target: figureRef,
     offset: ['start end', 'end start'],
   })
   const mediaY = useTransform(scrollYProgress, [0, 0.5, 1], [28, 0, -28])
   const mediaScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.985, 1, 0.985])
-  const [touchCapable, setTouchCapable] = useState(false)
-  /* The photograph settles first; words arrive second. */
-  const settleDelay = reducedMotion ? 0 : 0.38
+
   const photo = detail.photo
+  const worldSlugs = worlds.map((entry) => entry.slug)
+  const worldName = (slug: string) => worlds.find((entry) => entry.slug === slug)?.name
   const world = photo.category
     ? (worlds.find((entry) => entry.slug === photo.category) ?? null)
     : null
-  const previousSlug = position > 0 ? siblings[position - 1] : null
-  const nextSlug = position >= 0 && position < siblings.length - 1 ? siblings[position + 1] : null
+
+  // History state only exists in the browser; read it after hydration so the
+  // first render matches the server's (fallback) breadcrumb.
+  const storedOrigin = hydrated ? readPhotoOrigin(historyState) : null
+  const origin = storedOrigin ?? fallbackPhotoOrigin(photo.category, worldSlugs)
+  const originLabel = describePhotoOrigin(origin, worldName)
+
+  const position = sequence.findIndex((entry) => entry.slug === photo.slug)
+  const previous = position > 0 ? sequence[position - 1] : null
+  const next = position >= 0 && position < sequence.length - 1 ? sequence[position + 1] : null
+  const others = sequence.filter((entry) => entry.slug !== photo.slug)
+  const worldIndex = world ? worlds.findIndex((entry) => entry.slug === world.slug) : -1
+  const hasWorldNeighbours = worldIndex >= 0 && worlds.length > 1
+  const previousWorld = hasWorldNeighbours
+    ? worlds[(worldIndex - 1 + worlds.length) % worlds.length]
+    : null
+  const nextWorld = hasWorldNeighbours ? worlds[(worldIndex + 1) % worlds.length] : null
   const washColor = photo.metadata.palette?.[0]
-  const orientation =
-    photo.metadata.width > 0 && photo.metadata.height > photo.metadata.width * 1.08
-      ? 'portrait'
-      : photo.metadata.width > photo.metadata.height * 1.08
-        ? 'landscape'
-        : 'square'
+  const orientation = orientationOf(photo)
+  const ratio =
+    photo.metadata.width > 0 && photo.metadata.height > 0
+      ? photo.metadata.width / photo.metadata.height
+      : 1
+  const captureDate = formatCaptureDate(photo.captureDate)
+  const counter = position >= 0 ? `${pad(position + 1)} / ${pad(sequence.length)}` : undefined
+  const sequenceLabel = world ? world.name : 'the archive'
+
+  /** Sideways moves replace the history entry, so Back still returns to the origin. */
+  const goTo = useCallback(
+    (slug: string) =>
+      void navigate({
+        to: '/photos/$slug',
+        params: { slug },
+        replace: true,
+        state: carryPhotoOrigin(storedOrigin),
+      }),
+    [navigate, storedOrigin]
+  )
+
+  const returnToOrigin = useCallback(() => {
+    if (storedOrigin?.viaHistory) {
+      router.history.back()
+      return
+    }
+
+    if (origin.kind === 'world') {
+      void navigate({ to: '/worlds/$world', params: { world: origin.world } })
+    } else {
+      void navigate({ to: '/archive', search: origin.filters })
+    }
+  }, [navigate, origin, router, storedOrigin])
 
   useEffect(() => {
     setTouchCapable(window.matchMedia('(pointer: coarse)').matches)
   }, [])
 
+  // ← → page through the world; Esc returns to wherever you came from.
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' && previousSlug) {
-        void navigate({ to: '/photos/$slug', params: { slug: previousSlug } })
+      if (
+        event.defaultPrevented ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        isTypingTarget(event.target) ||
+        overlayIsOpen()
+      ) {
+        return
       }
 
-      if (event.key === 'ArrowRight' && nextSlug) {
-        void navigate({ to: '/photos/$slug', params: { slug: nextSlug } })
+      if (event.key === 'ArrowLeft' && previous) {
+        event.preventDefault()
+        goTo(previous.slug)
+      } else if (event.key === 'ArrowRight' && next) {
+        event.preventDefault()
+        goTo(next.slug)
+      } else if (event.key === 'Escape') {
+        event.preventDefault()
+        returnToOrigin()
       }
     }
 
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [navigate, previousSlug, nextSlug])
+  }, [goTo, next, previous, returnToOrigin])
+
+  // Warm the neighbours (image and route data) so paging is instant.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      for (const neighbour of [next, previous]) {
+        if (!neighbour) continue
+        preloadPhoto(
+          resolvePhotoSources({
+            publicId: neighbour.publicId,
+            preset: 'detail',
+            hotspot: neighbour.image?.hotspot,
+          }),
+          detailSizes(neighbour)
+        )
+        void router
+          .preloadRoute({ to: '/photos/$slug', params: { slug: neighbour.slug } })
+          .catch(() => {})
+      }
+    }, 500)
+
+    return () => window.clearTimeout(timer)
+  }, [next, previous, router])
 
   const handleDragEnd = (_event: PointerEvent, info: PanInfo) => {
-    const swipePower = Math.abs(info.offset.x) * info.velocity.x
+    const direction = resolveSwipe({
+      dx: info.offset.x,
+      dy: info.offset.y,
+      velocityX: info.velocity.x,
+    })
 
-    if (swipePower < -8000 && nextSlug) {
-      void navigate({ to: '/photos/$slug', params: { slug: nextSlug } })
-    } else if (swipePower > 8000 && previousSlug) {
-      void navigate({ to: '/photos/$slug', params: { slug: previousSlug } })
+    if (direction === 1 && next) {
+      goTo(next.slug)
+    } else if (direction === -1 && previous) {
+      goTo(previous.slug)
     }
   }
 
@@ -249,86 +343,118 @@ function PhotoDetailRoute() {
       <div className="page-shell">
         <p role="status" aria-live="polite" className="sr-only">
           {position >= 0
-            ? `Frame ${position + 1} of ${siblings.length}: ${photo.title}`
+            ? `Frame ${position + 1} of ${sequence.length} in ${sequenceLabel}: ${photo.title}`
             : photo.title}
         </p>
 
-        <nav
-          aria-label="Photograph context"
-          className="flex flex-wrap items-center gap-x-4 gap-y-2"
-        >
-          {world ? (
-            <Link
-              to="/worlds/$world"
-              params={{ world: world.slug }}
-              className="mono-label no-underline hover:text-(--ink)"
-            >
-              ← {world.name}
-            </Link>
-          ) : null}
-          <Link to="/archive" className="mono-label no-underline hover:text-(--ink)">
-            Index
-          </Link>
-          {position >= 0 ? (
-            <span className="mono-label ml-auto">
-              frame {String(position + 1).padStart(2, '0')} /{' '}
-              {String(siblings.length).padStart(2, '0')}
-            </span>
-          ) : null}
+        <nav aria-label="Photograph context" className="photo-detail-trail">
+          <OriginLink
+            origin={origin}
+            label={originLabel}
+            onReturn={storedOrigin?.viaHistory ? returnToOrigin : undefined}
+          />
+          <span className="photo-detail-crumbs">
+            {origin.kind === 'world' ? (
+              <Link to="/archive" className="mono-label">
+                Index
+              </Link>
+            ) : world ? (
+              <Link to="/worlds/$world" params={{ world: world.slug }} className="mono-label">
+                {world.name}
+              </Link>
+            ) : null}
+            {counter ? <span className="mono-label">Frame {counter}</span> : null}
+          </span>
         </nav>
 
-        <motion.figure
+        <figure
           ref={figureRef}
           data-orientation={orientation}
           className="photo-detail-stage relative m-0 mt-6"
-          initial={reducedMotion ? undefined : { opacity: 0, scale: 0.985 }}
-          animate={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
-          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="photo-detail-index" aria-hidden="true">
-            {position >= 0 ? String(position + 1).padStart(2, '0') : 'FO'}
+            {position >= 0 ? pad(position + 1) : 'FO'}
           </span>
-          <motion.div
-            data-orientation={orientation}
-            className="photo-detail-media pocket-frame mx-auto w-fit max-w-full touch-pan-y"
-            style={{
-              aspectRatio:
-                photo.metadata.width > 0 && photo.metadata.height > 0
-                  ? `${photo.metadata.width} / ${photo.metadata.height}`
-                  : undefined,
-              y: reducedMotion ? undefined : mediaY,
-              scale: reducedMotion ? undefined : mediaScale,
-            }}
-            drag={touchCapable ? 'x' : false}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.6}
-            onDragEnd={handleDragEnd}
-          >
-            <PhotoImage
-              publicId={photo.publicId}
-              alt={photo.alt}
-              preset="detail"
-              priority
-              sizes="(max-width: 1024px) 100vw, 76vw"
-              intrinsicWidth={photo.metadata.width || undefined}
-              intrinsicHeight={photo.metadata.height || undefined}
-              lqip={photo.image?.lqip}
-              hotspot={photo.image?.hotspot}
-              className="photo-detail-image mx-auto h-auto w-auto max-w-full"
-            />
-            <span className="photo-detail-sheen" aria-hidden="true" />
-            <span className="frame-corners" aria-hidden="true" />
-            <MetadataHotspot photo={photo} />
-          </motion.div>
-          {touchCapable && (previousSlug || nextSlug) ? (
-            <p className="mono-label mt-3 text-center">Swipe to browse</p>
+
+          <div className="photo-detail-frame">
+            {previous ? (
+              <Link
+                to="/photos/$slug"
+                params={{ slug: previous.slug }}
+                replace
+                state={carryPhotoOrigin(storedOrigin)}
+                className="photo-stage-nav photo-stage-nav--previous"
+                aria-label={`Previous photograph: ${previous.title}`}
+                aria-keyshortcuts="ArrowLeft"
+              >
+                <ArrowLeft aria-hidden="true" />
+              </Link>
+            ) : null}
+
+            <motion.div
+              data-orientation={orientation}
+              className="photo-detail-media photo-detail-enter pocket-frame touch-pan-y"
+              style={
+                {
+                  '--photo-ratio': ratio,
+                  y: reducedMotion ? undefined : mediaY,
+                  scale: reducedMotion ? undefined : mediaScale,
+                } as MotionStyle
+              }
+              drag={touchCapable && (previous || next) ? 'x' : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.5}
+              dragDirectionLock
+              onDragEnd={handleDragEnd}
+            >
+              <PhotoImage
+                publicId={photo.publicId}
+                alt={photo.alt}
+                preset="detail"
+                priority
+                sizes={detailSizes(photo)}
+                intrinsicWidth={photo.metadata.width || undefined}
+                intrinsicHeight={photo.metadata.height || undefined}
+                lqip={photo.image?.lqip}
+                palette={photo.metadata.palette}
+                hotspot={photo.image?.hotspot}
+                className="photo-detail-image"
+              />
+              <span className="photo-detail-sheen" aria-hidden="true" />
+              <span className="frame-corners" aria-hidden="true" />
+              <button
+                type="button"
+                className="photo-expand"
+                onClick={() => setViewerOpen(true)}
+                aria-label="View full screen"
+              >
+                <Maximize2 aria-hidden="true" />
+              </button>
+              <CaptureDataPopover photo={photo} />
+            </motion.div>
+
+            {next ? (
+              <Link
+                to="/photos/$slug"
+                params={{ slug: next.slug }}
+                replace
+                state={carryPhotoOrigin(storedOrigin)}
+                className="photo-stage-nav photo-stage-nav--next"
+                aria-label={`Next photograph: ${next.title}`}
+                aria-keyshortcuts="ArrowRight"
+              >
+                <ArrowRight aria-hidden="true" />
+              </Link>
+            ) : null}
+          </div>
+
+          {touchCapable && (previous || next) ? (
+            <p className="mono-label mt-3 text-center">Swipe to browse · tap ⤢ for full screen</p>
           ) : null}
 
-          <motion.figcaption
-            className="mx-auto mt-8 max-w-2xl text-center"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: settleDelay, ease: [0.16, 1, 0.3, 1] }}
+          <figcaption
+            className="enter-focus mx-auto mt-8 max-w-2xl text-center"
+            style={{ '--enter-delay': reducedMotion ? '0ms' : '320ms' } as React.CSSProperties}
           >
             <h1 className="display-font text-3xl leading-tight font-light text-(--ink) sm:text-4xl">
               {photo.title}
@@ -347,7 +473,29 @@ function PhotoDetailRoute() {
               {world ? (
                 <div className="flex items-baseline gap-2">
                   <dt>World</dt>
-                  <dd>{world.name}</dd>
+                  <dd>
+                    <Link
+                      to="/worlds/$world"
+                      params={{ world: world.slug }}
+                      className="photo-detail-link"
+                    >
+                      {world.name}
+                    </Link>
+                  </dd>
+                </div>
+              ) : null}
+              {photo.series ? (
+                <div className="flex items-baseline gap-2">
+                  <dt>Series</dt>
+                  <dd>
+                    <Link
+                      to="/archive"
+                      search={{ series: photo.series }}
+                      className="photo-detail-link"
+                    >
+                      {photo.series}
+                    </Link>
+                  </dd>
                 </div>
               ) : null}
               {photo.locationLabel ? (
@@ -356,10 +504,10 @@ function PhotoDetailRoute() {
                   <dd>{photo.locationLabel}</dd>
                 </div>
               ) : null}
-              {photo.captureDate ? (
+              {captureDate ? (
                 <div className="flex items-baseline gap-2">
                   <dt>Date</dt>
-                  <dd>{photo.captureDate.slice(0, 10)}</dd>
+                  <dd>{captureDate}</dd>
                 </div>
               ) : null}
               <div className="flex items-baseline gap-2">
@@ -367,40 +515,146 @@ function PhotoDetailRoute() {
                 <dd>A phone</dd>
               </div>
             </dl>
-          </motion.figcaption>
-        </motion.figure>
+            {photo.tags.length > 0 ? (
+              <ul className="photo-detail-tags" aria-label="Tags — each opens the Index filtered">
+                {photo.tags.map((tag) => (
+                  <li key={tag}>
+                    <Link to="/archive" search={{ tag }}>
+                      #{tag}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </figcaption>
+        </figure>
 
-        <motion.nav
-          aria-label="Previous and next photographs"
-          className="mt-10 flex items-center justify-between gap-4 border-t border-(--line) pt-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: settleDelay + 0.12 }}
-        >
-          {previousSlug ? (
+        <nav aria-label="Previous and next photographs" className="photo-detail-pager">
+          {previous ? (
             <Link
               to="/photos/$slug"
-              params={{ slug: previousSlug }}
-              className="text-sm font-semibold text-(--muted-strong) no-underline hover:text-(--ink)"
+              params={{ slug: previous.slug }}
+              replace
+              state={carryPhotoOrigin(storedOrigin)}
+              className="photo-pager-link"
             >
-              ← Previous
+              <span className="mono-label">← Previous</span>
+              <strong>{previous.title}</strong>
+            </Link>
+          ) : previousWorld ? (
+            <Link
+              to="/worlds/$world"
+              params={{ world: previousWorld.slug }}
+              className="photo-pager-link"
+            >
+              <span className="mono-label">← Previous world</span>
+              <strong>{previousWorld.name}</strong>
             </Link>
           ) : (
             <span aria-hidden="true" />
           )}
-          <CopyLinkButton canonicalUrl={detail.canonicalUrl} />
-          {nextSlug ? (
+
+          <div className="photo-detail-actions">
+            <ShareButton
+              url={detail.canonicalUrl}
+              title={photo.title}
+              text={photo.caption}
+              className="photo-action"
+            />
+            <button type="button" className="photo-action" onClick={() => setViewerOpen(true)}>
+              <Maximize2 aria-hidden="true" />
+              <span>Full screen</span>
+            </button>
+          </div>
+
+          {next ? (
             <Link
               to="/photos/$slug"
-              params={{ slug: nextSlug }}
-              className="text-sm font-semibold text-(--muted-strong) no-underline hover:text-(--ink)"
+              params={{ slug: next.slug }}
+              replace
+              state={carryPhotoOrigin(storedOrigin)}
+              className="photo-pager-link photo-pager-link--next"
             >
-              Next →
+              <span className="mono-label">Next →</span>
+              <strong>{next.title}</strong>
+            </Link>
+          ) : nextWorld ? (
+            <Link
+              to="/worlds/$world"
+              params={{ world: nextWorld.slug }}
+              className="photo-pager-link photo-pager-link--next"
+            >
+              <span className="mono-label">Next world →</span>
+              <strong>{nextWorld.name}</strong>
             </Link>
           ) : (
             <span aria-hidden="true" />
           )}
-        </motion.nav>
+        </nav>
+
+        {others.length > 0 ? (
+          <section className="photo-more" aria-labelledby="photo-more-heading">
+            <div className="photo-more-head">
+              <h2 id="photo-more-heading" className="display-font">
+                More from {sequenceLabel}
+              </h2>
+              <div className="photo-more-links">
+                {world ? (
+                  <Link to="/worlds/$world" params={{ world: world.slug }}>
+                    Visit {world.name}
+                  </Link>
+                ) : null}
+                <Link to="/archive" search={world ? { world: world.slug } : {}}>
+                  {world ? `${world.name} in the Index` : 'Open the Index'}
+                </Link>
+              </div>
+            </div>
+            <ul className="photo-more-strip">
+              {others.map((entry) => (
+                <li key={entry.slug}>
+                  <Link
+                    to="/photos/$slug"
+                    params={{ slug: entry.slug }}
+                    replace
+                    state={carryPhotoOrigin(storedOrigin)}
+                    className="photo-more-link"
+                  >
+                    <span className="pocket-frame photo-more-frame">
+                      <PhotoImage
+                        publicId={entry.publicId}
+                        alt=""
+                        preset="thumb"
+                        sizes="(max-width: 640px) 38vw, 180px"
+                        lqip={entry.image?.lqip}
+                        palette={entry.metadata.palette}
+                        hotspot={entry.image?.hotspot}
+                        className="h-full w-full object-cover"
+                      />
+                      <span className="frame-corners" aria-hidden="true" />
+                    </span>
+                    <span className="photo-more-title">{entry.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : (
+          <section className="photo-more" aria-label="Keep exploring">
+            <div className="photo-more-head">
+              <p className="display-font photo-more-solo">
+                This is the only frame in {sequenceLabel} so far.
+              </p>
+              <div className="photo-more-links">
+                {nextWorld ? (
+                  <Link to="/worlds/$world" params={{ world: nextWorld.slug }}>
+                    Next world: {nextWorld.name}
+                  </Link>
+                ) : null}
+                <Link to="/archive">Open the Index</Link>
+              </div>
+            </div>
+          </section>
+        )}
 
         {detail.isDegraded ? (
           <div className="mt-8">
@@ -410,6 +664,19 @@ function PhotoDetailRoute() {
           </div>
         ) : null}
       </div>
+
+      <PhotoViewerDialog
+        photo={photo}
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+        onPage={(direction) => {
+          const target = direction === 1 ? next : previous
+          if (target) goTo(target.slug)
+        }}
+        hasPrevious={Boolean(previous)}
+        hasNext={Boolean(next)}
+        counter={counter}
+      />
     </main>
   )
 }
