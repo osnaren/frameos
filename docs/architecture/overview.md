@@ -46,14 +46,18 @@ matters for cost, not our own Vercel function usage.
 
 ## Stack
 
-| Layer             | Technology                                          |
-| ----------------- | --------------------------------------------------- |
-| App framework     | TanStack Start (React 19, Vite, TypeScript strict)  |
-| Styling           | Tailwind CSS v4                                     |
-| Content + photos  | Sanity (Content Lake + native image asset pipeline) |
-| Caching           | Vercel CDN cache tags, TanStack Router loader cache |
-| Idempotency store | Upstash Redis (optional, degrades to in-memory)     |
-| Hosting           | Vercel (Hobby/free tier by default)                 |
+| Layer             | Technology                                                                                   |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| App framework     | TanStack Start (React 19, Vite, TypeScript strict)                                           |
+| Styling           | Tailwind CSS v4                                                                              |
+| Content + photos  | Sanity (Content Lake + native image asset pipeline)                                          |
+| Caching           | Vercel CDN cache tags, TanStack Router loader cache                                          |
+| Idempotency store | Upstash Redis (optional, degrades to in-memory)                                              |
+| Hosting           | Vercel (Hobby/free tier by default)                                                          |
+| Home page         | Pocket planets: one WebGL1 shader, no 3D engine ([../pocket-worlds.md](../pocket-worlds.md)) |
+| Motion            | CSS, framer-motion, GSAP (footer)                                                            |
+| Fonts             | Self-hosted via `@fontsource`, metric-matched fallbacks                                      |
+| Insights          | Vercel Web Analytics + Speed Insights (production only)                                      |
 
 See [decisions/0001-tanstack-start-baseline.md](../decisions/0001-tanstack-start-baseline.md)
 and [decisions/0002-remove-cloudinary.md](../decisions/0002-remove-cloudinary.md)

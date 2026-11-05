@@ -17,6 +17,38 @@ for the free-tier comparison that led to this architecture.
    in the project's Settings → Environment Variables.
 3. Deploy. `apps/web/vercel.json` already declares the reconcile cron job —
    no extra configuration needed.
+4. Once a custom domain is attached, set `VITE_SITE_URL` to it so canonical
+   links, social cards and the sitemap all use that one host (see
+   [../reference/environment-variables.md](../reference/environment-variables.md#client-visible)).
+5. Optional: in the Vercel project, enable **Analytics** (Web Analytics) and
+   **Speed Insights**. The app already ships both components in production
+   builds (`src/components/layout/VercelInsights.tsx`); they send nothing until
+   enabled. Both are cookie-less.
+
+### What the deployment serves
+
+- **Headers.** Every response carries `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options:
+SAMEORIGIN` and a closed `Permissions-Policy`. Hashed build assets and fonts
+  (`/assets/**`) are cached immutably; photos, icons and the default share
+  image are cached for a day in browsers and a month at the edge, revalidating
+  in the background. These are Nitro `routeRules` in `apps/web/vite.config.ts`,
+  so they compile into Vercel's build output and also apply to the local Node
+  server. Page and data responses keep their own cache-tag headers
+  ([../architecture/caching-and-webhooks.md](../architecture/caching-and-webhooks.md)).
+- **SEO.** Every route has a title, description, canonical, Open Graph and
+  Twitter card (photo pages share the photo itself; worlds share their cover;
+  other pages fall back to `public/og-default.jpg`), and JSON-LD (`WebSite` and
+  `Person` on the home page (referenced from every other graph), `Photograph` on photo pages, `CollectionPage` on worlds
+  and the Index). Logic lives in `src/lib/seo.ts`.
+- **`/sitemap.xml` and `/robots.txt`** are generated from the repository: every
+  public route, world and published photo. Hidden worlds, drafts and archived
+  photos never appear; `/api/` is disallowed.
+- **Fonts** are self-hosted (`@fontsource`), with the two above-the-fold files
+  preloaded and metric-matched system fallbacks so the swap causes no layout
+  shift. No requests go to Google Fonts.
+- **Errors** are structured JSON logs in Vercel's Runtime Logs. `SENTRY_DSN` is
+  not wired to an SDK yet.
 
 ### Cron jobs and the Hobby plan
 

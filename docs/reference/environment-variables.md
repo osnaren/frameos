@@ -49,6 +49,6 @@ scoped to a single warm serverless instance.
 
 ## Client-visible
 
-| Variable        | Purpose                                                                                                   |
-| --------------- | --------------------------------------------------------------------------------------------------------- |
-| `VITE_SITE_URL` | Absolute site URL for canonical links/SEO when it can't be inferred from request headers (e.g. local dev) |
+| Variable        | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_SITE_URL` | The canonical origin (e.g. `https://frameos.example`) used by canonical links, Open Graph/Twitter URLs, JSON-LD, the sitemap and robots.txt. Set it in production once a custom domain exists. When unset, a Vercel production deployment uses `VERCEL_PROJECT_PRODUCTION_URL` (set automatically by Vercel), and previews/local dev use the request's own origin. An invalid value is ignored rather than failing requests. |

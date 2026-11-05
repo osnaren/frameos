@@ -143,3 +143,5 @@ highp
 stereographically
 webglcontextlost
 SSIM
+SAMEORIGIN
+nosniff
