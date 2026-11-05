@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 
 import { PhotoImage } from '@/components/photo/PhotoImage'
 import { useHydratedReducedMotion } from '@/lib/motion'
+import { photoOriginState } from '@/lib/photo-origin'
 
 import type { World } from '@/types/content'
 import type { Photo } from '@/types/photo'
@@ -93,6 +94,12 @@ function buildTiles(photos: Photo[]): {
   return { tiles, cols, tileSize, radiusFactor }
 }
 
+/** Shortest signed angle (-180…180] from a ring angle to the viewer. */
+function facingAngle(tileAngle: number, ringRotation: number) {
+  const wrapped = (((tileAngle + ringRotation) % 360) + 360) % 360
+  return wrapped > 180 ? wrapped - 360 : wrapped
+}
+
 const AUTO_ROTATE_DEG_PER_SEC = 3
 /** Low = a flick coasts for a couple of seconds before settling; high = it snaps back instantly. */
 const RELAX_RATE = 0.45
@@ -100,35 +107,45 @@ const MAX_FLICK_DEG_PER_SEC = 640
 const DRAG_MOVE_THRESHOLD = 6
 const MAX_TILT = 16
 const MIN_TILT = -22
+/** How quickly a keyboard step settles onto the next frame. */
+const SNAP_RATE = 9
 
 /**
- * The world's photos, glued to the inside of a dome you can drag to spin —
- * a DOM/CSS-only replacement for the old WebGL "planet" (no shaders, no
- * lighting rig, no bundle weight, and it actually shows the photographs).
+ * The world's photos, glued to the inside of a dome you can turn — drag or
+ * swipe sideways, or focus it and use ← → (Enter opens the frame in front).
+ * Touch keeps vertical page scrolling. A plain list of every frame follows
+ * it for anyone who'd rather not spin anything.
  */
 export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) {
   const reducedMotion = useHydratedReducedMotion()
+  const navigate = useNavigate()
   const rootRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const frameRefs = useRef<Array<HTMLAnchorElement | null>>([])
   const { tiles, tileSize, radiusFactor } = useMemo(() => buildTiles(photos), [photos])
   const tilesRef = useRef(tiles)
   tilesRef.current = tiles
+  const [frontIndex, setFrontIndex] = useState<number | null>(null)
+  const frontRef = useRef(0)
 
   const rotation = useRef({ x: -8, y: 0 })
   const velocityY = useRef(0)
+  /** Set by keyboard steps; the ring eases onto it, then auto-rotation resumes on blur. */
+  const targetY = useRef<number | null>(null)
   const dragRef = useRef<{
     pointerId: number
     startX: number
     startY: number
     lastX: number
-    lastY: number
     lastT: number
     startRotX: number
     startRotY: number
+    mouse: boolean
   } | null>(null)
   const draggedRef = useRef(false)
-  const hoveredRef = useRef(false)
+  const pausedRef = useRef({ hovered: false, focused: false })
+
+  const originState = photoOriginState({ kind: 'world', world: world.slug, viaHistory: true })
 
   useEffect(() => {
     const stage = stageRef.current
@@ -155,29 +172,31 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
       // is harmless.
       //
       // The falloff is measured in "steps" (the angle between adjacent tiles),
-      // not raw degrees: a plain cosine stays near-1 for a wide arc around
-      // center, so two neighbouring tiles were both ~95%+ opaque at once and
-      // collided into a "half-open book" look whenever the ring passed the
-      // midpoint between them. Normalizing by the step size guarantees the
-      // fade completes before the next tile takes over, so only one tile is
-      // ever the clear "hero" at a time.
+      // not raw degrees, so only one tile is ever the clear "hero" at a time.
       const currentTiles = tilesRef.current
       const stepDeg = 360 / currentTiles.length
+      let front = 0
+      let frontDistance = Number.POSITIVE_INFINITY
       for (let i = 0; i < currentTiles.length; i++) {
+        const angle = facingAngle(currentTiles[i].rotateY, rotation.current.y)
+        if (Math.abs(angle) < frontDistance) {
+          frontDistance = Math.abs(angle)
+          front = i
+        }
         const el = frameRefs.current[i]
         if (!el) continue
-        const wrapped = (((currentTiles[i].rotateY + rotation.current.y) % 360) + 360) % 360
-        const angleDiff = wrapped > 180 ? wrapped - 360 : wrapped
-        const normalized = Math.min(1, Math.abs(angleDiff) / (stepDeg * 0.9))
+        const normalized = Math.min(1, Math.abs(angle) / (stepDeg * 0.9))
         const facing = 1 - normalized * normalized * (3 - 2 * normalized) // smoothstep falloff
         el.style.opacity = (0.35 + 0.65 * facing).toFixed(2)
         el.style.filter = facing > 0.96 ? 'none' : `blur(${((1 - facing) * 3).toFixed(2)}px)`
       }
+      frontRef.current = front
     }
 
     applyTransform()
 
     let raf = 0
+    let running = false
     let last = performance.now()
 
     const tick = (time: number) => {
@@ -185,16 +204,39 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
       last = time
 
       if (!dragRef.current) {
-        const baseline = reducedMotion || hoveredRef.current ? 0 : AUTO_ROTATE_DEG_PER_SEC
-        velocityY.current += (baseline - velocityY.current) * Math.min(1, RELAX_RATE * delta)
-        rotation.current.y += velocityY.current * delta
+        if (targetY.current !== null) {
+          const remaining = targetY.current - rotation.current.y
+          rotation.current.y += remaining * Math.min(1, SNAP_RATE * delta)
+          velocityY.current = 0
+          if (Math.abs(remaining) < 0.05) rotation.current.y = targetY.current
+        } else {
+          const paused = pausedRef.current.hovered || pausedRef.current.focused
+          const baseline = reducedMotion || paused ? 0 : AUTO_ROTATE_DEG_PER_SEC
+          velocityY.current += (baseline - velocityY.current) * Math.min(1, RELAX_RATE * delta)
+          rotation.current.y += velocityY.current * delta
+        }
         applyTransform()
       }
 
       raf = requestAnimationFrame(tick)
     }
 
-    raf = requestAnimationFrame(tick)
+    const start = () => {
+      if (running) return
+      running = true
+      last = performance.now()
+      raf = requestAnimationFrame(tick)
+    }
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(raf)
+    }
+
+    // Spin only while the dome is on screen.
+    const visibility = new IntersectionObserver(([entry]) =>
+      entry.isIntersecting ? start() : stop()
+    )
+    visibility.observe(root)
 
     const handlePointerDown = (event: PointerEvent) => {
       if (event.pointerType === 'mouse' && event.button !== 0) {
@@ -202,16 +244,17 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
       }
 
       root.classList.add('is-interacted')
+      targetY.current = null
       draggedRef.current = false
       dragRef.current = {
         pointerId: event.pointerId,
         startX: event.clientX,
         startY: event.clientY,
         lastX: event.clientX,
-        lastY: event.clientY,
         lastT: performance.now(),
         startRotX: rotation.current.x,
         startRotY: rotation.current.y,
+        mouse: event.pointerType === 'mouse',
       }
     }
 
@@ -231,7 +274,10 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
       }
 
       rotation.current.y = drag.startRotY + dxTotal * 0.32
-      rotation.current.x = Math.min(MAX_TILT, Math.max(MIN_TILT, drag.startRotX - dyTotal * 0.22))
+      // Vertical tilt is a mouse nicety; on touch, vertical movement scrolls the page.
+      if (drag.mouse) {
+        rotation.current.x = Math.min(MAX_TILT, Math.max(MIN_TILT, drag.startRotX - dyTotal * 0.22))
+      }
       applyTransform()
 
       const now = performance.now()
@@ -242,7 +288,6 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
         Math.max(-MAX_FLICK_DEG_PER_SEC, instantVelocity)
       )
       drag.lastX = event.clientX
-      drag.lastY = event.clientY
       drag.lastT = now
     }
 
@@ -257,22 +302,23 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
       }
     }
 
+    const handlePointerEnter = (event: PointerEvent) => {
+      if (event.pointerType === 'mouse') pausedRef.current.hovered = true
+    }
+    const handlePointerLeave = () => {
+      pausedRef.current.hovered = false
+    }
+
     root.addEventListener('pointerdown', handlePointerDown)
     root.addEventListener('pointermove', handlePointerMove)
     root.addEventListener('pointerup', endDrag)
     root.addEventListener('pointercancel', endDrag)
-
-    const handlePointerEnter = () => {
-      hoveredRef.current = true
-    }
-    const handlePointerLeave = () => {
-      hoveredRef.current = false
-    }
     root.addEventListener('pointerenter', handlePointerEnter)
     root.addEventListener('pointerleave', handlePointerLeave)
 
     return () => {
-      cancelAnimationFrame(raf)
+      stop()
+      visibility.disconnect()
       root.removeEventListener('pointerdown', handlePointerDown)
       root.removeEventListener('pointermove', handlePointerMove)
       root.removeEventListener('pointerup', endDrag)
@@ -282,12 +328,32 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
     }
   }, [reducedMotion])
 
+  /** Turns the ring one frame left (-1) or right (1) and announces what's in front. */
+  const step = (direction: -1 | 1) => {
+    const currentTiles = tilesRef.current
+    const stepDeg = 360 / currentTiles.length
+    const base = targetY.current ?? rotation.current.y
+    // Snap to the nearest frame first, then move one step.
+    const snapped = Math.round(base / stepDeg) * stepDeg
+    const next = snapped - direction * stepDeg
+    targetY.current = next
+    const front = currentTiles.findIndex(
+      (tile) => Math.abs(facingAngle(tile.rotateY, next)) < stepDeg / 2
+    )
+    setFrontIndex(front === -1 ? null : front)
+    rootRef.current?.classList.add('is-interacted')
+  }
+
   if (tiles.length === 0) {
     return null
   }
 
+  const frontPhoto = frontIndex === null ? null : tiles[frontIndex].photo
+
   return (
     <div className="world-dome-block">
+      {/* A focusable, labelled group whose arrow keys turn the ring (see aria-label). */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <div
         ref={rootRef}
         className="world-dome"
@@ -298,7 +364,35 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
           } as React.CSSProperties
         }
         role="group"
-        aria-label={`${world.name} photographs — drag to look around, then use the frame links below to open a photograph`}
+        aria-roledescription="rotating gallery"
+        aria-label={`${world.name} photographs. Use the left and right arrow keys to turn the ring and Enter to open the photograph in front. Every frame is also listed below.`}
+        // A focusable group: arrow keys turn it, Enter opens the front frame.
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+        tabIndex={0}
+        onFocus={(event) => {
+          if (event.target !== event.currentTarget) return
+          pausedRef.current.focused = true
+          setFrontIndex(frontRef.current)
+        }}
+        onBlur={() => {
+          pausedRef.current.focused = false
+          targetY.current = null
+          setFrontIndex(null)
+        }}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault()
+            step(event.key === 'ArrowLeft' ? -1 : 1)
+          } else if ((event.key === 'Enter' || event.key === ' ') && frontIndex !== null) {
+            event.preventDefault()
+            void navigate({
+              to: '/photos/$slug',
+              params: { slug: tiles[frontIndex].photo.slug },
+              state: originState,
+            })
+          }
+        }}
         onClickCapture={(event) => {
           if (draggedRef.current) {
             event.preventDefault()
@@ -311,7 +405,7 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
           {tiles.map((tile, index) => (
             <div
               key={tile.key}
-              className="world-dome__tile"
+              className={`world-dome__tile${index === frontIndex ? ' is-front' : ''}`}
               style={{ transform: `rotateY(${tile.rotateY}deg) rotateX(${tile.rotateX}deg)` }}
             >
               <Link
@@ -320,6 +414,7 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
                 }}
                 to="/photos/$slug"
                 params={{ slug: tile.photo.slug }}
+                state={originState}
                 aria-hidden="true"
                 tabIndex={-1}
                 className="world-dome__frame group block no-underline"
@@ -336,6 +431,7 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
                     preset="gallery"
                     sizes="220px"
                     lqip={tile.photo.image?.lqip}
+                    palette={tile.photo.metadata.palette}
                     hotspot={tile.photo.image?.hotspot}
                     className="h-full w-full object-cover"
                   />
@@ -346,17 +442,20 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
             </div>
           ))}
         </div>
-        <span aria-hidden="true" className="world-dome__vignette" />
         <span aria-hidden="true" className="world-dome__hint">
-          ‹ drag to look around ›
+          ‹ drag to turn ›
         </span>
+        <p className="sr-only" aria-live="polite">
+          {frontPhoto ? `In front: ${frontPhoto.title}. Press Enter to open.` : ''}
+        </p>
       </div>
-      <nav className="world-dome__index" aria-label={`${world.name} frames`}>
+      <nav className="world-dome__index" aria-label={`Every frame in ${world.name}`}>
         {photos.map((photo, index) => (
           <Link
             key={photo.slug}
             to="/photos/$slug"
             params={{ slug: photo.slug }}
+            state={originState}
             viewTransition
             className="world-dome__index-link no-underline"
           >

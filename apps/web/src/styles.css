@@ -2393,18 +2393,87 @@ a:focus-visible .frame-corners {
   margin-top: 1rem;
   perspective: 1000px;
   perspective-origin: 50% 44%;
-  touch-action: none;
+  /* Horizontal drags turn the ring; vertical swipes still scroll the page. */
+  touch-action: pan-y;
   cursor: grab;
+  border-radius: 1.5rem;
   -webkit-user-select: none;
   user-select: none;
+  /* Fade the ring's far edges into whatever is behind it (world wash, either
+     theme) — a painted vignette showed up as a flat rectangle. */
+  mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+}
+
+/* The mask above would clip an outline, so the focus ring lives on the block. */
+.world-dome:focus-visible {
+  outline: none;
 }
 
 .world-dome-block {
   position: relative;
 }
 
+.world-dome-block:has(> .world-dome:focus-visible)::before {
+  content: '';
+  position: absolute;
+  inset: calc(1rem - 6px) -6px auto;
+  height: calc(clamp(280px, 34vw, 420px) + 12px);
+  border: 2px solid var(--world-accent);
+  border-radius: 1.75rem;
+  pointer-events: none;
+}
+
 .world-dome:active {
   cursor: grabbing;
+}
+
+.world-dome__tile.is-front .world-dome__frame {
+  transform: translateZ(calc(var(--tile-radius) + 16px)) scale(1.08);
+  box-shadow:
+    0 0 0 2px var(--world-accent),
+    0 28px 60px var(--shadow);
+}
+
+.world-dome__tile.is-front .world-dome__caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.world-hero-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.world-hero-pager a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  background: color-mix(in srgb, var(--panel) 80%, transparent);
+  color: var(--muted-strong);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition:
+    border-color 240ms ease,
+    color 240ms ease;
+}
+
+.world-hero-pager a:hover,
+.world-hero-pager a:focus-visible {
+  border-color: color-mix(in srgb, var(--world-accent) 60%, var(--line));
+  color: var(--ink);
+}
+
+.world-hero-pager svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .world-dome__ground {
@@ -2501,14 +2570,6 @@ a:focus-visible .frame-corners {
   transform: translateY(0);
 }
 
-.world-dome__vignette {
-  position: absolute;
-  inset: 0 -4rem;
-  z-index: 2;
-  pointer-events: none;
-  background: radial-gradient(closest-side, transparent 46%, var(--bg) 92%);
-}
-
 .world-dome__hint {
   position: absolute;
   bottom: 0.65rem;
@@ -2554,6 +2615,11 @@ a:focus-visible .frame-corners {
   border-bottom: 1px solid transparent;
   color: color-mix(in srgb, var(--ink) 78%, var(--muted));
   font-size: 0.82rem;
+}
+
+:root[data-theme='dark'] .world-dome__index-link > span:first-child {
+  /* World accents are tuned for ivory; lift them on dark. */
+  color: color-mix(in srgb, var(--world-accent) 50%, #f3efe8);
 }
 
 .world-dome__index-link > span:first-child {

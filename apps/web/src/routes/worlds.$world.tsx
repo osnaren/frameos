@@ -1,20 +1,24 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
+import { WorldSkeleton } from '@/components/layout/RouteSkeletons'
 import { WorldScene } from '@/components/worlds/WorldScene'
+import { loadCompleteGalleryFeed } from '@/lib/gallery-feed'
 import { buildSeoHead, collectionPageJsonLd, getPhotoShareImage } from '@/lib/seo'
-import { getGalleryFeedServer, getWorldsServer } from '@/server/server-functions/portfolio'
+import { getWorldsServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/worlds/$world')({
   loader: async ({ params }) => {
     const worlds = await getWorldsServer()
+    // Only public worlds come back from the server, so hidden ones 404 here.
     const world = worlds!.find((entry) => entry.slug === params.world)
 
     if (!world) {
       throw notFound()
     }
 
-    const feed = await getGalleryFeedServer({ data: { category: world.slug, limit: 48 } })
+    // Every page of the world's feed, so a large world shows all its frames.
+    const feed = await loadCompleteGalleryFeed({ category: world.slug })
     return { world, worlds: worlds!, feed }
   },
   staleTime: 60_000,
@@ -51,6 +55,7 @@ export const Route = createFileRoute('/worlds/$world')({
       jsonLd: [collectionPageJsonLd({ canonicalUrl, name: title, description, image, photos })],
     })
   },
+  pendingComponent: WorldSkeleton,
   component: WorldRoute,
 })
 
