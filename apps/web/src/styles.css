@@ -334,6 +334,32 @@ img {
   -webkit-user-drag: none;
 }
 
+/* ---- Photo image: placeholder, then develop ----
+   PhotoImage paints a blurred preview of the photograph over its dominant
+   colour (inline background) while the file loads. Once decoded it resolves
+   from soft to sharp — the site's focus-pull motif. Images that were already
+   loaded (SSR, cache) are marked `instant` and skip the animation. Components
+   that tint a photo set `--photo-filter` instead of `filter`, so the develop
+   composes with their look rather than overriding it. */
+.photo-image[data-loaded='develop'] {
+  animation: photo-develop 720ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes photo-develop {
+  from {
+    filter: blur(14px) saturate(0.84) var(--photo-filter,);
+  }
+  to {
+    filter: blur(0) saturate(1) var(--photo-filter,);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-image[data-loaded='develop'] {
+    animation: none;
+  }
+}
+
 .pocket-frame::after {
   content: '';
   position: absolute;
@@ -3677,7 +3703,8 @@ a:focus-visible .frame-corners {
   height: 100%;
   object-fit: cover;
   object-position: center 62%;
-  filter: saturate(0.62) contrast(1.08) brightness(0.62);
+  --photo-filter: saturate(0.62) contrast(1.08) brightness(0.62);
+  filter: var(--photo-filter);
 }
 
 .signal-cinema-shade {

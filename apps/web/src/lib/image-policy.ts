@@ -61,6 +61,58 @@ export function getImagePresetDefinition(preset: ImagePreset) {
   return imagePresetMap[preset]
 }
 
+export interface ContainedSizeRule {
+  /** Media condition, e.g. `(max-width: 640px)`; omit for the final fallback rule. */
+  media?: string
+  /** CSS lengths the frame's width can't exceed. */
+  maxWidths: readonly string[]
+  /** CSS lengths the frame's height can't exceed (scaled by the aspect ratio into widths). */
+  maxHeights: readonly string[]
+}
+
+function roundRatio(value: number) {
+  return Math.round(value * 1000) / 1000
+}
+
+/**
+ * `sizes` for a photograph shown whole inside a box capped by both width and
+ * height (the detail stage, the lightbox). A portrait frame limited to 58vh
+ * is only ~300px wide on a laptop, so a plain "76vw" would download a file
+ * several times larger than it ever displays. Each rule resolves to the
+ * smallest of its width caps and its height caps × aspect ratio.
+ */
+export function containedImageSizes(
+  width: number,
+  height: number,
+  rules: readonly ContainedSizeRule[]
+): string {
+  const ratio = width > 0 && height > 0 ? roundRatio(width / height) : 1
+
+  return rules
+    .map((rule) => {
+      const candidates = [
+        ...rule.maxWidths,
+        ...rule.maxHeights.map((length) => `calc(${length} * ${ratio})`),
+      ]
+      const value = candidates.length === 1 ? candidates[0] : `min(${candidates.join(', ')})`
+      return rule.media ? `${rule.media} ${value}` : value
+    })
+    .join(', ')
+}
+
+/**
+ * `sizes` for one tile of the Index's justified contact sheet. Tiles grow in
+ * proportion to their aspect ratio, so a landscape frame can be three times
+ * wider than a portrait one sitting in the same row.
+ */
+export function contactSheetTileSizes(width: number, height: number) {
+  const ratio = width > 0 && height > 0 ? width / height : 1
+  const mobileVw = Math.min(92, Math.max(30, Math.round(ratio * 52)))
+  const desktopPx = Math.min(640, Math.max(150, Math.round(ratio * 280)))
+
+  return `(max-width: 640px) ${mobileVw}vw, ${desktopPx}px`
+}
+
 export interface SanityImageHotspot {
   x: number
   y: number
