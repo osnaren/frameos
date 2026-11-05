@@ -71,22 +71,24 @@ export default function Footer() {
         return
       }
 
-      gsap.set(reveals, { yPercent: 115, filter: 'blur(10px)', autoAlpha: 0 })
+      // `opacity`, never `autoAlpha`: visibility:hidden would make the footer's
+      // links unfocusable until the reveal had played.
+      gsap.set(reveals, { yPercent: 115, filter: 'blur(10px)', opacity: 0 })
       gsap.set(railLines, { scaleX: 0, transformOrigin: 'center' })
-      gsap.set(railLabels, { y: 8, autoAlpha: 0 })
-      gsap.set(slash, { scaleY: 0, transformOrigin: 'bottom', autoAlpha: 0 })
-      gsap.set(credits, { y: 12, autoAlpha: 0 })
+      gsap.set(railLabels, { y: 8, opacity: 0 })
+      gsap.set(slash, { scaleY: 0, transformOrigin: 'bottom', opacity: 0 })
+      gsap.set(credits, { y: 12, opacity: 0 })
 
       const timeline = gsap.timeline({ paused: true, defaults: { ease: 'expo.out' } })
       timeline
         .to(railLines, { scaleX: 1, duration: 1.1, stagger: 0.08 })
-        .to(railLabels, { y: 0, autoAlpha: 1, duration: 0.65, stagger: 0.08 }, '<0.1')
+        .to(railLabels, { y: 0, opacity: 1, duration: 0.65, stagger: 0.08 }, '<0.1')
         .to(
           reveals,
           {
             yPercent: 0,
             filter: 'blur(0px)',
-            autoAlpha: 1,
+            opacity: 1,
             duration: 1.15,
             stagger: 0.075,
           },
@@ -96,7 +98,7 @@ export default function Footer() {
           slash,
           {
             scaleY: 1,
-            autoAlpha: 1,
+            opacity: 1,
             duration: 0.9,
           },
           '<0.18'
@@ -105,7 +107,7 @@ export default function Footer() {
           credits,
           {
             y: 0,
-            autoAlpha: 1,
+            opacity: 1,
             duration: 0.75,
             stagger: 0.08,
           },
@@ -123,9 +125,14 @@ export default function Footer() {
         { threshold: 0.12 }
       )
 
+      // Tabbing into the footer reveals it at once, whatever the scroll position.
+      const handleFocusIn = () => timeline.progress(1).pause()
+
       observer.observe(root)
+      root.addEventListener('focusin', handleFocusIn)
       return () => {
         observer.disconnect()
+        root.removeEventListener('focusin', handleFocusIn)
         timeline.kill()
       }
     },
@@ -165,7 +172,7 @@ export default function Footer() {
           </span>
         </div>
 
-        <nav aria-label="Footer" className="cinematic-footer-nav">
+        <nav id="footer-navigation" aria-label="Footer" className="cinematic-footer-nav">
           {NAV_LINKS.map((link, index) => (
             <Link
               key={link.label}

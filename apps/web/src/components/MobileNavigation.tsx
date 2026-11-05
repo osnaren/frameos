@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Link } from '@tanstack/react-router'
 import { Aperture, ArrowUpRight } from 'lucide-react'
@@ -15,8 +15,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+/**
+ * The compact-screen menu. Radix's modal dropdown traps focus, closes on Esc
+ * or outside tap, locks page scroll and returns focus to the trigger; it also
+ * closes whenever the route changes (including browser Back), not only when
+ * one of its own links is chosen.
+ */
 export default function MobileNavigation({ pathname }: { pathname: string }) {
   const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
 
   return (
     <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>

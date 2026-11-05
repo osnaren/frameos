@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from 'react'
 
 import { Link, useRouterState } from '@tanstack/react-router'
+import { Aperture } from 'lucide-react'
 
 import { isNavigationLinkActive, NAV_LINKS } from '@/components/navigation'
 
@@ -19,8 +20,21 @@ function getCompactNavigationSnapshot() {
   return window.matchMedia(COMPACT_NAV_QUERY).matches
 }
 
+/**
+ * Holds the menu button's place until the compact menu has loaded. It's a
+ * real link to the footer's navigation, so even before (or without)
+ * JavaScript a phone visitor can reach every page.
+ */
 function MobileNavigationPlaceholder() {
-  return <span aria-hidden="true" className="site-mobile-menu-placeholder" />
+  return (
+    <a
+      href="#footer-navigation"
+      className="site-mobile-menu-placeholder site-mobile-menu-trigger"
+      aria-label="Site navigation"
+    >
+      <Aperture aria-hidden="true" />
+    </a>
+  )
 }
 
 export default function Header() {
