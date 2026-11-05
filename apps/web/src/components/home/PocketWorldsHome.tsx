@@ -2,9 +2,7 @@ import { useEffect, useState, type CSSProperties } from 'react'
 
 import { Link } from '@tanstack/react-router'
 
-import { useHydratedReducedMotion } from '@/lib/motion'
-
-import { resolveChapterMode, type ChapterMode } from './chapter-mode'
+import { useChapterMode } from './chapter-mode'
 import { HomeOrrery } from './HomeOrrery'
 import { PlanetStill } from './planet/PlanetStill'
 import { WorldChapter } from './WorldChapter'
@@ -31,14 +29,18 @@ export function PocketWorldsHome({
   page: Pick<HomePageContent, 'eyebrow' | 'headline' | 'intro'>
   overviews: WorldOverview[]
 }) {
-  const reducedMotion = useHydratedReducedMotion()
-  const [mode, setMode] = useState<ChapterMode>('static')
+  const mode = useChapterMode()
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
   const totalFrames = overviews.reduce((sum, overview) => sum + overview.photoCount, 0)
 
+  /* a deep link (/#world-…) was resolved against the server's static layout;
+     land it again once the scroll layout is in place */
   useEffect(() => {
-    setMode(resolveChapterMode(reducedMotion))
-  }, [reducedMotion])
+    if (mode === 'static' || !window.location.hash.startsWith('#world-')) {
+      return
+    }
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ block: 'start' })
+  }, [mode])
 
   /* which chapter holds the middle of the viewport — drives the rail */
   useEffect(() => {
