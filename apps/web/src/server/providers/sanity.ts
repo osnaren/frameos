@@ -279,6 +279,20 @@ function normalizeSanityPhoto(raw: SanityRawPhoto): Photo | null {
   }
 }
 
+function normalizeWorldPlanet(raw: SanityRawWorld['planet']): World['planet'] {
+  const photoSlug = raw?.photo?.slug?.trim()
+  const horizon = typeof raw?.horizon === 'number' ? raw.horizon : undefined
+
+  if (!photoSlug && horizon === undefined) {
+    return undefined
+  }
+
+  return {
+    photo: photoSlug ? { slug: photoSlug } : undefined,
+    horizon,
+  }
+}
+
 function normalizeSanityWorld(raw: SanityRawWorld): World | null {
   const slug = raw.slug?.trim()
   const name = raw.name?.trim()
@@ -302,6 +316,7 @@ function normalizeSanityWorld(raw: SanityRawWorld): World | null {
     sortOrder: raw.sortOrder ?? 100,
     status: raw.status === 'hidden' ? 'hidden' : 'active',
     heroPhoto: raw.heroPhoto?.slug ? { slug: raw.heroPhoto.slug } : undefined,
+    planet: normalizeWorldPlanet(raw.planet),
     mood,
     seo: raw.seo ? normalizeSeo(raw.seo, `${name} — FrameOS`, raw.description || line) : undefined,
   }
@@ -501,7 +516,12 @@ const worldsQuery = defineQuery(`*[_type == "world"] | order(sortOrder asc, name
   description,
   sortOrder,
   status,
-  form,
+  planet{
+    horizon,
+    photo->{
+      "slug": slug.current
+    }
+  },
   heroPhoto->{
     "slug": slug.current
   },

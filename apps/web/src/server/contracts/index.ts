@@ -1,3 +1,4 @@
+import type { WorldOverview } from '@/lib/world-overview'
 import type {
   AboutView,
   AboutPageContent,
@@ -43,6 +44,8 @@ export interface PortfolioRepository {
   getAboutView: (options: { baseUrl: string }) => Promise<AboutView>
   getContactView: (options: { baseUrl: string }) => Promise<ContactView>
   getWorlds: () => Promise<World[]>
+  /** Public worlds with their photographs resolved — what the home page draws. */
+  getWorldsOverview: () => Promise<{ worlds: WorldOverview[]; isDegraded: boolean }>
   getSeoPayload: (
     routeId: PageDocumentId | 'gallery' | 'photo',
     options: { slug?: string; baseUrl: string }

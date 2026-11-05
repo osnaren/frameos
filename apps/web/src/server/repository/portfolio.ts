@@ -1,5 +1,6 @@
 import { buildCanonicalArchiveSearch, buildCanonicalGallerySearch } from '@/lib/gallery-search'
 import { buildCanonicalUrl } from '@/lib/url'
+import { buildWorldOverviews, type WorldOverview } from '@/lib/world-overview'
 import { readSnapshot, rememberSnapshot } from '@/server/cache/snapshots'
 import { getPageTags, getPhotoTags } from '@/server/cache/tags'
 import { invalidateCacheTags } from '@/server/cache/vercel'
@@ -127,6 +128,33 @@ export function createPortfolioRepository(): PortfolioRepository {
         const snapshot = readSnapshot<World[]>(snapshotKey)
         if (snapshot) {
           return snapshot
+        }
+        throw new ServiceUnavailableError(
+          'The worlds are temporarily unavailable while Sanity is recovering.'
+        )
+      }
+    },
+    async getWorldsOverview() {
+      const snapshotKey = getSnapshotKey('worlds-overview')
+
+      try {
+        const [worlds, response] = await Promise.all([
+          this.getWorlds(),
+          sanityProvider.searchPhotos({ limit: Number.MAX_SAFE_INTEGER }),
+        ])
+        const published = response.photos
+          .map((photo) => ensurePublishedPhoto(photo))
+          .filter((photo): photo is Photo => Boolean(photo))
+
+        return rememberSnapshot(snapshotKey, {
+          worlds: buildWorldOverviews(worlds, published),
+          isDegraded: false,
+        })
+      } catch (error) {
+        captureException(error, { route: 'worlds-overview', outcome: 'failure' })
+        const snapshot = readSnapshot<{ worlds: WorldOverview[] }>(snapshotKey)
+        if (snapshot) {
+          return { worlds: snapshot.worlds, isDegraded: true }
         }
         throw new ServiceUnavailableError(
           'The worlds are temporarily unavailable while Sanity is recovering.'

@@ -81,6 +81,16 @@ export const getWorldsServer = createServerFn({ method: 'GET' }).handler(async (
   }
 })
 
+export const getWorldsOverviewServer = createServerFn({ method: 'GET' }).handler(async () => {
+  try {
+    const overview = await repository.getWorldsOverview()
+    applyCacheResponse('page', ['worlds', 'gallery'])
+    return overview
+  } catch (error) {
+    handleUnavailable(error)
+  }
+})
+
 export const getGalleryFeedServer = createServerFn({ method: 'GET' })
   .validator(galleryInputSchema)
   .handler(async ({ data }) => {

@@ -30,6 +30,21 @@ export interface WorldMood {
   accent: string
 }
 
+/**
+ * Tuning for a world's pocket planet: one photograph curled into a tiny planet.
+ * Every field is optional — the lead photograph and a balanced horizon are used
+ * when nothing is set.
+ */
+export interface WorldPlanet {
+  /** The photograph to curl into the planet. Defaults to the world's lead photograph. */
+  photo?: PhotoRef
+  /**
+   * How much of the frame becomes ground (0.2 – 1.2). Lower values gather the
+   * bottom of the photo into a tight core and give the sky more of the disc.
+   */
+  horizon?: number
+}
+
 /** A CMS-managed photographic collection. Photos reference this document by slug. */
 export interface World {
   slug: string
@@ -40,13 +55,8 @@ export interface World {
   status: WorldStatus
   heroPhoto?: PhotoRef
   mood: WorldMood
-  /**
-   * Which miniature landform the home journey builds this world on.
-   *
-   * Names a form in the web app's form registry. Absent means the world has
-   * no scene: it still appears in the index and has its own collection.
-   */
-  form?: string
+  /** How this world is drawn as a pocket planet on the home page. Optional; sensible defaults apply. */
+  planet?: WorldPlanet
   seo?: SeoFields
 }
 

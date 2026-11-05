@@ -504,32 +504,27 @@
         },
         "optional": true
       },
-      "form": {
+      "planet": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "coast"
+          "type": "object",
+          "attributes": {
+            "photo": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "photo.reference"
+              },
+              "optional": true
             },
-            {
-              "type": "string",
-              "value": "plateau"
-            },
-            {
-              "type": "string",
-              "value": "basin"
-            },
-            {
-              "type": "string",
-              "value": "wetland"
-            },
-            {
-              "type": "string",
-              "value": "table"
+            "horizon": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "number"
+              },
+              "optional": true
             }
-          ]
+          }
         },
         "optional": true
       },

@@ -80,24 +80,36 @@ export const worldType = defineType({
       validation: (rule) => rule.required().integer().min(0),
     }),
     defineField({
-      name: 'form',
-      title: 'Model form',
+      name: 'planet',
+      title: 'Pocket planet',
       description:
-        'Which miniature landform this world is built on. The three tones below colour it; ' +
-        'this decides its shape, its destination and what is scattered across it. Leave empty ' +
-        'and the world appears in the index and its own collection, but has no scene on the ' +
-        'home journey.',
-      type: 'string',
+        'On the home page every world appears as a tiny planet: one photograph curled into a ' +
+        'circle, which unrolls into the full frame as visitors scroll. Both settings are ' +
+        'optional. Landscapes with ground at the bottom and sky at the top make the clearest ' +
+        'planets; close-ups make kaleidoscopes.',
+      type: 'object',
       group: 'atmosphere',
-      options: {
-        list: [
-          {title: 'Coast — headland and lighthouse', value: 'coast'},
-          {title: 'Plateau — a stepped mesa and a temple', value: 'plateau'},
-          {title: 'Basin — a shallow bowl and a lens', value: 'basin'},
-          {title: 'Wetland — braided channels and a hide', value: 'wetland'},
-          {title: 'Table — a cloth and a place laid', value: 'table'},
-        ],
-      },
+      options: {collapsible: true, collapsed: false},
+      fields: [
+        defineField({
+          name: 'photo',
+          title: 'Planet photograph',
+          description:
+            'Which frame to curl into the planet. Leave empty to use the lead photograph.',
+          type: 'reference',
+          to: [{type: 'photo'}],
+        }),
+        defineField({
+          name: 'horizon',
+          title: 'Horizon',
+          description:
+            'How much of the frame becomes ground, from 0.2 (a tight core, mostly sky) to 1.2 ' +
+            '(a broad, flat world). 0.55 suits most photographs.',
+          type: 'number',
+          initialValue: 0.55,
+          validation: (rule) => rule.min(0.2).max(1.2).precision(2),
+        }),
+      ],
     }),
     defineField({
       name: 'mood',
