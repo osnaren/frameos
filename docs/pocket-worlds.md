@@ -1,320 +1,123 @@
-# FrameOS — Pocket Worlds
-
-Production reference for the cinematic Pocket Worlds homepage introduced in July 2026.
-The server, cache, and publication architecture is unchanged; photo storage/delivery
-moved from Cloudinary to Sanity's native image pipeline in August 2026 — see
-[architecture/overview.md](./architecture/overview.md) and
-[decisions/0002-remove-cloudinary.md](./decisions/0002-remove-cloudinary.md). The
-original creative brief remains in [video-pocket-worlds.md](./video-pocket-worlds.md).
-
-## Current status
-
-The connected visual world, semantic fallback, responsive stills journey, scroll
-controller, media manifest, and browser fallbacks are implemented.
-
-Six final keyframes were generated with OpenAI imagegen and are already used by the live
-stills experience:
-
-1. one aerial overview of the complete geography;
-2. Wander;
-3. Sacred Geometry;
-4. Small Wonders;
-5. Living Things;
-6. Table Notes.
-
-No placeholder video is shipped. The runtime manifest remains `ready: false` until the
-five Google Flow renders are supplied, encoded, checked for continuity, and visually
-approved. Until then, visitors get the complete authored scroll journey using the same
-generated world imagery.
-
-The former WebGL homepage is no longer routed. Its source and Three/R3F dependencies are
-temporarily retained until the production video chain is approved; they can then be
-removed without risking the working editorial fallback.
-
-## Creative identity
-
-**FrameOS — Pocket Worlds**
+# FrameOS — Pocket Worlds (the home page)
 
 > Things I noticed, photographed on a phone.
 
-The homepage is one journey through five worlds connected by captured light. The light is
-sunlight made navigable: photographic exposure, visitor progress, and continuity between
-different acts of noticing. It must never look like a neon laser or generic interface
-glow.
+The home page turns every world into a **pocket planet**: one of its photographs, curled
+into the "tiny planet" a phone camera makes from a panorama. The page opens on all of them
+at once, then visits each in turn, unrolling its planet back into the frame it came from.
 
-This remains a personal mobile-photography archive, not a photography-services website.
-Copy is minimal, observational, and honest. Locations, dates, equipment, and stories are
-never invented.
+It uses no generated imagery, no 3D models, and no video. The planets are the archive's
+own photographs, re-projected live by one short fragment shader. That keeps the page
+honest to what the site is, fast on phones, and editable from the CMS.
 
-## Journey order
+Why it replaced the earlier 3D-island and video approaches:
+[decisions/0005-pocket-planet-homepage.md](decisions/0005-pocket-planet-homepage.md).
 
-| Order | World           | Public route              | Homepage line                            |
-| ----- | --------------- | ------------------------- | ---------------------------------------- |
-| 01    | Wander          | `/worlds/wander`          | Places passed through, horizons kept.    |
-| 02    | Sacred Geometry | `/worlds/sacred-geometry` | Stone, sky, ritual, and repetition.      |
-| 03    | Small Wonders   | `/worlds/small-wonders`   | The closer you look, the larger it gets. |
-| 04    | Living Things   | `/worlds/living-things`   | Company that chooses its own distance.   |
-| 05    | Table Notes     | `/worlds/at-the-table`    | Meals worth interrupting.                |
+## The page, top to bottom
 
-`at-the-table` remains the internal route slug for compatibility; the public name is
-**Table Notes**. The hidden People world is excluded from every public journey and remains
-draft-only until consent is confirmed.
+| Section     | What the visitor sees                                                                                                                                                                                                                                                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Orrery**  | The headline beside an orrery: every world's planet on its own orbit around a small sun of "captured light". Orbits are tilted ellipses, near-side planets sit larger and in front, and outer orbits turn more slowly. Planets turn on their axes, can be spun by dragging, and pause while hovered. Click one to jump to its chapter. |
+| **Chapter** | One per world. The planet holds beside the world's name and line, then unrolls as you scroll (photo → arch → ring → planet, in reverse) until the photograph fills the screen. Its title and caption, a contact strip of the world's other frames, and links into the world and the Index then rise over it.                           |
+| **Rail**    | Desktop only: a small vertical rail of planet thumbnails marks the current chapter and jumps between them.                                                                                                                                                                                                                             |
+| **Closing** | "Every world, on one sheet." A row of planets linking to each world, then the Index, Field Notes and Signal.                                                                                                                                                                                                                           |
 
-## Visual system
+## Content controls (no code needed)
 
-The attached concept reference informed only the spatial idea: a foreground world in
-focus with later worlds visible through atmospheric depth. The implementation uses its
-own FrameOS geography, composition, copy, and camera grammar.
+Everything on the home page comes from the CMS (or `apps/web/src/content/worlds.ts` in
+fixture mode):
 
-Every generated frame belongs to one continuous landscape. The route begins above the
-whole archipelago, moves into the coastal Wander district, climbs to Sacred Geometry,
-shrinks into the rain-leaf valley of Small Wonders, passes through Living Things, and
-settles at the circular Table Notes gathering. A warm thread of captured sunlight links
-every district.
+- **Which worlds appear, and in what order**: every `world` that is **Active** and has at
+  least one published photograph, sorted by **Navigation order**. A new world appears
+  automatically; an empty one stays off the home page until it has a photo.
+- **Colours**: the world's **Photographic atmosphere** (`mood`). `wash` tints the stage and
+  the planet's halo, `deep` the bezel and dark-theme stage, `accent` the numbers and focus.
+- **Pocket planet** (`planet`, optional, under the Atmosphere tab in Studio):
+  - **Planet photograph**: the frame to curl. Defaults to the world's lead photograph. It's
+    also the frame the chapter unrolls into and opens with.
+  - **Horizon** (0.2–1.2, default 0.55): how much of the frame becomes ground. Lower values
+    gather the bottom of the photo into a tight core and give the sky most of the disc.
+- **Copy**: the headline, eyebrow, intro and SEO come from the `homePage` document.
 
-Shared visual language:
+**Choosing a planet photograph.** Landscapes with ground at the bottom and sky at the top
+make the clearest planets (Living Things' _Grazing_, Wander's _The Waterfall_). Close-ups
+and top-down food shots make kaleidoscopes, which work too (Small Wonders, Table Notes).
+Very dark frames make dark planets. Check the result on the site after publishing (or on a
+local dev server pointed at the dataset) and adjust **Horizon** to taste.
 
-- handcrafted architectural-scale realism with believable terrain and water;
-- warm ivory mist, ocean teal, leaf green, temple terracotta, and charcoal;
-- warm natural sunlight and delicate atmospheric perspective;
-- controlled tilt-shift depth that feels photographic rather than toy-like;
-- no lettering, logos, picture frames, UI, neon science-fiction light, or generic glossy
-  plastic.
+## How it is drawn
 
-The six lossless 1664×936 Flow inputs live in:
+The unfold is a continuous family of mappings from screen pixels back to the photo,
+parameterized by `t` (0 = flat photo, 1 = closed planet):
 
-`media-production/pocket-worlds-flow/inputs/`
+1. **Bend.** The photo's bottom edge is wrapped around a circle below it. Curvature grows
+   from ~0 (flat) to the point where two mirrored copies of the photo fill one full turn,
+   so the closed planet has no seam. The arc-length formula is written to stay exact as
+   curvature → 0, so the flat end matches a `object-fit: cover` photo pixel for pixel.
+2. **Scale and travel.** The photo shrinks from cover size to the planet's radius, and the
+   bend's centre travels to the planet's resting position.
+3. **Close the core.** Over the last half, the radial mapping blends from linear (a ring with
+   a hole) to stereographic (`atan(r / horizon)`), which gathers the photo's bottom rows
+   into the core. Both mappings share one centre and agree at the rim, so there is never a
+   double edge.
+4. **Atmosphere.** A soft limb darkening and a halo in the world's `wash` colour fade in as
+   the planet closes.
 
-Responsive web versions live in:
+The same closed-planet mapping exists on the CPU (`samplePlanetUv`) for browsers without
+WebGL, and is unit-tested.
 
-`public/media/pocket-worlds/keyframes/`
+### Three render modes per chapter
 
-## Source photography
+| Mode     | When                                        | Behaviour                                                                                                                             |
+| -------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `gl`     | WebGL available, motion allowed             | The shader unrolls the planet frame by frame. Once flat, the real responsive `<img>` (sharper than the texture) takes over invisibly. |
+| `css`    | No WebGL (and `gl` while its texture loads) | A still planet (painted once) hands over to the photo through an opening circular iris (`clip-path`).                                 |
+| `static` | `prefers-reduced-motion`, no JavaScript     | A calm editorial layout: planet beside the copy, the photograph below, the strip under it. **This is what the server renders.**       |
 
-Only bundled FrameOS photography informed the visual worlds:
+The orrery, rail and closing planets are always **still** planets: painted once into a 2D
+canvas through one shared offscreen WebGL context (or the CPU fallback), then turned with
+CSS. Until painted, and without JavaScript, each shows a soft disc in the photo's palette,
+so nothing shifts when the planet arrives.
 
-- Wander: `the-sea`, `the-waterfall`, `passing-overhead`;
-- Sacred Geometry: `tower-and-sky`, `white-tower`, `the-chariot`;
-- Small Wonders: `leaf-after-rain`, `rain-on-the-street`, `yellow-flowers`, `cosmos`,
-  `tomatoes-on-the-vine`;
-- Living Things: `parakeet`, `the-cat`, `grazing`;
-- Table Notes: `banana-leaf-meal`, `paneer-skewers`, `toasted`, `small-plate`.
+## Performance budget
 
-Source photographs remain photographs in the collection routes. Generated media is only
-the homepage's cinematic connective tissue.
+- Server-rendered and complete without JavaScript; no WebGL work happens before hydration.
+- No 3D engine: the renderer is raw WebGL1 (works everywhere) with one triangle and one
+  texture per chapter. Textures are redrawn to power-of-two sizes so mipmaps keep planets
+  alias-free on every GPU.
+- A chapter only creates its WebGL context when it comes within one viewport, only draws on
+  scroll (or while its planet is visibly turning), and disposes the context on unmount.
+  DPR is capped at 1.75.
+- The orrery runs one `requestAnimationFrame` loop for all planets and pauses off-screen,
+  in background tabs, and while hovered.
+- Textures load at the size they're drawn: ~480–1024 px for still planets and 1600 px for
+  the unfold (bundled variants locally, Sanity CDN transforms in production).
 
-## Camera architecture
+## Accessibility
 
-The production target is architecture A: five uninterrupted forward legs through one
-connected geography. It adapts the `scroll-world` frame-seeking mechanics to this
-particular concept instead of imposing a repeated dive-and-pull-out template.
+- Reduced motion gets the static layout: nothing turns, nothing scrubs.
+- Planets are decorative (`aria-hidden`); every world is a real link with a text label
+  (name, line, frame count), reachable by keyboard, with visible focus.
+- Chapter copy is real headings and text, readable whatever the unfold state.
+- The rail is a labelled `nav` with `aria-current="location"` on the active chapter.
 
-| Leg | Camera journey                    |
-| --- | --------------------------------- |
-| 01  | complete aerial overview → Wander |
-| 02  | Wander → Sacred Geometry          |
-| 03  | Sacred Geometry → Small Wonders   |
-| 04  | Small Wonders → Living Things     |
-| 05  | Living Things → Table Notes       |
-
-The camera never resets, pulls backward, or teleports between islands. Each leg ends with
-a slow forward velocity that the next leg inherits.
-
-Continuity rule: leg 01 uses the generated overview as its first frame. Legs 02–05 must
-use the accepted previous video's **actual rendered last frame** as their first frame.
-The supplied numbered keyframe remains the target last frame. This prevents a visible pop
-caused by generative drift at clip boundaries.
-
-## Google Flow render handoff
-
-The complete handoff is in:
-
-`media-production/pocket-worlds-flow/`
-
-It contains:
-
-- six lossless start/end frames in `inputs/`;
-- one self-contained prompt for every camera leg in `prompts/`;
-- a shared direction sheet;
-- `outputs/`, the exact destination for the five accepted MP4 files;
-- `handoffs/`, an optional place for saved actual-last-frame PNGs;
-- a local helper that extracts the exact final decoded frame when Flow does not expose a
-  convenient saved-frame action.
-
-Follow the numbered render order in
-[media-production/pocket-worlds-flow/README.md](../media-production/pocket-worlds-flow/README.md).
-Use Flow's Video → Frames mode, 16:9, eight seconds, and a currently available model that
-supports both first and last frames. The Flow feature matrix can vary by account and
-region, so confirm that capability before rendering.
-
-Expected source files:
+## Files
 
 ```text
-media-production/pocket-worlds-flow/outputs/
-  01-overview-to-wander.mp4
-  02-wander-to-sacred-geometry.mp4
-  03-sacred-geometry-to-small-wonders.mp4
-  04-small-wonders-to-living-things.mp4
-  05-living-things-to-table-notes.mp4
+apps/web/src/routes/index.tsx                       loader: homePage + worlds overview
+apps/web/src/lib/world-overview.ts                  worlds ⨯ photos → WorldOverview (tested)
+apps/web/src/server/repository/portfolio.ts         getWorldsOverview()
+apps/web/src/components/home/
+  PocketWorldsHome.tsx                              page composition, rail, closing
+  HomeOrrery.tsx, orrery-math.ts                    the opening plate (tested)
+  WorldChapter.tsx, chapter-mode.ts                 one world: planet → photo
+  planet/planet-math.ts                             shader + CPU mapping + choreography (tested)
+  planet/planet-renderer.ts                         WebGL renderer, still-planet painter
+  planet/PlanetStill.tsx, planet/photo-source.ts    still planets, texture URLs, placeholders
+apps/web/src/styles/home.css                        all home styles (imported by styles.css)
+apps/studio/schemaTypes/documents/world.ts          the `planet` field
 ```
 
-After accepting legs 01–04, the next start frame can be extracted locally with:
-
-```powershell
-./scripts/pocket-worlds/extract-flow-handoff.ps1 -Leg 1
-```
-
-Repeat with `-Leg 2`, `-Leg 3`, and `-Leg 4`. Each generated PNG is written to
-`media-production/pocket-worlds-flow/handoffs/` and is ready to upload as the next Flow
-start frame.
-
-## Ingestion and approval
-
-After all five accepted renders are present, run:
-
-```powershell
-./scripts/pocket-worlds/ingest-flow-videos.ps1
-```
-
-This performs all local production work in one pass:
-
-- native-resolution desktop H.264 encoding;
-- 720p-or-smaller mobile H.264 encoding with tighter keyframes;
-- audio removal and fast-start metadata;
-- poster extraction from the encoded first frames;
-- codec, resolution, pixel-format, duration, and size inspection;
-- poster-to-first-frame SSIM checks;
-- actual-last-frame to next-first-frame SSIM checks;
-- a machine-readable verification report;
-- a measured runtime manifest that remains locked.
-
-Review the encoded journey at full size. If it is visually approved, run:
-
-```powershell
-./scripts/pocket-worlds/ingest-flow-videos.ps1 -ApproveVisual
-```
-
-The script sets `ready: true` only when visual approval is supplied and every structural
-and SSIM check passes. Never unlock the manifest by hand.
-
-## Media contract
-
-The runtime reads:
-
-`/media/pocket-worlds/manifests/web-manifest.json`
-
-It does not request MP4 files unless that manifest is valid, complete, measured, and
-`ready: true`.
-
-```text
-public/media/pocket-worlds/
-  keyframes/   # responsive generated overview and five world stills
-  master/      # native-resolution H.264 Flow clips
-  mobile/      # 720p-or-smaller, tighter-GOP phone clips
-  posters/     # posters extracted from encoded desktop and mobile clips
-  manifests/   # runtime manifest and verification results
-```
-
-Raw Flow exports stay in the gitignored `media-production/.../outputs/` directory.
-Temporary decoded first/last frames stay under the gitignored
-`artifacts/pocket-worlds/` directory.
-
-## Encoding rules
-
-Desktop/master clips:
-
-- retain native source resolution;
-- H.264, `yuv420p`, CRF 20, slow preset;
-- GOP 8, minimum keyframe interval 8, scene-cut keyframes disabled;
-- no audio;
-- `faststart` enabled;
-- restrained sharpening.
-
-Phone clips:
-
-- scale down to 720p without upscaling smaller sources;
-- H.264, `yuv420p`, CRF 23;
-- GOP 4, minimum keyframe interval 4;
-- no audio and `faststart` enabled.
-
-SSIM scores at or above 0.90 pass. Scores from 0.75 to 0.90 are warnings; lower scores
-fail. Only an all-pass report can enable cinematic video mode.
-
-## Runtime ownership
-
-- `src/content/pocket-worlds-journey.ts` — typed editorial journey and generated fallbacks;
-- `PocketWorldsExperience.tsx` — SSR editorial floor and client-only upgrade boundary;
-- `PocketWorldsCinematic.tsx` — scroll mapping, media lifecycle, copy phases, and route rail;
-- `src/lib/pocket-world-media.ts` — strict runtime manifest contract;
-- `public/media/pocket-worlds/manifests/web-manifest.json` — deploy-time readiness.
-
-The controller adapts the hardened `scroll-world` mechanics to React ownership:
-
-- raw scroll progress stays in refs and direct DOM updates;
-- React state changes only for active segment, active world, and copy phase;
-- architecture A changes the active world midway through each forward leg;
-- clips are fetched as blobs for reliable in-memory seeking;
-- only nearby segments are prefetched;
-- mobile seeks are coalesced while the decoder is busy;
-- muted videos are primed on first touch for iOS;
-- rejected playback falls back to stills without an error screen;
-- listeners, animation frames, fetches, videos, and object URLs are released on unmount;
-- homepage progress is restored after world-route back navigation.
-
-## Progressive enhancement
-
-### Basic DOM
-
-The server response contains one H1, five world H2s, every summary, and real links to each
-world, the Index, Field Notes, and Signal. JavaScript is not required for understanding or
-navigation.
-
-### Stills journey
-
-Used while videos are pending and for reduced motion, data saver, slow connections,
-constrained memory, missing or invalid manifests, fetch failure, and rejected playback.
-It uses the generated connected-world keyframes, preserves the same route rail and copy,
-and makes no MP4 request.
-
-### Cinematic journey
-
-Used only when motion is allowed, device and network signals are adequate, and the media
-manifest has passed production verification. Wide viewports use master media; phones use
-the tighter-GOP mobile files.
-
-## Accessibility, navigation, and SEO
-
-- semantic copy and real TanStack Router links remain DOM-owned;
-- inactive cinematic copy leaves the tab order and accessibility tree;
-- route-rail controls are labelled and expose the current step;
-- focus styles remain visible over every scene;
-- videos are silent and always muted;
-- reduced-motion visitors receive the complete still experience;
-- the Index remains available in the global header and cinematic chrome;
-- browser back/forward and direct world routes remain standard navigation;
-- the SSR homepage contains the full editorial floor before hydration;
-- hidden portraits remain excluded by existing publication guards.
-
-## Verification status
-
-Completed against the generated still journey and synthetic video harness:
-
-- desktop and phone sticky-layout inspection;
-- forward and reverse scroll mapping;
-- active-world CTA navigation;
-- browser back/forward with progress restoration;
-- reduced-motion and data-saver modes with zero MP4 requests;
-- blob-backed video loading and scroll-to-time seeking;
-- bounded adjacent prefetch;
-- simulated playback rejection with a clean still fallback;
-- TypeScript, ESLint, unit, and production-build checks.
-
-Production durations, byte sizes, encoded posters, seam scores, and final device recordings
-remain pending until the five Flow exports are placed in `outputs/`.
-
-## Removal boundary
-
-After production media and fallbacks are visually verified, remove the obsolete
-`src/components/worlds/spatial/` tree, `src/lib/capability.ts`, and unused Three/R3F
-dependencies. Do not remove publication guards, world routes, photo-detail pages, Index,
-Field Notes, Signal, responsive image infrastructure, or the editorial fallback.
+To tune the choreography, change `CHAPTER_PHASES` in `planet-math.ts` (when the planet
+starts unrolling and when the photo is flat) and the chapter height in `home.css`
+(`.chapter[data-mode='gl']`, currently `280svh`).

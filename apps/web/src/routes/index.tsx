@@ -1,16 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
-import { PocketWorldsHome } from '@/components/worlds/PocketWorldsHome'
-import { getGalleryFeedServer, getHomeViewServer } from '@/server/server-functions/portfolio'
+import { PocketWorldsHome } from '@/components/home/PocketWorldsHome'
+import { getHomeViewServer, getWorldsOverviewServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/')({
   loader: async () => {
-    const [home, feed] = await Promise.all([
-      getHomeViewServer(),
-      getGalleryFeedServer({ data: { limit: 48 } }),
-    ])
-    return { home, feed }
+    const [home, overview] = await Promise.all([getHomeViewServer(), getWorldsOverviewServer()])
+    return { home: home!, overview: overview! }
   },
   staleTime: 60_000,
   gcTime: 300_000,
@@ -28,26 +25,19 @@ export const Route = createFileRoute('/')({
 })
 
 function HomeRoute() {
-  const { home, feed } = Route.useLoaderData()
-  const photos = feed.items.map((item) => item.photo)
-  const worldCounts = photos.reduce<Record<string, number>>((counts, photo) => {
-    if (photo.category) {
-      counts[photo.category] = (counts[photo.category] ?? 0) + 1
-    }
-    return counts
-  }, {})
+  const { home, overview } = Route.useLoaderData()
 
   return (
-    <main id="worlds">
-      <PocketWorldsHome frameCount={photos.length} worldCounts={worldCounts} />
-
-      {feed.isDegraded || home?.isDegraded ? (
-        <div className="page-shell px-4 py-8">
+    <main id="worlds" className="home-main">
+      {overview.isDegraded || home.isDegraded ? (
+        <div className="page-shell px-4 pt-6">
           <StatusBanner title="Serving cached content.">
             The archive is showing its last successful snapshot while the image provider recovers.
           </StatusBanner>
         </div>
       ) : null}
+
+      <PocketWorldsHome page={home.page} overviews={overview.worlds} />
     </main>
   )
 }

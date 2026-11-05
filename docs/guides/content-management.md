@@ -39,16 +39,50 @@ create a second copy or delete the only one.
 
 ## Worlds
 
-Worlds are first-class documents rather than a hardcoded dropdown. Create a
-world, set its slug, short line, optional description, order, color mood, hero
-photo, and SEO fields, then publish it. An active world automatically appears
-in the Index filters and gains a route at `/worlds/<slug>`. Its page is a
-single interactive photo dome with an accessible text index; images are not
-duplicated in a second gallery below it.
+Worlds are first-class documents rather than a hardcoded dropdown. Every active world
+that has at least one published photograph appears, with no code change, in:
 
-Set a world to **Hidden** to keep the document and its photo relationships
-without exposing it in public world navigation. Every photo references a
-world document, so renaming world copy or updating its colors happens once.
+- the home page, as a **pocket planet** in the opening orrery and as its own chapter (see
+  [../pocket-worlds.md](../pocket-worlds.md));
+- the Index filters (`/archive?world=<slug>`);
+- its own page at `/worlds/<slug>`, with previous/next world navigation;
+- every photo page that belongs to it.
+
+Set a world to **Hidden** to keep the document and its photo relationships without
+exposing it anywhere public. Every photo references a world document, so renaming a
+world or changing its colours happens once.
+
+### Adding a world
+
+1. **Worlds → Create**. Fill in **Name** (the slug is generated from it), the
+   **One-line statement**, and optionally a **Description** (used for search and sharing).
+2. **Organization**: keep **Visibility** on _Active_ and set **Navigation order**: lower
+   numbers come first everywhere (home, Index filters, world navigation). The launch
+   worlds use 10, 20, 30… so you can slot a new one in between.
+3. **Atmosphere**: pick the three **Photographic atmosphere** colours (hex):
+   - _Ambient wash_: a pale tint for backgrounds and the planet's halo;
+   - _Depth tone_: a deep companion colour for overlays and the dark theme;
+   - _Focus accent_: numbers, focus rings, and highlights.
+
+   Sampling them from the world's best photograph works well.
+
+4. Publish. Then move or upload photos into it (set each photo's **World**). The world
+   appears on the site as soon as its first photo is published.
+5. Optionally choose a **Lead photograph** (the representative frame for sharing and
+   navigation) and tune its **Pocket planet** (below).
+
+### Tuning a world's pocket planet
+
+Under **Atmosphere → Pocket planet** (both optional):
+
+| Field                 | Default             | Effect                                                                                                                                                                       |
+| --------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Planet photograph** | the lead photograph | The frame curled into the planet. The world's home chapter also unrolls into it and opens on it. Any published photo works, even one from another world.                     |
+| **Horizon**           | 0.55                | How much of the frame becomes ground, 0.2–1.2. Lower gathers the bottom of the photo into a tight core and gives the sky most of the disc; higher gives a broad, flat world. |
+
+Landscapes with ground at the bottom and sky at the top make the clearest planets.
+Close-ups and top-down shots make kaleidoscopes, which also work. Very dark photos make
+dark planets, so pick another frame for those worlds.
 
 ## The `photo` document
 
@@ -64,6 +98,23 @@ world document, so renaming world copy or updating its colors happens once.
 | `captureDate`                                                      | Same override behavior as the capture-data fields above.                                                                                                                                                                      |
 | `sortOrder`                                                        | Higher numbers sort first in the gallery.                                                                                                                                                                                     |
 
+### Adding a photo
+
+1. **Photos → Create**, drop the image in. Sanity extracts dimensions, palette, blur
+   placeholder, EXIF and GPS automatically.
+2. Fill **Title** and **Alt text** (required: publishing is blocked without it), and
+   optionally **Caption** / **Description**.
+3. Pick its **World**. Add **Tags** (each becomes a filter link on the photo page and in
+   the Index), a **Location label** and **Series** if useful.
+4. Drag the **hotspot** onto the subject so square/portrait crops keep it in frame.
+5. Leave the capture fields empty to use the camera's EXIF, or fill them to override.
+6. Publish. The photo appears in its world, the Index, the home chapter's contact strip,
+   and previous/next navigation, with no code changes.
+
+All capture metadata (camera, lens, focal length, aperture, shutter, ISO, dimensions,
+capture date, location) is shown in the photo page's capture-data panel. Fields without a
+value are hidden, never guessed.
+
 ### Draft vs. published vs. archived
 
 - **Draft**: the normal Sanity "unpublished changes" state. Draft photos are
@@ -78,10 +129,23 @@ world document, so renaming world copy or updating its colors happens once.
 
 ## Featuring photos on Home / About
 
-`homePage.featuredPhotos` and `aboutPage.photoHighlights` are references to
-existing `photo` documents (1–6 each) — pick from the library rather than
-uploading a new image. This means a photo's title/alt/camera data etc. only
-ever lives in one place.
+The home page is built from worlds (above), not from a featured list.
+`homePage` still supplies its **eyebrow**, **headline**, **intro** and **SEO**.
+`homePage.featuredPhotos` is kept for sharing/SEO fallbacks, and
+`aboutPage.photoHighlights` picks the Field Notes stills. Both are references to
+existing `photo` documents (1–6 each), so a photo's title/alt/camera data only ever
+lives in one place.
+
+## Fixture mode: adding content without Sanity
+
+Without Sanity credentials the site runs on `apps/web/src/content/worlds.ts`:
+
+- **Worlds**: the `worlds` array (same fields as the Studio document, including
+  `planet: { photo: { slug }, horizon }`).
+- **Photos**: put the original in `apps/web/photo-source/<id>.<ext>`, run
+  `pnpm photos:build` (see [getting-started.md](./getting-started.md)), then add an
+  entry to the `editorial` array with its `id`, `world`, `title`, `alt`, optional
+  `caption`, `tags` and `sortOrder`.
 
 ## Schema extraction and GROQ TypeGen
 

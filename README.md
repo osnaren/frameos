@@ -76,7 +76,7 @@ packages/
   typescript-config/  Shared tsconfig base
   content-schema/      Shared content/photo TypeScript types (types-only, no build step)
 docs/           Architecture, guides, decision records (see docs/README.md)
-media-production/  Creative-production inputs/outputs for the Pocket Worlds photo/video set
+media-production/  Archived creative inputs from the retired video homepage (unused by the app)
 ```
 
 - `apps/web/src/routes/` — TanStack Start file-based routes (pages + `api/**` handlers)

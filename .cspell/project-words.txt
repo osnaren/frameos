@@ -139,3 +139,7 @@ stripwood
 backgrounded
 kilometre
 recolouring
+highp
+stereographically
+webglcontextlost
+SSIM

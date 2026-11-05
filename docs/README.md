@@ -7,14 +7,16 @@ giant file.
 
 ## Start here
 
-| I want to...                         | Read                                                                     |
-| ------------------------------------ | ------------------------------------------------------------------------ |
-| Run the app locally                  | [guides/getting-started.md](guides/getting-started.md)                   |
-| Understand the system end-to-end     | [architecture/overview.md](architecture/overview.md)                     |
-| Add or edit photos and pages         | [guides/content-management.md](guides/content-management.md)             |
-| Deploy or configure hosting          | [guides/deployment.md](guides/deployment.md)                             |
-| Look up an environment variable      | [reference/environment-variables.md](reference/environment-variables.md) |
-| Understand _why_ a decision was made | [decisions/](decisions/)                                                 |
+| I want to...                         | Read                                                                        |
+| ------------------------------------ | --------------------------------------------------------------------------- |
+| Run the app locally                  | [guides/getting-started.md](guides/getting-started.md)                      |
+| Understand the system end-to-end     | [architecture/overview.md](architecture/overview.md)                        |
+| Add or edit photos and pages         | [guides/content-management.md](guides/content-management.md)                |
+| Add a new world or tune its planet   | [guides/content-management.md](guides/content-management.md#adding-a-world) |
+| Understand the home page             | [pocket-worlds.md](pocket-worlds.md)                                        |
+| Deploy or configure hosting          | [guides/deployment.md](guides/deployment.md)                                |
+| Look up an environment variable      | [reference/environment-variables.md](reference/environment-variables.md)    |
+| Understand _why_ a decision was made | [decisions/](decisions/)                                                    |
 
 ## Structure
 
@@ -33,11 +35,11 @@ docs/
 │   ├── 0001-tanstack-start-baseline.md
 │   ├── 0002-remove-cloudinary.md
 │   ├── 0003-standalone-sanity-studio.md
-│   └── 0004-monorepo-restructure.md
+│   ├── 0004-monorepo-restructure.md
+│   └── 0005-pocket-planet-homepage.md
 ├── reference/               Lookup tables
 │   └── environment-variables.md
-├── pocket-worlds.md         Production notes for the cinematic homepage
-└── video-pocket-worlds.md   Original creative brief (historical)
+└── pocket-worlds.md         The home page: pocket planets, how they're drawn, CMS controls
 ```
 
 ## Keeping this up to date
