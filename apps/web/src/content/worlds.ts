@@ -34,7 +34,7 @@ export type WorldDefinition = World & { slug: WorldSlug; heroId: string }
 export const worlds: WorldDefinition[] = [
   {
     slug: 'wander',
-    planet: { photo: { slug: 'the-waterfall' }, horizon: 0.55 },
+    planet: { photo: { slug: 'the-waterfall' }, horizon: 0.8 },
     name: 'Wander',
     line: 'Places passed through, horizons kept.',
     description: 'Open horizons, movement, and places passed through slowly enough to keep.',

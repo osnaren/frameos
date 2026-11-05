@@ -73,7 +73,7 @@ export function PlanetStill({
           paint()
         }
       },
-      { rootMargin: '400px' }
+      { rootMargin: '1200px 0px' }
     )
     observer.observe(canvas)
     return () => {

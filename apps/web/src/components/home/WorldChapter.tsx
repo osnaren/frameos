@@ -281,8 +281,10 @@ export function WorldChapter({
           <p className="display-italic chapter__line">{world.line}</p>
           <p className="mono-label chapter__count">
             {String(photoCount).padStart(2, '0')} {photoCount === 1 ? 'frame' : 'frames'}
-            <span aria-hidden="true"> · </span>
-            <span className="chapter__hint">Scroll to unfold</span>
+            <span className="chapter__hint">
+              <span aria-hidden="true"> · </span>
+              Scroll to unfold
+            </span>
           </p>
         </header>
 

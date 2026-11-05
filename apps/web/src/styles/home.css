@@ -623,8 +623,8 @@
 
 .chapter[data-mode='css'] .chapter__planet,
 .chapter[data-mode='gl']:not([data-gl='ready']) .chapter__planet {
-  scale: calc(1 + (1 - var(--t)) * 1.6);
-  opacity: clamp(0, calc(var(--t) * 1.8 - 0.4), 1);
+  scale: calc(1 + (1 - var(--t)) * 1.2);
+  opacity: clamp(0, calc((var(--t) - 0.55) * 3.2), 1);
 }
 
 /* --- copy: the intro belongs to the planet, the caption to the photo --- */
