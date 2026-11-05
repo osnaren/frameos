@@ -4,11 +4,13 @@ import {
   HeadContent,
   Scripts,
   createRootRoute,
+  useRouter,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 
 import { NotFound } from '@/components/content/NotFound'
 import { ServiceState } from '@/components/content/ServiceState'
+import { NavigationProgress } from '@/components/layout/NavigationProgress'
 import { ViewfinderCursor } from '@/components/layout/ViewfinderCursor'
 import { SITE_NAME, THEME_COLORS } from '@/lib/seo'
 
@@ -88,8 +90,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
+        <NavigationProgress />
         <Header />
-        <div id="main-content" className="relative pb-20">
+        {/* Focusable so the skip link and route changes can move focus here. */}
+        <div id="main-content" tabIndex={-1} className="relative pb-20 outline-none">
           {children}
         </div>
         <Footer />
@@ -100,14 +104,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   )
 }
 
-function RootErrorBoundary({ error }: ErrorComponentProps) {
-  const message = error instanceof Error ? error.message : 'The route could not be rendered.'
+function RootErrorBoundary({ error, reset }: ErrorComponentProps) {
+  const router = useRouter()
 
   // Rendered inside RootDocument's own outlet by the router — do not
   // re-wrap with <RootDocument>, which would nest a second <html>/<body>.
   return (
     <main className="page-shell px-4 pt-12">
-      <ServiceState title="The archive needs a moment." body={message} />
+      <ServiceState
+        title="The archive needs a moment."
+        body="This page didn’t develop properly — usually the photo service is briefly out of reach. Nothing is lost: try again, or keep browsing the Index."
+        onRetry={() => {
+          // Re-run the loaders, then let the boundary render the route again.
+          void router.invalidate().finally(reset)
+        }}
+        debug={import.meta.env.DEV && error instanceof Error ? error.message : undefined}
+      />
     </main>
   )
 }
