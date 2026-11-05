@@ -22,8 +22,8 @@ import {
 } from '@/lib/gallery-search'
 import { contactSheetTileSizes } from '@/lib/image-policy'
 import { useHydratedReducedMotion } from '@/lib/motion'
-import { buildSeoHead, collectionPageJsonLd, getPhotoShareImage } from '@/lib/seo'
 import { photoOriginState, type PhotoOrigin } from '@/lib/photo-origin'
+import { buildSeoHead, collectionPageJsonLd, getPhotoShareImage } from '@/lib/seo'
 import { getWorldsServer } from '@/server/server-functions/portfolio'
 
 import type { World } from '@/types/content'

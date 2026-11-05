@@ -24,7 +24,6 @@ import { isInPublicWorld } from '@/lib/gallery-search'
 import { resolveSwipe } from '@/lib/gestures'
 import { containedImageSizes } from '@/lib/image-policy'
 import { useHydratedReducedMotion } from '@/lib/motion'
-import { buildSeoHead, getPhotoShareImage, photographJsonLd } from '@/lib/seo'
 import {
   carryPhotoOrigin,
   describePhotoOrigin,
@@ -33,6 +32,7 @@ import {
   type PhotoOrigin,
 } from '@/lib/photo-origin'
 import { preloadPhoto, resolvePhotoSources } from '@/lib/photo-sources'
+import { buildSeoHead, getPhotoShareImage, photographJsonLd } from '@/lib/seo'
 import { getPhotoDetailServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 import type { Photo } from '@/types/photo'
