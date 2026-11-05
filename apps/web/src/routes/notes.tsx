@@ -5,8 +5,9 @@ import { motion, useScroll } from 'framer-motion'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
+import { NotesSkeleton } from '@/components/layout/RouteSkeletons'
 import { PhotoImage } from '@/components/photo/PhotoImage'
-import { contactSheet, revealVariants, useHydratedReducedMotion } from '@/lib/motion'
+import { useHydratedReducedMotion } from '@/lib/motion'
 import { buildSeoHead } from '@/lib/seo'
 import { getAboutViewServer } from '@/server/server-functions/portfolio'
 
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/notes')({
           image: loaderData.shareImage,
         })
       : {},
+  pendingComponent: NotesSkeleton,
   component: FieldNotesRoute,
 })
 
@@ -42,9 +44,18 @@ function ReadingProgress({ target }: { target: React.RefObject<HTMLElement | nul
   return <motion.div className="reading-progress" style={{ scaleX: scrollYProgress }} />
 }
 
+function delay(ms: number) {
+  return { '--enter-delay': `${ms}ms` } as React.CSSProperties
+}
+
+/**
+ * Field Notes. Reveals are CSS: the hero settles in from the first painted
+ * frame and later sections reveal as they scroll into view (where the
+ * browser supports scroll-driven animation) — nothing waits on hydration,
+ * so there is never an invisible heading or a blank band on first paint.
+ */
 function FieldNotesRoute() {
   const data = Route.useLoaderData()!
-  const reducedMotion = useHydratedReducedMotion()
   const pageRef = useRef<HTMLElement>(null)
   const lead = data.gallery.at(0)
   const stills = data.gallery.slice(1)
@@ -54,17 +65,12 @@ function FieldNotesRoute() {
     <main ref={pageRef} className="field-notes-page">
       <ReadingProgress target={pageRef} />
 
-      <motion.header
-        className="page-shell field-notes-hero"
-        initial="hidden"
-        animate="visible"
-        variants={contactSheet}
-      >
-        <motion.div className="field-notes-title" variants={revealVariants(reducedMotion)}>
+      <header className="page-shell field-notes-hero">
+        <div className="field-notes-title enter-focus">
           <p>Field Notes · an essay on attention</p>
           <h1>{data.page.headline}</h1>
-        </motion.div>
-        <motion.aside className="field-notes-intro" variants={revealVariants(reducedMotion)}>
+        </div>
+        <aside className="field-notes-intro enter-focus" style={delay(120)}>
           <p>
             A small manifesto for carrying less, looking longer, and letting the camera arrive after
             the moment has already asked to be seen.
@@ -73,22 +79,17 @@ function FieldNotesRoute() {
             Read the note
             <ArrowDownRight aria-hidden="true" />
           </a>
-        </motion.aside>
-      </motion.header>
+        </aside>
+      </header>
 
       {lead ? (
-        <motion.figure
-          className="field-notes-lead"
-          initial={reducedMotion ? undefined : { clipPath: 'inset(7% 5% 7% 5%)', opacity: 0.7 }}
-          animate={reducedMotion ? undefined : { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1 }}
-          transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
-        >
+        <figure className="field-notes-lead">
           <Link to="/photos/$slug" params={{ slug: slugOf(lead.photoHref) }}>
             <PhotoImage
               publicId={lead.imagePublicId}
               alt={lead.alt}
               preset="hero"
-              sizes="100vw"
+              sizes="(max-width: 1536px) calc(100vw - 2rem), 1536px"
               priority
               lqip={lead.imageLqip}
               hotspot={lead.imageHotspot}
@@ -99,7 +100,7 @@ function FieldNotesRoute() {
             <span>Opening frame</span>
             <em>{lead.title}</em>
           </figcaption>
-        </motion.figure>
+        </figure>
       ) : null}
 
       <section id="essay" className="page-shell field-notes-essay">
@@ -118,26 +119,20 @@ function FieldNotesRoute() {
           </div>
         </aside>
 
-        <motion.article
-          className="field-notes-copy"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={contactSheet}
-        >
+        <article className="field-notes-copy">
           {data.page.body.map((paragraph, index) => (
-            <motion.p key={paragraph.slice(0, 32)} variants={revealVariants(reducedMotion)}>
+            <p key={paragraph.slice(0, 32)} className="reveal-on-scroll">
               {index === 0 ? (
                 <span className="field-notes-dropcap">{paragraph.charAt(0)}</span>
               ) : null}
               {index === 0 ? paragraph.slice(1) : paragraph}
-            </motion.p>
+            </p>
           ))}
 
-          <motion.blockquote variants={revealVariants(reducedMotion)}>
+          <blockquote className="reveal-on-scroll">
             The phone is the camera that is present when something worth noticing happens.
-          </motion.blockquote>
-        </motion.article>
+          </blockquote>
+        </article>
       </section>
 
       <section className="page-shell field-notes-observations" aria-labelledby="noticing-heading">
@@ -147,16 +142,10 @@ function FieldNotesRoute() {
         </div>
         <ol>
           {NOTICING.map((item, index) => (
-            <motion.li
-              key={item}
-              initial={reducedMotion ? undefined : { opacity: 0, x: 24 }}
-              whileInView={reducedMotion ? undefined : { opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
-              transition={{ duration: 0.7, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <li key={item} className="reveal-on-scroll">
               <span>{String(index + 1).padStart(2, '0')}</span>
               <em>{item}</em>
-            </motion.li>
+            </li>
           ))}
         </ol>
       </section>
@@ -164,24 +153,20 @@ function FieldNotesRoute() {
       {stills.length > 0 ? (
         <section className="field-notes-stills" aria-label="Selected field notes">
           {stills.map((item, index) => (
-            <motion.figure
+            <figure
               key={item.imagePublicId}
-              className={
+              className={`reveal-on-scroll ${
                 index % 2 === 1
                   ? 'field-notes-still field-notes-still--offset'
                   : 'field-notes-still'
-              }
-              initial={reducedMotion ? undefined : { opacity: 0, y: 48, filter: 'blur(8px)' }}
-              whileInView={reducedMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
-              viewport={{ once: true, amount: 0.18 }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              }`}
             >
               <Link to="/photos/$slug" params={{ slug: slugOf(item.photoHref) }}>
                 <PhotoImage
                   publicId={item.imagePublicId}
                   alt={item.alt}
                   preset="card"
-                  sizes="(max-width: 760px) 92vw, 54vw"
+                  sizes="(max-width: 540px) calc(100vw - 2rem), (max-width: 780px) 82vw, min(68vw, 62rem)"
                   lqip={item.imageLqip}
                   hotspot={item.imageHotspot}
                   className="field-notes-still-image"
@@ -192,7 +177,7 @@ function FieldNotesRoute() {
                 <em>{item.title}</em>
                 <span>Field note</span>
               </figcaption>
-            </motion.figure>
+            </figure>
           ))}
         </section>
       ) : null}
@@ -202,6 +187,10 @@ function FieldNotesRoute() {
         <div>
           <Link to="/archive">
             Open the full index
+            <ArrowUpRight aria-hidden="true" />
+          </Link>
+          <Link to="/" hash="worlds">
+            Wander the worlds
             <ArrowUpRight aria-hidden="true" />
           </Link>
           <Link to="/signal">

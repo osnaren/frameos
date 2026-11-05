@@ -4996,7 +4996,7 @@ a:focus-visible .frame-corners {
 
 .signal-address-block > span {
   display: block;
-  color: rgba(244, 240, 232, 0.45);
+  color: rgba(244, 240, 232, 0.62);
   font-family: var(--font-mono);
   font-size: 0.55rem;
   letter-spacing: 0.14em;
@@ -5103,11 +5103,29 @@ a:focus-visible .frame-corners {
   justify-content: space-between;
   border-top: 1px solid rgba(244, 240, 232, 0.16);
   padding-top: 0.8rem;
-  color: rgba(244, 240, 232, 0.42);
+  color: rgba(244, 240, 232, 0.62);
   font-family: var(--font-mono);
-  font-size: 0.54rem;
+  font-size: 0.58rem;
   letter-spacing: 0.13em;
   text-transform: uppercase;
+}
+
+.signal-footerline a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: rgba(244, 240, 232, 0.82);
+  text-decoration-color: rgba(244, 240, 232, 0.3);
+  text-underline-offset: 3px;
+}
+
+.signal-footerline a:hover,
+.signal-footerline a:focus-visible {
+  color: #f4f0e8;
+}
+
+.signal-footerline > span {
+  align-self: center;
 }
 
 @media (max-width: 900px) {
@@ -5187,14 +5205,15 @@ a:focus-visible .frame-corners {
   color: var(--ink);
 }
 
+/* No min-height + bottom alignment here: that combination pushed the heading
+   ~330px down a 900px-tall viewport, leaving a blank band on first paint. */
 .field-notes-hero {
   display: grid;
-  min-height: min(42rem, 76svh);
   grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.6fr);
   gap: clamp(2rem, 7vw, 7rem);
   align-items: end;
-  padding-top: clamp(7rem, 14vh, 11rem);
-  padding-bottom: clamp(3rem, 8vh, 6rem);
+  padding-top: clamp(3.5rem, 9vh, 6.5rem);
+  padding-bottom: clamp(2.5rem, 6vh, 4.5rem);
 }
 
 .field-notes-title > p,
@@ -5259,6 +5278,25 @@ a:focus-visible .frame-corners {
   position: relative;
   width: min(calc(100% - 2rem), 96rem);
   margin: 0 auto;
+  animation: notes-lead-open 1.3s cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+
+/* The opening frame unmasks like a shutter, starting on first paint. */
+@keyframes notes-lead-open {
+  from {
+    clip-path: inset(7% 5% 7% 5%);
+    opacity: 0.7;
+  }
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field-notes-lead {
+    animation: none;
+  }
 }
 
 .field-notes-lead > a {
@@ -5575,7 +5613,12 @@ a:focus-visible .frame-corners {
 
 @media (max-width: 540px) {
   .field-notes-hero {
-    padding-top: 7rem;
+    gap: 1.75rem;
+    padding-top: 2.5rem;
+  }
+
+  .field-notes-intro {
+    justify-self: stretch;
   }
 
   .field-notes-title h1 {
