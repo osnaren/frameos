@@ -53,7 +53,7 @@ export const Route = createFileRoute('/archive')({
   // totals, and nothing past the first page can silently go missing.
   loader: async () => {
     const [worlds, feed] = await Promise.all([getWorldsServer(), loadCompleteGalleryFeed()])
-    return { feed, worlds: worlds! }
+    return { feed, worlds }
   },
   staleTime: 30_000,
   gcTime: 300_000,

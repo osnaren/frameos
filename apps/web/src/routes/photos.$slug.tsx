@@ -43,8 +43,8 @@ export const Route = createFileRoute('/photos/$slug')({
       getPhotoDetailServer({ data: { slug: params.slug } }),
       getWorldsServer(),
     ])
-    const photo = detail!.photo
-    const worldSlugs = worlds!.map((world) => world.slug)
+    const photo = detail.photo
+    const worldSlugs = worlds.map((world) => world.slug)
 
     // Fail closed: a photo filed under a world that isn't public stays private.
     if (!isInPublicWorld(photo, worldSlugs)) {
@@ -58,7 +58,7 @@ export const Route = createFileRoute('/photos/$slug')({
       .map((item) => item.photo)
       .filter((entry) => isInPublicWorld(entry, worldSlugs))
 
-    return { detail: detail!, worlds: worlds!, sequence }
+    return { detail, worlds, sequence }
   },
   staleTime: 60_000,
   gcTime: 300_000,

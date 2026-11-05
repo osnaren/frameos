@@ -86,6 +86,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           content={THEME_COLORS.light}
         />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content={THEME_COLORS.dark} />
+        {/* Must run before first paint to avoid a theme flash. THEME_INIT_SCRIPT is a
+            module constant with no user input, so injecting it is safe. */}
+        {/* skipcq: JS-0440 */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>

@@ -96,20 +96,20 @@ export function invalidateAllPhotosCache() {
 }
 
 function getSanityClient() {
-  if (!hasSanityConfig()) {
-    return null
-  }
-
   if (sanityClient) {
     return sanityClient
   }
 
   const env = getServerEnv()
+  const { SANITY_DATASET: dataset, SANITY_PROJECT_ID: projectId } = env
+  if (!dataset || !projectId) {
+    return null
+  }
 
   sanityClient = createClient({
     apiVersion: env.SANITY_API_VERSION,
-    dataset: env.SANITY_DATASET!,
-    projectId: env.SANITY_PROJECT_ID!,
+    dataset,
+    projectId,
     token: env.SANITY_API_TOKEN,
     perspective: 'published',
     useCdn: false,
@@ -371,19 +371,11 @@ function decodeCursor(cursor?: string) {
 }
 
 function matchesFilters(photo: Photo, filters: PhotoFilters) {
-  if (filters.category && photo.category !== filters.category) {
-    return false
-  }
-
-  if (filters.series && photo.series !== filters.series) {
-    return false
-  }
-
-  if (filters.tag && !photo.tags.includes(filters.tag)) {
-    return false
-  }
-
-  return true
+  return (
+    (!filters.category || photo.category === filters.category) &&
+    (!filters.series || photo.series === filters.series) &&
+    (!filters.tag || photo.tags.includes(filters.tag))
+  )
 }
 
 function paginatePhotos(photos: Photo[], filters: PhotoFilters) {
@@ -401,13 +393,11 @@ function paginatePhotos(photos: Photo[], filters: PhotoFilters) {
   const offset = Math.max(startIndex, 0)
   const limit = filters.limit ?? 24
   const items = filtered.slice(offset, offset + limit)
+  const last = items.at(-1)
 
   return {
     photos: items,
-    nextCursor:
-      filtered.length > offset + limit && items.length > 0
-        ? encodeCursor(items.at(-1)!)
-        : undefined,
+    nextCursor: filtered.length > offset + limit && last ? encodeCursor(last) : undefined,
   }
 }
 

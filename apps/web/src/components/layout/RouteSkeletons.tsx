@@ -31,9 +31,19 @@ function Bar({ className, style }: { className?: string; style?: CSSProperties }
 }
 
 /** Width/height ratios for a believable mixed contact sheet (portrait-heavy, like the archive). */
+const FILTER_PILLS = [4.5, 7, 10, 9, 9, 8].map((width, slot) => ({ id: `pill-${slot}`, width }))
+
+const RING_FRAMES = [0.62, 0.82, 1, 0.82, 0.62].map((scale, slot) => ({
+  id: `ring-${slot}`,
+  scale,
+}))
+
 const SHEET_RATIOS = [
   1.78, 0.56, 0.56, 0.75, 0.56, 0.56, 0.75, 0.56, 0.56, 0.56, 0.56, 1, 0.56, 0.56,
 ]
+
+/* Placeholders never reorder, but each still gets a stable key of its own. */
+const SHEET_FRAMES = SHEET_RATIOS.map((ratio, slot) => ({ id: `sheet-${slot}`, ratio }))
 
 export function ArchiveSkeleton() {
   return (
@@ -46,14 +56,14 @@ export function ArchiveSkeleton() {
           </div>
         </div>
         <div className="mt-6 flex flex-wrap gap-2.5">
-          {[4.5, 7, 10, 9, 9, 8].map((width, index) => (
-            <Bar key={index} className="skeleton-pill" style={{ width: `${width}rem` }} />
+          {FILTER_PILLS.map((pill) => (
+            <Bar key={pill.id} className="skeleton-pill" style={{ width: `${pill.width}rem` }} />
           ))}
         </div>
         <div className="mt-8 flex flex-wrap gap-2">
-          {SHEET_RATIOS.map((ratio, index) => (
+          {SHEET_FRAMES.map(({ id, ratio }) => (
             <span
-              key={index}
+              key={id}
               className="skeleton-block skeleton-frame grow"
               style={{
                 flexBasis: `${Math.round(ratio * 200)}px`,
@@ -97,9 +107,9 @@ export function WorldSkeleton() {
         <Bar className="skeleton-line mt-3 w-[min(30rem,80vw)]" />
       </div>
       <div className="page-shell skeleton-ring">
-        {[0.62, 0.82, 1, 0.82, 0.62].map((scale, index) => (
+        {RING_FRAMES.map(({ id, scale }) => (
           <span
-            key={index}
+            key={id}
             className="skeleton-block skeleton-frame"
             style={{ '--ring-scale': scale } as CSSProperties}
           />

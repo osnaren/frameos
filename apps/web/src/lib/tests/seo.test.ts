@@ -56,8 +56,9 @@ describe('getPhotoShareImage', () => {
   })
 
   it('requests an exact 1200x630 hotspot-aware JPEG from the Sanity CDN', () => {
-    const image = getPhotoShareImage(sanityPhoto, ORIGIN)!
-    const url = new URL(image.url)
+    const image = getPhotoShareImage(sanityPhoto, ORIGIN)
+    expect(image).not.toBeNull()
+    const url = new URL(image?.url ?? 'about:blank')
 
     expect(image).toMatchObject({ width: 1200, height: 630, type: 'image/jpeg' })
     expect(url.searchParams.get('w')).toBe('1200')
@@ -80,12 +81,14 @@ describe('local variant assumptions', () => {
   it.each(curatedPhotos.filter((entry) => entry.status === 'published').map((p) => [p.slug, p]))(
     '%s has its share and full-size variants on disk',
     (slug, entry) => {
-      const manifest = getManifestEntry(slug)!
+      const manifest = getManifestEntry(slug)
+      expect(manifest).toBeDefined()
       for (const image of [getPhotoShareImage(entry, ORIGIN), getPhotoFullImage(entry, ORIGIN)]) {
         expect(image).not.toBeNull()
-        const width = Number(/\/w(\d+)\.webp$/.exec(image!.url)![1])
-        expect(manifest.widths).toContain(width)
-        expect(existsSync(path.join(PUBLIC_DIR, new URL(image!.url).pathname))).toBe(true)
+        const url = image?.url ?? ''
+        const width = Number(/\/w(\d+)\.webp$/.exec(url)?.[1])
+        expect(manifest?.widths).toContain(width)
+        expect(existsSync(path.join(PUBLIC_DIR, new URL(url, ORIGIN).pathname))).toBe(true)
       }
     }
   )

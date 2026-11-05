@@ -8,7 +8,7 @@ import { getHomeViewServer, getWorldsOverviewServer } from '@/server/server-func
 export const Route = createFileRoute('/')({
   loader: async () => {
     const [home, overview] = await Promise.all([getHomeViewServer(), getWorldsOverviewServer()])
-    return { home: home!, overview: overview! }
+    return { home, overview }
   },
   staleTime: 60_000,
   gcTime: 300_000,

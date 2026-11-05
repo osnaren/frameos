@@ -223,7 +223,9 @@ export function ZoomablePhoto({
     const points = Array.from(pointers.current.values())
     const start = active.startPoints.get(event.pointerId)
 
-    if (start && distance(start, pointers.current.get(event.pointerId)!) > TAP_SLOP) {
+    const latest = pointers.current.get(event.pointerId)
+
+    if (start && latest && distance(start, latest) > TAP_SLOP) {
       active.moved = true
     }
 

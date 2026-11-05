@@ -23,11 +23,12 @@ function variantUrl(id: string, width: number) {
 }
 
 function toAsset(id: string, entry: ManifestEntry): LocalPhotoAsset | null {
-  if (entry.hidden || entry.widths.length === 0) {
+  const widths = [...entry.widths].sort((a, b) => a - b)
+  const largest = widths.at(-1)
+
+  if (entry.hidden || largest === undefined) {
     return null
   }
-
-  const widths = [...entry.widths].sort((a, b) => a - b)
 
   return {
     id,
@@ -36,7 +37,7 @@ function toAsset(id: string, entry: ManifestEntry): LocalPhotoAsset | null {
     aspectRatio: entry.width / entry.height,
     palette: entry.palette,
     placeholder: entry.placeholder,
-    src: variantUrl(id, widths.at(-1)!),
+    src: variantUrl(id, largest),
     srcSet: widths.map((width) => `${variantUrl(id, width)} ${width}w`).join(', '),
   }
 }
@@ -50,13 +51,13 @@ export function getLocalVariantUrl(publicId: string, preferredWidth: number): st
   const id = localPhotoId(publicId)
   const entry = id ? getManifestEntry(id) : null
 
-  if (!id || !entry || entry.hidden || entry.widths.length === 0) {
+  if (!id || !entry || entry.hidden) {
     return null
   }
 
   const widths = [...entry.widths].sort((a, b) => a - b)
-  const width = widths.find((value) => value >= preferredWidth) ?? widths.at(-1)!
-  return variantUrl(id, width)
+  const width = widths.find((value) => value >= preferredWidth) ?? widths.at(-1)
+  return width === undefined ? null : variantUrl(id, width)
 }
 
 /** Returns delivery data for a local publicId, or null for Sanity-hosted/hidden photos. */

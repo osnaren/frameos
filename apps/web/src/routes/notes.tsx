@@ -55,7 +55,7 @@ function delay(ms: number) {
  * so there is never an invisible heading or a blank band on first paint.
  */
 function FieldNotesRoute() {
-  const data = Route.useLoaderData()!
+  const data = Route.useLoaderData()
   const pageRef = useRef<HTMLElement>(null)
   const lead = data.gallery.at(0)
   const stills = data.gallery.slice(1)

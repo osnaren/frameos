@@ -84,7 +84,7 @@ function delay(ms: number) {
 }
 
 function SignalRoute() {
-  const data = Route.useLoaderData()!
+  const data = Route.useLoaderData()
   const email = data.page.email
   const socials = data.page.socials.filter((social) => !social.href.startsWith('mailto:'))
   // The backdrop is the site's own share image (Site Settings → SEO image),

@@ -62,8 +62,8 @@ async function reconcile(request: Request) {
 export const Route = createFileRoute('/api/reconcile/content')({
   server: {
     handlers: {
-      GET: async ({ request }) => reconcile(request),
-      POST: async ({ request }) => reconcile(request),
+      GET: ({ request }) => reconcile(request),
+      POST: ({ request }) => reconcile(request),
     },
   },
 })

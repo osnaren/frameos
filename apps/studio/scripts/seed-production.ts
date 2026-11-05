@@ -330,7 +330,7 @@ function photoFile(slug: string) {
   return resolve(webRoot, 'public', 'photos', slug, `w${width}.webp`)
 }
 
-async function existingBySlug(type: 'world' | 'photo', slug: string) {
+function existingBySlug(type: 'world' | 'photo', slug: string) {
   return client.fetch<SluggedDocument | null>(
     '*[_type == $type && slug.current == $slug && !(_id in path("drafts.**"))][0]{_id, slug}',
     {type, slug},

@@ -266,5 +266,6 @@ async function main() {
 
 main().catch((error) => {
   console.error(error)
-  process.exit(1)
+  // Let pending output flush instead of exiting mid-write.
+  process.exitCode = 1
 })

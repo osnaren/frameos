@@ -94,19 +94,11 @@ interface FilterablePhoto {
  * in providers/sanity.ts): exact world slug, exact series, exact tag.
  */
 export function matchesArchiveFilters(photo: FilterablePhoto, filters: ArchiveFilters) {
-  if (filters.world && photo.category !== filters.world) {
-    return false
-  }
-
-  if (filters.series && photo.series !== filters.series) {
-    return false
-  }
-
-  if (filters.tag && !photo.tags.includes(filters.tag)) {
-    return false
-  }
-
-  return true
+  return (
+    (!filters.world || photo.category === filters.world) &&
+    (!filters.series || photo.series === filters.series) &&
+    (!filters.tag || photo.tags.includes(filters.tag))
+  )
 }
 
 export function filterArchiveItems<T extends { photo: FilterablePhoto }>(

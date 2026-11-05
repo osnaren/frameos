@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { Redis } from '@upstash/redis'
 
-import { getServerEnv, hasRedisConfig } from '@/server/env'
+import { getServerEnv } from '@/server/env'
 import { captureException } from '@/server/observability/error-tracker'
 import { logWarn } from '@/server/observability/logger'
 
@@ -12,20 +12,16 @@ const latestEventStore = new Map<string, string>()
 let redisClient: Redis | null = null
 
 function getRedisClient() {
-  if (!hasRedisConfig()) {
-    return null
-  }
-
   if (redisClient) {
     return redisClient
   }
 
-  const env = getServerEnv()
-  redisClient = new Redis({
-    url: env.UPSTASH_REDIS_REST_URL!,
-    token: env.UPSTASH_REDIS_REST_TOKEN!,
-  })
+  const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = getServerEnv()
+  if (!url || !token) {
+    return null
+  }
 
+  redisClient = new Redis({ url, token })
   return redisClient
 }
 

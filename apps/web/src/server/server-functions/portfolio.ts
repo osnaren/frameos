@@ -15,7 +15,8 @@ function getBaseUrlFromRequest() {
   return getSiteOrigin(getRequest())
 }
 
-function handleUnavailable(error: unknown) {
+/** Sets the response status for an unavailable backend, then rethrows; never returns. */
+function handleUnavailable(error: unknown): never {
   if (error instanceof ServiceUnavailableError) {
     setResponseStatus(error.statusCode)
   }
