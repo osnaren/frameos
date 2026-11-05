@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useHydratedReducedMotion } from '@/lib/motion'
+import { buildSeoHead, getPhotoShareImage, photographJsonLd } from '@/lib/seo'
 import {
   getGalleryFeedServer,
   getPhotoDetailServer,
@@ -44,19 +45,25 @@ export const Route = createFileRoute('/photos/$slug')({
   },
   staleTime: 60_000,
   gcTime: 300_000,
-  head: ({ loaderData }) =>
-    loaderData
-      ? {
-          meta: [
-            { title: `${loaderData.detail.photo.title} — FrameOS` },
-            {
-              name: 'description',
-              content: loaderData.detail.photo.caption ?? loaderData.detail.photo.alt,
-            },
-          ],
-          links: [{ rel: 'canonical', href: loaderData.detail.canonicalUrl }],
-        }
-      : {},
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {}
+    }
+
+    const { photo, canonicalUrl } = loaderData.detail
+    const world = loaderData.worlds.find((entry) => entry.slug === photo.category)
+
+    return buildSeoHead({
+      title: `${photo.title} — FrameOS`,
+      description: photo.caption ?? photo.alt,
+      canonicalUrl,
+      type: 'article',
+      image: getPhotoShareImage(photo, new URL(canonicalUrl).origin),
+      // Fail closed: a frame filed under a world that isn't public stays out of search.
+      robots: photo.category && !world ? 'noindex,follow' : undefined,
+      jsonLd: [photographJsonLd({ canonicalUrl, photo, world })],
+    })
+  },
   component: PhotoDetailRoute,
 })
 

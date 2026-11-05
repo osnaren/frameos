@@ -7,6 +7,7 @@ import { ArrowUpRight, Check, Copy } from 'lucide-react'
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
 import { contactSheet, revealVariants, useHydratedReducedMotion } from '@/lib/motion'
+import { buildSeoHead } from '@/lib/seo'
 import { getContactViewServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/signal')({
@@ -15,13 +16,12 @@ export const Route = createFileRoute('/signal')({
   gcTime: 300_000,
   head: ({ loaderData }) =>
     loaderData
-      ? {
-          meta: [
-            { title: loaderData.page.seo.title },
-            { name: 'description', content: loaderData.page.seo.description },
-          ],
-          links: [{ rel: 'canonical', href: loaderData.canonicalUrl }],
-        }
+      ? buildSeoHead({
+          title: loaderData.page.seo.title,
+          description: loaderData.page.seo.description,
+          canonicalUrl: loaderData.canonicalUrl,
+          image: loaderData.shareImage,
+        })
       : {},
   component: SignalRoute,
 })

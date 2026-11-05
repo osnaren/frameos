@@ -27,6 +27,9 @@ declare global {
       readonly RECONCILE_SECRET?: string
       readonly CRON_SECRET?: string
       readonly SENTRY_DSN?: string
+      readonly VITE_SITE_URL?: string
+      readonly VERCEL_ENV?: string
+      readonly VERCEL_PROJECT_PRODUCTION_URL?: string
     }
   }
 }

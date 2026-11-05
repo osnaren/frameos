@@ -1,4 +1,5 @@
 import { buildCanonicalArchiveSearch, buildCanonicalGallerySearch } from '@/lib/gallery-search'
+import { LOCAL_PHOTO_PREFIX, getPhotoShareImage } from '@/lib/seo'
 import { buildCanonicalUrl } from '@/lib/url'
 import { buildWorldOverviews, type WorldOverview } from '@/lib/world-overview'
 import { readSnapshot, rememberSnapshot } from '@/server/cache/snapshots'
@@ -9,7 +10,14 @@ import { logInfo, logWarn, recordMetric } from '@/server/observability/logger'
 import { createSanityProvider, invalidateAllPhotosCache } from '@/server/providers/sanity'
 
 import type { PortfolioRepository, SanityDocumentId } from '@/server/contracts'
-import type { AboutView, ContactView, HomeView, SiteSettings, World } from '@/types/content'
+import type {
+  AboutView,
+  ContactView,
+  HomeView,
+  ShareImage,
+  SiteSettings,
+  World,
+} from '@/types/content'
 import type { GalleryFeed, Photo, PhotoDetailView } from '@/types/photo'
 
 class ServiceUnavailableError extends Error {
@@ -80,6 +88,42 @@ export function createPortfolioRepository(): PortfolioRepository {
 
   function getSnapshotKey(type: string, suffix = 'default') {
     return `${type}:${suffix}`
+  }
+
+  /**
+   * A page's social card image. `seo.imagePublicId` holds a photo slug in
+   * Sanity (the fixture archive uses its `local/<slug>` public id); when it is
+   * unset or unpublished, fall back to the page's own curated photos. An
+   * undefined result makes the route use the site default card.
+   */
+  async function resolvePageShareImage(
+    imageRef: string | undefined,
+    fallbackPhotos: Photo[],
+    baseUrl: string
+  ): Promise<ShareImage | undefined> {
+    const ref = imageRef?.trim()
+    const slug = ref?.startsWith(LOCAL_PHOTO_PREFIX) ? ref.slice(LOCAL_PHOTO_PREFIX.length) : ref
+
+    if (slug) {
+      try {
+        const photo = ensurePublishedPhoto(await sanityProvider.getPhotoBySlug(slug))
+        const image = photo ? getPhotoShareImage(photo, baseUrl) : null
+        if (image) {
+          return image
+        }
+      } catch (error) {
+        captureException(error, { route: 'share-image', slug, outcome: 'fallback' })
+      }
+    }
+
+    for (const photo of fallbackPhotos) {
+      const image = getPhotoShareImage(photo, baseUrl)
+      if (image) {
+        return image
+      }
+    }
+
+    return undefined
   }
 
   async function addCuratedPageTags(slugs: string[], tags: Set<string>) {
@@ -294,6 +338,11 @@ export function createPortfolioRepository(): PortfolioRepository {
           featuredPhotos: page.featuredPhotos,
           featuredItems: resolveFeaturedItems(featuredPhotos),
           canonicalUrl: buildCanonicalUrl(options.baseUrl, '/'),
+          shareImage: await resolvePageShareImage(
+            page.seo.imagePublicId || site.seo.imagePublicId,
+            featuredPhotos,
+            options.baseUrl
+          ),
           isDegraded: false,
         }
 
@@ -333,7 +382,9 @@ export function createPortfolioRepository(): PortfolioRepository {
           site,
           page,
           gallery: resolveFeaturedItems(photos),
-          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/about'),
+          // The page lives at /notes; /about is a legacy redirect.
+          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/notes'),
+          shareImage: await resolvePageShareImage(page.seo.imagePublicId, photos, options.baseUrl),
           isDegraded: false,
         }
 
@@ -373,7 +424,9 @@ export function createPortfolioRepository(): PortfolioRepository {
         const result: ContactView = {
           site,
           page,
-          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/contact'),
+          // The page lives at /signal; /contact is a legacy redirect.
+          canonicalUrl: buildCanonicalUrl(options.baseUrl, '/signal'),
+          shareImage: await resolvePageShareImage(page.seo.imagePublicId, [], options.baseUrl),
           isDegraded: false,
         }
 

@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { WorldScene } from '@/components/worlds/WorldScene'
+import { buildSeoHead, collectionPageJsonLd, getPhotoShareImage } from '@/lib/seo'
 import { getGalleryFeedServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/worlds/$world')({
@@ -19,29 +20,36 @@ export const Route = createFileRoute('/worlds/$world')({
   staleTime: 60_000,
   gcTime: 300_000,
   head: ({ loaderData }) => {
-    const world = loaderData?.world
-    const canonicalUrl = world
-      ? new URL(
-          `/worlds/${encodeURIComponent(world.slug)}`,
-          loaderData.feed.canonicalUrl
-        ).toString()
-      : undefined
+    if (!loaderData) {
+      return {}
+    }
 
-    return world
-      ? {
-          meta: [
-            { title: world.seo?.title ?? `${world.name} — FrameOS Pocket Worlds` },
-            {
-              name: 'description',
-              content:
-                world.seo?.description ??
-                world.description ??
-                `${world.line} Photographs from the ${world.name} world, all made on a phone.`,
-            },
-          ],
-          links: [{ rel: 'canonical', href: canonicalUrl }],
-        }
-      : {}
+    const { world, feed } = loaderData
+    const canonicalUrl = new URL(
+      `/worlds/${encodeURIComponent(world.slug)}`,
+      feed.canonicalUrl
+    ).toString()
+    const origin = new URL(canonicalUrl).origin
+    const title = world.seo?.title ?? `${world.name} — FrameOS Pocket Worlds`
+    const description =
+      world.seo?.description ??
+      world.description ??
+      `${world.line} Photographs from the ${world.name} world, all made on a phone.`
+    const photos = feed.items.map((item) => item.photo)
+    // The world's SEO image (a photo slug), then its hero, then its first frame.
+    const cover =
+      photos.find((photo) => photo.slug === world.seo?.imagePublicId) ??
+      photos.find((photo) => photo.slug === world.heroPhoto?.slug) ??
+      photos.at(0)
+    const image = cover ? getPhotoShareImage(cover, origin) : null
+
+    return buildSeoHead({
+      title,
+      description,
+      canonicalUrl,
+      image,
+      jsonLd: [collectionPageJsonLd({ canonicalUrl, name: title, description, image, photos })],
+    })
   },
   component: WorldRoute,
 })

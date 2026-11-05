@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PocketWorldsHome } from '@/components/home/PocketWorldsHome'
+import { buildSeoHead, siteJsonLd } from '@/lib/seo'
 import { getHomeViewServer, getWorldsOverviewServer } from '@/server/server-functions/portfolio'
 
 export const Route = createFileRoute('/')({
@@ -11,16 +12,26 @@ export const Route = createFileRoute('/')({
   },
   staleTime: 60_000,
   gcTime: 300_000,
-  head: ({ loaderData }) =>
-    loaderData?.home
-      ? {
-          meta: [
-            { title: loaderData.home.page.seo.title },
-            { name: 'description', content: loaderData.home.page.seo.description },
-          ],
-          links: [{ rel: 'canonical', href: loaderData.home.canonicalUrl }],
-        }
-      : {},
+  head: ({ loaderData }) => {
+    const home = loaderData?.home
+    if (!home) {
+      return {}
+    }
+
+    return buildSeoHead({
+      title: home.page.seo.title,
+      description: home.page.seo.description,
+      canonicalUrl: home.canonicalUrl,
+      image: home.shareImage,
+      jsonLd: [
+        siteJsonLd({
+          origin: new URL(home.canonicalUrl).origin,
+          site: home.site,
+          description: home.page.seo.description,
+        }),
+      ],
+    })
+  },
   component: HomeRoute,
 })
 

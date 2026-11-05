@@ -6,20 +6,13 @@ import { z } from 'zod'
 import { DEFAULT_GALLERY_LIMIT, MAX_GALLERY_LIMIT } from '@/lib/gallery-search'
 import { getPageTags, getPhotoTags, getGalleryTags } from '@/server/cache/tags'
 import { applyCacheResponse } from '@/server/cache/vercel-headers'
+import { getSiteOrigin } from '@/server/http/site-origin'
 import { ServiceUnavailableError, createPortfolioRepository } from '@/server/repository/portfolio'
 
 const repository = createPortfolioRepository()
 
 function getBaseUrlFromRequest() {
-  const request = getRequest()
-  const forwardedProto = request.headers.get('x-forwarded-proto')
-  const forwardedHost = request.headers.get('x-forwarded-host')
-
-  if (forwardedProto && forwardedHost) {
-    return `${forwardedProto}://${forwardedHost}`
-  }
-
-  return new URL(request.url).origin
+  return getSiteOrigin(getRequest())
 }
 
 function handleUnavailable(error: unknown) {

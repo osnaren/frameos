@@ -21,6 +21,16 @@ export type {
   WorldStatus,
 } from '@frameos/content-schema'
 
+/** An absolute image URL for Open Graph / Twitter cards and structured data. */
+export interface ShareImage {
+  url: string
+  width?: number
+  height?: number
+  /** MIME type, e.g. `image/jpeg`. */
+  type?: string
+  alt: string
+}
+
 export interface HomeView {
   site: SiteSettings
   page: HomePageContent
@@ -35,6 +45,8 @@ export interface HomeView {
     alt: string
   }[]
   canonicalUrl: string
+  /** Resolved server-side from `page.seo.imagePublicId`, else the first featured photo. */
+  shareImage?: ShareImage
   isDegraded: boolean
 }
 
@@ -50,6 +62,8 @@ export interface AboutView {
     alt: string
   }[]
   canonicalUrl: string
+  /** Resolved server-side from `page.seo.imagePublicId`, else the first highlighted photo. */
+  shareImage?: ShareImage
   isDegraded: boolean
 }
 
@@ -57,5 +71,7 @@ export interface ContactView {
   site: SiteSettings
   page: ContactPageContent
   canonicalUrl: string
+  /** Resolved server-side from `page.seo.imagePublicId`. */
+  shareImage?: ShareImage
   isDegraded: boolean
 }

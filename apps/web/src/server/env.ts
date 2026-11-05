@@ -31,6 +31,11 @@ const serverEnvSchema = z.object({
   RECONCILE_SECRET: optionalString(),
   CRON_SECRET: optionalString(),
   SENTRY_DSN: optionalString(),
+  /** Validated leniently in server/site-url.ts — a typo must not take down every route. */
+  VITE_SITE_URL: optionalString(),
+  /** Vercel system variables (set automatically on Vercel; absent elsewhere). */
+  VERCEL_ENV: optionalString(),
+  VERCEL_PROJECT_PRODUCTION_URL: optionalString(),
 })
 
 type ServerEnv = z.infer<typeof serverEnvSchema>
@@ -46,9 +51,18 @@ export function getServerEnv() {
   return cachedEnv
 }
 
-export function getPublicRuntimeConfig() {
+/**
+ * The canonical-origin inputs for server/site-url.ts. `VITE_SITE_URL` is read
+ * at runtime first (Vercel exposes project env vars to functions) and falls
+ * back to the value Vite inlined at build time from a local `.env`.
+ */
+export function getSiteOriginConfig() {
+  const env = getServerEnv()
+
   return {
-    siteUrl: import.meta.env.VITE_SITE_URL ?? 'http://localhost:3000',
+    configuredUrl: env.VITE_SITE_URL ?? import.meta.env.VITE_SITE_URL,
+    vercelEnv: env.VERCEL_ENV,
+    vercelProductionHost: env.VERCEL_PROJECT_PRODUCTION_URL,
   }
 }
 

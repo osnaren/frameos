@@ -8,6 +8,7 @@ import { ArchiveLightbox } from '@/components/archive/ArchiveLightbox'
 import { StatusBanner } from '@/components/content/StatusBanner'
 import { PhotoImage } from '@/components/photo/PhotoImage'
 import { chrome, focusEase, useHydratedReducedMotion } from '@/lib/motion'
+import { buildSeoHead, collectionPageJsonLd, getPhotoShareImage } from '@/lib/seo'
 import { getGalleryFeedServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 const archiveSearchSchema = z.object({
@@ -34,21 +35,40 @@ export const Route = createFileRoute('/archive')({
   },
   staleTime: 30_000,
   gcTime: 300_000,
-  head: ({ loaderData }) =>
-    loaderData
-      ? {
-          meta: [
-            { title: 'Index \u2014 FrameOS Pocket Worlds' },
-            {
-              name: 'description',
-              content:
-                'The full FrameOS archive as a contact sheet: every published frame, photographed on a phone.',
-            },
-            { name: 'robots', content: loaderData.feed.robots },
-          ],
-          links: [{ rel: 'canonical', href: loaderData.feed.canonicalUrl }],
-        }
-      : {},
+  head: ({ loaderData }) => {
+    if (!loaderData) {
+      return {}
+    }
+
+    const { feed, worlds } = loaderData
+    const world = worlds.find((entry) => entry.slug === feed.appliedFilters.category)
+    const title = world
+      ? `${world.name} \u00b7 Index \u2014 FrameOS Pocket Worlds`
+      : 'Index \u2014 FrameOS Pocket Worlds'
+    const description = world
+      ? `Every published frame from ${world.name}, laid out as a contact sheet. ${world.line}`
+      : 'The full FrameOS archive as a contact sheet: every published frame, photographed on a phone.'
+    const origin = new URL(feed.canonicalUrl).origin
+    const photos = feed.items.map((item) => item.photo)
+    const image = photos.length > 0 ? getPhotoShareImage(photos[0], origin) : null
+
+    return buildSeoHead({
+      title,
+      description,
+      canonicalUrl: feed.canonicalUrl,
+      image,
+      robots: feed.robots,
+      jsonLd: [
+        collectionPageJsonLd({
+          canonicalUrl: feed.canonicalUrl,
+          name: title,
+          description,
+          image,
+          photos,
+        }),
+      ],
+    })
+  },
   component: ArchiveRoute,
 })
 
