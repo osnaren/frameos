@@ -11,6 +11,7 @@ import {
 import { NotFound } from '@/components/content/NotFound'
 import { ServiceState } from '@/components/content/ServiceState'
 import { NavigationProgress } from '@/components/layout/NavigationProgress'
+import { VercelInsights } from '@/components/layout/VercelInsights'
 import { ViewfinderCursor } from '@/components/layout/ViewfinderCursor'
 import { SITE_NAME, THEME_COLORS } from '@/lib/seo'
 
@@ -98,6 +99,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </div>
         <Footer />
         <ViewfinderCursor />
+        <VercelInsights />
         <Scripts />
       </body>
     </html>
