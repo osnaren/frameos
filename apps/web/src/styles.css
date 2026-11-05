@@ -4046,8 +4046,6 @@ a:focus-visible .frame-corners {
 }
 
 .archive-lightbox-content {
-  top: 0 !important;
-  left: 0 !important;
   z-index: 71;
   display: grid;
   width: 100vw;
@@ -4070,8 +4068,6 @@ a:focus-visible .frame-corners {
   padding: clamp(0.9rem, 2.4vw, 2rem);
   color: #f4f0e8;
   box-shadow: none;
-  translate: none !important;
-  transform: none !important;
 }
 
 .archive-lightbox-content[data-state='open'] {

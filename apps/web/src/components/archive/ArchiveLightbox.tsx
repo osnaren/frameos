@@ -130,6 +130,7 @@ export function ArchiveLightbox({
     >
       {photo && activeIndex !== null ? (
         <DialogContent
+          fullscreen
           showCloseButton={false}
           overlayClassName="archive-lightbox-overlay"
           className="archive-lightbox-content"

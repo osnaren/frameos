@@ -51,7 +51,7 @@ See [../pocket-worlds.md](../pocket-worlds.md) for the design and implementation
 - The `world.form` field from the 3D attempt was replaced by `world.planet`. Any `form`
   values already in a dataset are ignored by the app and show as an unknown field in
   Studio. Unset them (or leave them; they're harmless).
-- `media-production/pocket-worlds-flow/` (the Flow inputs and prompts) is no longer used by
-  the app. It is kept as creative-production history and can be deleted at any time.
+- `media-production/pocket-worlds-flow/` (the Flow inputs and prompts) was no longer used by
+  the app and has since been deleted; it remains in git history.
 - Some photographs make clearer planets than others. Editors pick the planet photograph
   and horizon per world; the defaults (lead photograph, 0.55) are always valid.

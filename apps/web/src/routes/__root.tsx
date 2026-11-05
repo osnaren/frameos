@@ -65,7 +65,9 @@ export const Route = createRootRoute({
       { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon/favicon-96x96.png' },
       { rel: 'shortcut icon', href: '/favicon/favicon.ico' },
       { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' },
-      { rel: 'manifest', href: '/favicon/site.webmanifest' },
+      // Browsers fetch the manifest without cookies unless told otherwise, so
+      // behind Vercel Deployment Protection it would bounce to the login page.
+      { rel: 'manifest', href: '/favicon/site.webmanifest', crossOrigin: 'use-credentials' },
     ],
   }),
   shellComponent: RootDocument,

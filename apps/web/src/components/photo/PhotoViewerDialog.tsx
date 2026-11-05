@@ -56,6 +56,7 @@ export function PhotoViewerDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       {open ? (
         <DialogContent
+          fullscreen
           showCloseButton={false}
           overlayClassName="archive-lightbox-overlay"
           className="archive-lightbox-content photo-viewer-content"
