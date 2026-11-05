@@ -1,3 +1,5 @@
+import frauncesRomanLatin from '@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url'
+import plexSansLatin from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url'
 import {
   HeadContent,
   Scripts,
@@ -12,6 +14,9 @@ import { ViewfinderCursor } from '@/components/layout/ViewfinderCursor'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import appCss from '../styles.css?url'
+
+/** Above-the-fold faces (headings + body/nav); the same hashed files styles/fonts.css references. */
+const PRELOADED_FONTS = [frauncesRomanLatin, plexSansLatin]
 
 /* Pocket Worlds opens bright by default; dark is an explicit choice (or stored auto). */
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'light';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);root.setAttribute('data-theme',resolved);if(mode==='auto'){root.setAttribute('data-theme-mode','auto')}root.style.colorScheme=resolved;}catch(e){}})();`
@@ -31,6 +36,13 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      ...PRELOADED_FONTS.map((href) => ({
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href,
+        crossOrigin: 'anonymous' as const,
+      })),
       {
         rel: 'stylesheet',
         href: appCss,
@@ -39,8 +51,6 @@ export const Route = createRootRoute({
       { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon/favicon-96x96.png' },
       { rel: 'shortcut icon', href: '/favicon/favicon.ico' },
       { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],
   }),
   shellComponent: RootDocument,

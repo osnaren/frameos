@@ -15,6 +15,9 @@
     "ui:add": "shadcn add"
   },
   "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@frameos/content-schema": "workspace:*",
     "@gsap/react": "^2.1.2",
     "@sanity/client": "^7.23.0",
