@@ -433,7 +433,7 @@
 
 @media (max-width: 899px) {
   .orrery {
-    --planet-size: clamp(54px, 16vw, 104px);
+    --planet-size: clamp(64px, 19vw, 112px);
     min-height: auto;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto;
@@ -441,6 +441,7 @@
 
   .orrery__system {
     position: relative;
+    grid-row: 1;
     inset: auto;
     width: 100%;
     aspect-ratio: 1 / 0.88;
@@ -452,6 +453,7 @@
   }
 
   .orrery__copy {
+    grid-row: 2;
     padding-block: 0 2rem;
   }
 

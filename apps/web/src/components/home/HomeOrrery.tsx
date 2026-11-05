@@ -124,6 +124,36 @@ export function HomeOrrery({
 
   return (
     <section className="orrery" aria-labelledby="orrery-title">
+      <div className="orrery__copy page-shell">
+        <div className="orrery__copy-inner">
+          <p className="mono-label orrery__eyebrow">
+            FrameOS <span aria-hidden="true">·</span> {page.eyebrow}
+          </p>
+          <h1 id="orrery-title" className="display-font orrery__title">
+            {page.headline}
+          </h1>
+          <p className="orrery__intro">{page.intro}</p>
+          <div className="orrery__actions">
+            {overviews[0] ? (
+              <a
+                href={`#world-${overviews[0].world.slug}`}
+                className="home-action home-action--solid"
+              >
+                Unfold the worlds <span aria-hidden="true">↓</span>
+              </a>
+            ) : null}
+            <Link to="/archive" className="home-action home-action--line">
+              Open the Index
+            </Link>
+          </div>
+        </div>
+        <p className="mono-label orrery__legend">
+          <span>
+            Fig. 1 — {count} {count === 1 ? 'world' : 'worlds'}, {totalFrames} frames.
+          </span>
+          <span>Each planet is one photograph, curled. Drag one to turn it.</span>
+        </p>
+      </div>
       <div className="orrery__system" ref={systemRef}>
         <svg
           className="orrery__orbits"
@@ -164,37 +194,6 @@ export function HomeOrrery({
             </li>
           ))}
         </ol>
-      </div>
-
-      <div className="orrery__copy page-shell">
-        <div className="orrery__copy-inner">
-          <p className="mono-label orrery__eyebrow">
-            FrameOS <span aria-hidden="true">·</span> {page.eyebrow}
-          </p>
-          <h1 id="orrery-title" className="display-font orrery__title">
-            {page.headline}
-          </h1>
-          <p className="orrery__intro">{page.intro}</p>
-          <div className="orrery__actions">
-            {overviews[0] ? (
-              <a
-                href={`#world-${overviews[0].world.slug}`}
-                className="home-action home-action--solid"
-              >
-                Unfold the worlds <span aria-hidden="true">↓</span>
-              </a>
-            ) : null}
-            <Link to="/archive" className="home-action home-action--line">
-              Open the Index
-            </Link>
-          </div>
-        </div>
-        <p className="mono-label orrery__legend">
-          <span>
-            Fig. 1 — {count} {count === 1 ? 'world' : 'worlds'}, {totalFrames} frames.
-          </span>
-          <span>Each planet is one photograph, curled. Drag one to turn it.</span>
-        </p>
       </div>
     </section>
   )
