@@ -186,6 +186,10 @@ reviewing the reported counts and exporting a dataset backup, apply it with
 preserved; the seed only creates missing worlds, photos, image assets, and
 singleton pages.
 
+The seed also gives each launch world its curated **pocket planet** (planet photograph +
+horizon) if the world has none yet. A dataset seeded before planets existed can pick these
+up by running the seed again; it never overwrites a planet an editor has already set.
+
 ## Real-time invalidation
 
 If you want page/gallery changes to appear immediately (rather than waiting

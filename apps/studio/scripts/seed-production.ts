@@ -17,6 +17,8 @@ type WorldSeed = {
   status: 'active' | 'hidden'
   mood: {wash: string; deep: string; accent: string}
   heroId: string
+  /** The pocket planet on the home page: which photo is curled, and its horizon. */
+  planet?: {photoId?: string; horizon: number}
 }
 type PhotoSeed = {
   slug: string
@@ -43,6 +45,7 @@ const worlds: WorldSeed[] = [
     status: 'active',
     mood: {wash: '#e3edf1', deep: '#16303c', accent: '#3e7284'},
     heroId: 'the-sea',
+    planet: {photoId: 'the-waterfall', horizon: 0.8},
   },
   {
     slug: 'sacred-geometry',
@@ -53,6 +56,7 @@ const worlds: WorldSeed[] = [
     status: 'active',
     mood: {wash: '#e4ebf4', deep: '#0e2334', accent: '#2c5c9c'},
     heroId: 'tower-and-sky',
+    planet: {photoId: 'the-chariot', horizon: 0.55},
   },
   {
     slug: 'small-wonders',
@@ -63,6 +67,7 @@ const worlds: WorldSeed[] = [
     status: 'active',
     mood: {wash: '#ecf1e2', deep: '#1d2f16', accent: '#4d7a38'},
     heroId: 'leaf-after-rain',
+    planet: {photoId: 'yellow-flowers', horizon: 0.6},
   },
   {
     slug: 'living-things',
@@ -73,6 +78,7 @@ const worlds: WorldSeed[] = [
     status: 'active',
     mood: {wash: '#e7eee7', deep: '#122019', accent: '#2f5d43'},
     heroId: 'parakeet',
+    planet: {photoId: 'grazing', horizon: 0.55},
   },
   {
     slug: 'at-the-table',
@@ -83,6 +89,7 @@ const worlds: WorldSeed[] = [
     status: 'active',
     mood: {wash: '#f4ead9', deep: '#33210f', accent: '#b05c2a'},
     heroId: 'banana-leaf-meal',
+    planet: {horizon: 0.6},
   },
   {
     slug: 'people',
@@ -261,7 +268,7 @@ const publishedPhotos: PhotoSeed[] = [
   },
 ]
 
-const seededWorlds = worlds.map(({heroId: _heroId, ...world}) => world)
+const seededWorlds = worlds.map(({heroId: _heroId, planet: _planet, ...world}) => world)
 
 const singletonDocuments = {
   siteSettings: {
@@ -414,10 +421,21 @@ async function connectWorldHeroes(worldIds: Map<string, string>, photoIds: Map<s
     const heroId = photoIds.get(world.heroId)
     if (!worldId || !heroId) continue
 
-    await client
-      .patch(worldId)
-      .setIfMissing({heroPhoto: {_type: 'reference', _ref: heroId}})
-      .commit()
+    const planetPhotoId = world.planet?.photoId ? photoIds.get(world.planet.photoId) : undefined
+
+    let patch = client.patch(worldId).setIfMissing({heroPhoto: {_type: 'reference', _ref: heroId}})
+
+    if (world.planet) {
+      patch = patch.setIfMissing({
+        planet: {
+          _type: 'object',
+          horizon: world.planet.horizon,
+          ...(planetPhotoId ? {photo: {_type: 'reference', _ref: planetPhotoId}} : {}),
+        },
+      })
+    }
+
+    await patch.commit()
   }
 }
 
