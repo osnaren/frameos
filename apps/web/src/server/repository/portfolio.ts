@@ -20,6 +20,9 @@ import type {
 } from '@/types/content'
 import type { GalleryFeed, Photo, PhotoDetailView } from '@/types/photo'
 
+/** Every published photo, for the sitemap — far above any realistic archive size. */
+const SITEMAP_PHOTO_LIMIT = 10_000
+
 class ServiceUnavailableError extends Error {
   statusCode = 503
 }
@@ -447,6 +450,30 @@ export function createPortfolioRepository(): PortfolioRepository {
 
         throw new ServiceUnavailableError(
           'The contact page is temporarily unavailable while Sanity is recovering.'
+        )
+      }
+    },
+    async getSitemapContent() {
+      const snapshotKey = getSnapshotKey('sitemap')
+
+      try {
+        const [worlds, response] = await Promise.all([
+          this.getWorlds(),
+          sanityProvider.searchPhotos({ limit: SITEMAP_PHOTO_LIMIT }),
+        ])
+        const photos = response.photos
+          .map((photo) => ensurePublishedPhoto(photo))
+          .filter((photo): photo is Photo => Boolean(photo))
+
+        return rememberSnapshot(snapshotKey, { worlds, photos })
+      } catch (error) {
+        captureException(error, { route: 'sitemap', outcome: 'failure' })
+        const snapshot = readSnapshot<{ worlds: World[]; photos: Photo[] }>(snapshotKey)
+        if (snapshot) {
+          return snapshot
+        }
+        throw new ServiceUnavailableError(
+          'The sitemap is temporarily unavailable while Sanity is recovering.'
         )
       }
     },

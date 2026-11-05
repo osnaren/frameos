@@ -46,6 +46,9 @@ export interface PortfolioRepository {
   getWorlds: () => Promise<World[]>
   /** Public worlds with their photographs resolved — what the home page draws. */
   getWorldsOverview: () => Promise<{ worlds: WorldOverview[]; isDegraded: boolean }>
+  /** Active worlds plus every published photo — the raw material for sitemap.xml. */
+  getSitemapContent: () => Promise<{ worlds: World[]; photos: Photo[] }>
+
   getSeoPayload: (
     routeId: PageDocumentId | 'gallery' | 'photo',
     options: { slug?: string; baseUrl: string }

@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignalRouteImport } from './routes/signal'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -21,9 +23,19 @@ import { Route as PhotosSlugRouteImport } from './routes/photos.$slug'
 import { Route as ApiWebhooksSanityRouteImport } from './routes/api/webhooks/sanity'
 import { Route as ApiReconcileContentRouteImport } from './routes/api/reconcile/content'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignalRoute = SignalRouteImport.update({
   id: '/signal',
   path: '/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesRoute = NotesRouteImport.update({
@@ -84,7 +96,9 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/notes': typeof NotesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/signal': typeof SignalRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/photos/$slug': typeof PhotosSlugRoute
   '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
@@ -97,7 +111,9 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/notes': typeof NotesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/signal': typeof SignalRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/photos/$slug': typeof PhotosSlugRoute
   '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
@@ -111,7 +127,9 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/notes': typeof NotesRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/signal': typeof SignalRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/photos/$slug': typeof PhotosSlugRoute
   '/worlds/$world': typeof WorldsWorldRoute
   '/api/reconcile/content': typeof ApiReconcileContentRoute
@@ -126,7 +144,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/notes'
+    | '/robots.txt'
     | '/signal'
+    | '/sitemap.xml'
     | '/photos/$slug'
     | '/worlds/$world'
     | '/api/reconcile/content'
@@ -139,7 +159,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/notes'
+    | '/robots.txt'
     | '/signal'
+    | '/sitemap.xml'
     | '/photos/$slug'
     | '/worlds/$world'
     | '/api/reconcile/content'
@@ -152,7 +174,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/notes'
+    | '/robots.txt'
     | '/signal'
+    | '/sitemap.xml'
     | '/photos/$slug'
     | '/worlds/$world'
     | '/api/reconcile/content'
@@ -166,7 +190,9 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
   NotesRoute: typeof NotesRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SignalRoute: typeof SignalRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   PhotosSlugRoute: typeof PhotosSlugRoute
   WorldsWorldRoute: typeof WorldsWorldRoute
   ApiReconcileContentRoute: typeof ApiReconcileContentRoute
@@ -175,11 +201,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signal': {
       id: '/signal'
       path: '/signal'
       fullPath: '/signal'
       preLoaderRoute: typeof SignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes': {
@@ -262,7 +302,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
   NotesRoute: NotesRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SignalRoute: SignalRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   PhotosSlugRoute: PhotosSlugRoute,
   WorldsWorldRoute: WorldsWorldRoute,
   ApiReconcileContentRoute: ApiReconcileContentRoute,
