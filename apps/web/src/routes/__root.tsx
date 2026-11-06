@@ -10,6 +10,7 @@ import {
 
 import { NotFound } from '@/components/content/NotFound'
 import { ServiceState } from '@/components/content/ServiceState'
+import { KeyboardShortcuts } from '@/components/layout/KeyboardShortcuts'
 import { NavigationProgress } from '@/components/layout/NavigationProgress'
 import { VercelInsights } from '@/components/layout/VercelInsights'
 import { ViewfinderCursor } from '@/components/layout/ViewfinderCursor'
@@ -104,6 +105,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </div>
         <Footer />
         <ViewfinderCursor />
+        <KeyboardShortcuts />
         <VercelInsights />
         <Scripts />
       </body>

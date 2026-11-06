@@ -33,6 +33,7 @@ import {
 } from '@/lib/photo-origin'
 import { preloadPhoto, resolvePhotoSources } from '@/lib/photo-sources'
 import { buildSeoHead, getPhotoShareImage, photographJsonLd } from '@/lib/seo'
+import { isPlainKeypress } from '@/lib/shortcuts'
 import { getPhotoDetailServer, getWorldsServer } from '@/server/server-functions/portfolio'
 
 import type { Photo } from '@/types/photo'
@@ -121,13 +122,6 @@ function overlayIsOpen() {
   )
 }
 
-function isTypingTarget(target: EventTarget | null) {
-  return (
-    target instanceof HTMLElement &&
-    Boolean(target.closest('input, textarea, select, [contenteditable="true"]'))
-  )
-}
-
 /** The way back: a real history step when we know the previous entry is the origin. */
 function OriginLink({
   origin,
@@ -199,6 +193,7 @@ function PhotoDetailRoute() {
   const figureRef = useRef<HTMLElement>(null)
   const touchCapable = useTouchCapable()
   const [viewerOpen, setViewerOpen] = useState(false)
+  const [infoEntry, setInfoEntry] = useState<string | null>(null)
   const { scrollYProgress } = useScroll({
     target: figureRef,
     offset: ['start end', 'end start'],
@@ -208,6 +203,12 @@ function PhotoDetailRoute() {
 
   const photo = detail.photo
   const worldSlugs = worlds.map((entry) => entry.slug)
+  // Keyed by slug, so paging to the next frame closes the readout.
+  const infoOpen = infoEntry === photo.slug
+  const setInfoOpen = useCallback(
+    (open: boolean) => setInfoEntry(open ? photo.slug : null),
+    [photo.slug]
+  )
   const worldName = (slug: string) => worlds.find((entry) => entry.slug === slug)?.name
   const world = photo.category
     ? (worlds.find((entry) => entry.slug === photo.category) ?? null)
@@ -264,36 +265,55 @@ function PhotoDetailRoute() {
     }
   }, [navigate, origin, router, storedOrigin])
 
-  // ← → page through the world; Esc returns to wherever you came from.
+  const first = sequence.at(0)
+  const last = sequence.at(-1)
+
+  // ← → page through the world, Home/End jump to its ends, F opens full
+  // screen, I the capture data, Esc returns to wherever you came from.
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
-      if (
-        event.defaultPrevented ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.shiftKey ||
-        isTypingTarget(event.target) ||
-        overlayIsOpen()
-      ) {
+      if (!isPlainKeypress(event) || overlayIsOpen()) {
         return
       }
 
-      if (event.key === 'ArrowLeft' && previous) {
+      const jump = (slug: string | undefined) => {
         event.preventDefault()
-        goTo(previous.slug)
-      } else if (event.key === 'ArrowRight' && next) {
-        event.preventDefault()
-        goTo(next.slug)
-      } else if (event.key === 'Escape') {
-        event.preventDefault()
-        returnToOrigin()
+        if (slug && slug !== photo.slug) goTo(slug)
+      }
+
+      switch (event.key) {
+        case 'ArrowLeft':
+          if (previous) jump(previous.slug)
+          break
+        case 'ArrowRight':
+          if (next) jump(next.slug)
+          break
+        case 'Home':
+          jump(first?.slug)
+          break
+        case 'End':
+          jump(last?.slug)
+          break
+        case 'f':
+        case 'F':
+          event.preventDefault()
+          setViewerOpen(true)
+          break
+        case 'i':
+        case 'I':
+          event.preventDefault()
+          setInfoOpen(true)
+          break
+        case 'Escape':
+          event.preventDefault()
+          returnToOrigin()
+          break
       }
     }
 
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [goTo, next, previous, returnToOrigin])
+  }, [first, goTo, last, next, photo.slug, previous, returnToOrigin, setInfoOpen])
 
   // Warm the neighbours (image and route data) so paging is instant.
   useEffect(() => {
@@ -440,10 +460,11 @@ function PhotoDetailRoute() {
                 className="photo-expand"
                 onClick={() => setViewerOpen(true)}
                 aria-label="View full screen"
+                aria-keyshortcuts="F"
               >
                 <Maximize2 aria-hidden="true" />
               </button>
-              <CaptureDataPopover photo={photo} />
+              <CaptureDataPopover photo={photo} open={infoOpen} onOpenChange={setInfoOpen} />
             </motion.div>
 
             {next ? (
@@ -574,7 +595,12 @@ function PhotoDetailRoute() {
               text={photo.caption}
               className="photo-action"
             />
-            <button type="button" className="photo-action" onClick={() => setViewerOpen(true)}>
+            <button
+              type="button"
+              className="photo-action"
+              onClick={() => setViewerOpen(true)}
+              aria-keyshortcuts="F"
+            >
               <Maximize2 aria-hidden="true" />
               <span>Full screen</span>
             </button>

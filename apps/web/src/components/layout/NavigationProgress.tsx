@@ -40,28 +40,30 @@ export function NavigationProgress() {
     return () => window.clearTimeout(timer)
   }, [isLoading])
 
-  useEffect(
-    () =>
-      router.subscribe('onResolved', ({ toLocation, pathChanged }) => {
-        const previous = lastPathname.current
-        lastPathname.current = toLocation.pathname
+  useEffect(() => {
+    // Start from the page we hydrated on, so the very first client
+    // navigation is announced too (only a same-page resolve is skipped).
+    lastPathname.current ??= router.state.location.pathname
 
-        // Filter and lightbox changes keep the pathname and announce themselves.
-        if (!pathChanged || previous === null) {
-          return
+    return router.subscribe('onResolved', ({ toLocation, pathChanged }) => {
+      const previous = lastPathname.current
+      lastPathname.current = toLocation.pathname
+
+      // Filter and lightbox changes keep the pathname and announce themselves.
+      if (!pathChanged || previous === toLocation.pathname) {
+        return
+      }
+
+      window.requestAnimationFrame(() => {
+        setAnnouncement(document.title)
+
+        const focused = document.activeElement
+        if (!focused || focused === document.body || !focused.isConnected) {
+          document.getElementById('main-content')?.focus({ preventScroll: true })
         }
-
-        window.requestAnimationFrame(() => {
-          setAnnouncement(document.title)
-
-          const focused = document.activeElement
-          if (!focused || focused === document.body || !focused.isConnected) {
-            document.getElementById('main-content')?.focus({ preventScroll: true })
-          }
-        })
-      }),
-    [router]
-  )
+      })
+    })
+  }, [router])
 
   return (
     <>

@@ -83,6 +83,9 @@ export function PhotoViewerDialog({
           <div className="archive-lightbox-chrome">
             <DialogTitle className="photo-viewer-title">{photo.title}</DialogTitle>
             {counter ? <span aria-hidden="true">{counter}</span> : null}
+            <span className="archive-lightbox-hint" aria-hidden="true">
+              ← → browse · double-click or + − to zoom · Esc exits
+            </span>
           </div>
           <DialogDescription className="sr-only">
             Full-screen view. Double-click, pinch or use the zoom button to look closer; drag to

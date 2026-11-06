@@ -407,7 +407,7 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
           {tiles.map((tile, index) => (
             <div
               key={tile.key}
-              className={`world-dome__tile${index === frontIndex ? 'is-front' : ''}`}
+              className={`world-dome__tile${index === frontIndex ? ' is-front' : ''}`}
               style={{ transform: `rotateY(${tile.rotateY}deg) rotateX(${tile.rotateX}deg)` }}
             >
               <Link
