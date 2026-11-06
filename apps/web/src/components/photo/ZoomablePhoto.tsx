@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { ZoomIn, ZoomOut } from 'lucide-react'
 
@@ -106,7 +106,9 @@ export function ZoomablePhoto({
   const lastTap = useRef<{ time: number; point: PointerPoint } | null>(null)
   const lastPointerType = useRef('mouse')
   const zoomRef = useRef(zoom)
-  zoomRef.current = zoom
+  useLayoutEffect(() => {
+    zoomRef.current = zoom
+  }, [zoom])
   const [frameWidth, setFrameWidth] = useState(0)
   const [gesturing, setGesturing] = useState(false)
   const { width, height } = photo.metadata

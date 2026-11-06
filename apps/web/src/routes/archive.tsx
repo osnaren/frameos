@@ -202,7 +202,8 @@ function ArchiveRoute() {
   const router = useRouter()
   const reducedMotion = useHydratedReducedMotion()
   const sheetRef = useRef<HTMLUListElement>(null)
-  const openedViaPush = useRef(false)
+  /** Whether this page pushed the open frame onto history (so closing can go Back). */
+  const [pushedFrame, setPushedFrame] = useState(false)
   const [activeSlug, setActiveSlug] = useState<string | null>(null)
 
   const worldSlugs = useMemo(() => worlds.map((world) => world.slug), [worlds])
@@ -232,14 +233,11 @@ function ArchiveRoute() {
   /* ---- Lightbox: open state lives in `?frame=` ---- */
   const frameIndex = search.frame ? items.findIndex((item) => item.photo.slug === search.frame) : -1
 
-  useEffect(() => {
-    if (!search.frame) {
-      openedViaPush.current = false
-    }
-  }, [search.frame])
+  // Once the frame closes (by any route, Back included) there is nothing left to pop.
+  const openedViaPush = pushedFrame && Boolean(search.frame)
 
   const openFrame = (slug: string) => {
-    openedViaPush.current = true
+    setPushedFrame(true)
     setActiveSlug(slug)
     void navigate({
       search: (previous) => ({ ...previous, frame: slug }),
@@ -261,8 +259,8 @@ function ArchiveRoute() {
   }
 
   const closeFrame = () => {
-    if (openedViaPush.current) {
-      openedViaPush.current = false
+    if (openedViaPush) {
+      setPushedFrame(false)
       router.history.back()
       return
     }
@@ -290,7 +288,7 @@ function ArchiveRoute() {
   const detailOrigin: PhotoOrigin = {
     kind: 'archive',
     filters,
-    viaHistory: openedViaPush.current,
+    viaHistory: openedViaPush,
   }
 
   /* ---- Keyboard: roving focus across the justified rows ---- */

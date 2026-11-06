@@ -92,7 +92,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(173,120,64,0.28)]">
+      <body className="font-sans wrap-anywhere antialiased selection:bg-[rgba(173,120,64,0.28)]">
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>

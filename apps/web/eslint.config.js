@@ -9,6 +9,8 @@ import refreshPlugin from 'eslint-plugin-react-refresh'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+import { version as reactVersion } from 'react'
+
 export default tseslint.config(
   ...tanstackConfig,
   {
@@ -44,7 +46,15 @@ export default tseslint.config(
       'react/no-unknown-property': 'off', // R3F uses Three.js JSX elements
 
       // --- React Refresh ---
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // Route files export TanStack's `Route` next to their components; the router plugin
+      // handles their hot reload.
+      'react-refresh/only-export-components': [
+        'warn',
+        {
+          allowConstantExport: true,
+          extraHOCs: ['createFileRoute', 'createRootRoute', 'createRootRouteWithContext'],
+        },
+      ],
 
       // --- TypeScript ---
       '@typescript-eslint/no-unused-vars': [
@@ -106,7 +116,9 @@ export default tseslint.config(
     },
     settings: {
       react: {
-        version: 'detect',
+        // eslint-plugin-react's 'detect' calls context.getFilename(), which
+        // ESLint 10 removed; pass the installed version instead.
+        version: reactVersion,
       },
     },
   },

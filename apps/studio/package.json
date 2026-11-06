@@ -22,16 +22,16 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/icons": "^5.2.1",
-    "@sanity/vision": "^6.9.1",
+    "@sanity/icons": "^5.2.3",
+    "@sanity/vision": "^6.22.0",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sanity": "^6.9.1",
-    "styled-components": "^6.1.18"
+    "sanity": "^6.22.0",
+    "styled-components": "^6.6.0"
   },
   "devDependencies": {
     "@frameos/typescript-config": "workspace:*",
-    "@sanity/eslint-config-studio": "^6.0.0",
+    "@sanity/eslint-config-studio": "^7.0.0",
     "@types/react": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import {
   Link,
@@ -172,6 +172,23 @@ function OriginLink({
   )
 }
 
+const COARSE_POINTER_QUERY = '(pointer: coarse)'
+
+function subscribeToPointer(onChange: () => void) {
+  const media = window.matchMedia(COARSE_POINTER_QUERY)
+  media.addEventListener('change', onChange)
+  return () => media.removeEventListener('change', onChange)
+}
+
+/** True on touch-first devices; false on the server and until hydration. */
+function useTouchCapable() {
+  return useSyncExternalStore(
+    subscribeToPointer,
+    () => window.matchMedia(COARSE_POINTER_QUERY).matches,
+    () => false
+  )
+}
+
 function PhotoDetailRoute() {
   const { detail, worlds, sequence } = Route.useLoaderData()
   const navigate = useNavigate()
@@ -180,7 +197,7 @@ function PhotoDetailRoute() {
   const historyState = useRouterState({ select: (state) => state.location.state })
   const reducedMotion = useHydratedReducedMotion()
   const figureRef = useRef<HTMLElement>(null)
-  const [touchCapable, setTouchCapable] = useState(false)
+  const touchCapable = useTouchCapable()
   const [viewerOpen, setViewerOpen] = useState(false)
   const { scrollYProgress } = useScroll({
     target: figureRef,
@@ -246,10 +263,6 @@ function PhotoDetailRoute() {
       void navigate({ to: '/archive', search: origin.filters })
     }
   }, [navigate, origin, router, storedOrigin])
-
-  useEffect(() => {
-    setTouchCapable(window.matchMedia('(pointer: coarse)').matches)
-  }, [])
 
   // ← → page through the world; Esc returns to wherever you came from.
   useEffect(() => {

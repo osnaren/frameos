@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { Link, useNavigate } from '@tanstack/react-router'
 
@@ -124,7 +124,9 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
   const frameRefs = useRef<Array<HTMLAnchorElement | null>>([])
   const { tiles, tileSize, radiusFactor } = useMemo(() => buildTiles(photos), [photos])
   const tilesRef = useRef(tiles)
-  tilesRef.current = tiles
+  useLayoutEffect(() => {
+    tilesRef.current = tiles
+  }, [tiles])
   const [frontIndex, setFrontIndex] = useState<number | null>(null)
   const frontRef = useRef(0)
 
@@ -405,7 +407,7 @@ export function WorldDome({ world, photos }: { world: World; photos: Photo[] }) 
           {tiles.map((tile, index) => (
             <div
               key={tile.key}
-              className={`world-dome__tile${index === frontIndex ? ' is-front' : ''}`}
+              className={`world-dome__tile${index === frontIndex ? 'is-front' : ''}`}
               style={{ transform: `rotateY(${tile.rotateY}deg) rotateX(${tile.rotateX}deg)` }}
             >
               <Link

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Link } from '@tanstack/react-router'
 import { Aperture, ArrowUpRight } from 'lucide-react'
@@ -22,11 +22,10 @@ import {
  * one of its own links is chosen.
  */
 export default function MobileNavigation({ pathname }: { pathname: string }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    setMenuOpen(false)
-  }, [pathname])
+  // Remember which page the menu was opened on; navigating anywhere closes it.
+  const [openOn, setOpenOn] = useState<string | null>(null)
+  const menuOpen = openOn === pathname
+  const setMenuOpen = (open: boolean) => setOpenOn(open ? pathname : null)
 
   return (
     <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>

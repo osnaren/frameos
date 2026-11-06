@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 
 import { Monitor, Moon, Sun } from 'lucide-react'
 
@@ -45,14 +45,31 @@ function applyThemeMode(mode: ThemeMode) {
   root.style.colorScheme = resolved
 }
 
+/* The stored mode is the source of truth; this tiny store lets React read it
+   without copying it into state on mount (and follows other tabs too). */
+const modeListeners = new Set<() => void>()
+
+function subscribeToMode(onChange: () => void) {
+  modeListeners.add(onChange)
+  window.addEventListener('storage', onChange)
+  return () => {
+    modeListeners.delete(onChange)
+    window.removeEventListener('storage', onChange)
+  }
+}
+
+function storeMode(mode: ThemeMode) {
+  window.localStorage.setItem('theme', mode)
+  modeListeners.forEach((listener) => listener())
+}
+
 export default function ThemeToggle() {
-  const [mode, setMode] = useState<ThemeMode>('light')
+  // The server (and hydration) render the default; the stored mode follows.
+  const mode = useSyncExternalStore<ThemeMode>(subscribeToMode, getInitialMode, () => 'light')
 
   useEffect(() => {
-    const initialMode = getInitialMode()
-    setMode(initialMode)
-    applyThemeMode(initialMode)
-  }, [])
+    applyThemeMode(mode)
+  }, [mode])
 
   useEffect(() => {
     if (mode !== 'auto') {
@@ -72,9 +89,8 @@ export default function ThemeToggle() {
     const nextMode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length]
 
     const applyChange = () => {
-      setMode(nextMode)
       applyThemeMode(nextMode)
-      window.localStorage.setItem('theme', nextMode)
+      storeMode(nextMode)
     }
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches

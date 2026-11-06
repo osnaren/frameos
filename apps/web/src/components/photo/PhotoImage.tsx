@@ -1,5 +1,3 @@
-import { useCallback, type CSSProperties } from 'react'
-
 import { buildPlaceholderStyle } from '@/lib/image-placeholder'
 import {
   getImagePresetDefinition,
@@ -9,6 +7,8 @@ import {
 import { getLocalPhotoAsset } from '@/lib/local-photos'
 import { resolvePhotoSources } from '@/lib/photo-sources'
 import { cn } from '@/lib/utils'
+
+import type { CSSProperties } from 'react'
 
 export interface PhotoImageProps {
   /** Local fixture id (`local/<id>`) or a Sanity image CDN base URL. */
@@ -96,7 +96,8 @@ export function PhotoImage({
 }: PhotoImageProps) {
   const presetDefinition = getImagePresetDefinition(preset)
   const local = getLocalPhotoAsset(publicId)
-  const ref = useCallback(trackImageLoad, [])
+  // Module-level, so it is already a stable ref callback.
+  const ref = trackImageLoad
 
   // Local variants are always the whole frame; a Sanity `crop` preset is
   // delivered in the preset's own shape, whatever the original's.

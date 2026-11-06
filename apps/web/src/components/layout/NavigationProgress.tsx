@@ -20,6 +20,15 @@ export function NavigationProgress() {
   const [state, setState] = useState<ProgressState>('idle')
   const [announcement, setAnnouncement] = useState('')
   const lastPathname = useRef<string | null>(null)
+  const [wasLoading, setWasLoading] = useState(isLoading)
+
+  // A visible bar finishes ("done") the moment loading ends.
+  if (wasLoading !== isLoading) {
+    setWasLoading(isLoading)
+    if (!isLoading && state === 'loading') {
+      setState('done')
+    }
+  }
 
   useEffect(() => {
     if (isLoading) {
@@ -27,7 +36,6 @@ export function NavigationProgress() {
       return () => window.clearTimeout(timer)
     }
 
-    setState((current) => (current === 'loading' ? 'done' : current))
     const timer = window.setTimeout(() => setState('idle'), DONE_HOLD_MS)
     return () => window.clearTimeout(timer)
   }, [isLoading])

@@ -71,9 +71,11 @@ export function ArchiveLightbox({
   const zoom = photo && zoomEntry?.slug === photo.slug ? zoomEntry.zoom : IDENTITY_ZOOM
   const stageRef = useRef<HTMLDivElement>(null)
 
-  if (photo) {
-    lastSlug.current = photo.slug
-  }
+  useEffect(() => {
+    if (photo) {
+      lastSlug.current = photo.slug
+    }
+  }, [photo])
 
   const setZoom = (next: ZoomState) => {
     if (photo) {
