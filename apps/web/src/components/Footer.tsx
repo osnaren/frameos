@@ -3,7 +3,9 @@ import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import { Link } from '@tanstack/react-router'
 import gsap from 'gsap'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Keyboard } from 'lucide-react'
+
+import { openKeyboardShortcuts } from '@/lib/shortcuts'
 
 const NAV_LINKS = [
   { to: '/', hash: 'worlds', label: 'Worlds', note: 'Enter the collections' },
@@ -196,7 +198,16 @@ export default function Footer() {
         <div className="cinematic-footer-credits">
           <p data-footer-credit>FrameOS · Pocket Worlds · {year}</p>
           <p data-footer-credit>Things noticed, photographed on a phone.</p>
-          <span data-footer-credit>
+          <span data-footer-credit className="cinematic-footer-buttons">
+            <button
+              type="button"
+              onClick={openKeyboardShortcuts}
+              className="cinematic-footer-top cinematic-footer-shortcuts"
+              aria-keyshortcuts="Shift+?"
+            >
+              <Keyboard aria-hidden="true" />
+              Shortcuts
+            </button>
             <BackToTop />
           </span>
         </div>

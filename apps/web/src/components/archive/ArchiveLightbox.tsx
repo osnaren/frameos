@@ -150,6 +150,13 @@ export function ArchiveLightbox({
               return
             }
 
+            if (event.key === 'Home' || event.key === 'End') {
+              event.preventDefault()
+              const target = event.key === 'Home' ? 0 : items.length - 1
+              if (target !== activeIndex) onNavigate(target)
+              return
+            }
+
             const stage = stageRef.current?.querySelector<HTMLElement>('.zoomable-photo')
             const next = zoomFromKey(event.key, zoom, {
               width: stage?.clientWidth ?? 0,
@@ -166,7 +173,7 @@ export function ArchiveLightbox({
               {pad(position)} / {pad(items.length)}
             </span>
             <span className="archive-lightbox-hint" aria-hidden="true">
-              ← → browse · double-click to zoom · Esc closes
+              ← → browse · double-click or + − to zoom · ? shortcuts · Esc closes
             </span>
           </div>
           <p className="sr-only" aria-live="polite" aria-atomic="true">

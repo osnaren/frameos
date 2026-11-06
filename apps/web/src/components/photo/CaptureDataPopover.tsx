@@ -1,42 +1,92 @@
-import { useId, useState, useSyncExternalStore } from 'react'
+import { useEffect, useId, useState, useSyncExternalStore } from 'react'
+
+import { Check } from 'lucide-react'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { buildCaptureDetails, capturePalette, hasCameraExif } from '@/lib/capture-details'
+import {
+  buildCaptureSections,
+  capturePalette,
+  exposureSummary,
+  hasCameraExif,
+} from '@/lib/capture-details'
+import { legacyCopyToClipboard } from '@/lib/share'
 
 import type { Photo } from '@/types/photo'
 
 const COMPACT_QUERY = '(max-width: 640px)'
+const COARSE_QUERY = '(pointer: coarse)'
 
-function subscribeToCompact(onChange: () => void) {
-  const media = window.matchMedia(COMPACT_QUERY)
-  media.addEventListener('change', onChange)
-  return () => media.removeEventListener('change', onChange)
+function useMediaQuery(query: string) {
+  return useSyncExternalStore(
+    (onChange) => {
+      const media = window.matchMedia(query)
+      media.addEventListener('change', onChange)
+      return () => media.removeEventListener('change', onChange)
+    },
+    () => window.matchMedia(query).matches,
+    () => false
+  )
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    return legacyCopyToClipboard(text)
+  }
 }
 
 /**
  * The photograph's capture-data readout, opened from the glowing contact
- * point on the frame. Lists only what this file actually carries (see
- * lib/capture-details) plus its measured palette. Radix handles Esc,
- * click-away, focus moving in and back to the trigger, and keeping the card
- * inside the viewport; on phones it opens above the point rather than beside
- * it so it never runs off-screen.
+ * point on the frame (or the I key). Lists only what this file actually
+ * carries (see lib/capture-details), grouped as exposure / when & where /
+ * file, plus its measured palette — each swatch copies its hex value.
+ *
+ * Radix handles Esc, click-away, focus moving in and back to the trigger,
+ * and keeping the card inside the viewport. On wide screens it opens beside
+ * the frame (into the margin, flipping when there's no room); on phones it
+ * opens above the point so it never runs off-screen.
  */
-export function CaptureDataPopover({ photo }: { photo: Photo }) {
-  const [open, setOpen] = useState(false)
+export function CaptureDataPopover({
+  photo,
+  open,
+  onOpenChange,
+}: {
+  photo: Photo
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
   const titleId = useId()
-  const compact = useSyncExternalStore(
-    subscribeToCompact,
-    () => window.matchMedia(COMPACT_QUERY).matches,
-    () => false
-  )
-  const details = buildCaptureDetails(photo)
+  const compact = useMediaQuery(COMPACT_QUERY)
+  const coarse = useMediaQuery(COARSE_QUERY)
+  const [copied, setCopied] = useState<string | null>(null)
+  const sections = buildCaptureSections(photo)
+  const exposure = exposureSummary(photo)
   const palette = capturePalette(photo)
   const cameraExif = hasCameraExif(photo)
 
+  useEffect(() => {
+    if (!copied) return
+    const timer = window.setTimeout(() => setCopied(null), 1600)
+    return () => window.clearTimeout(timer)
+  }, [copied])
+
+  const handleCopy = async (colour: string) => {
+    if (await copyText(colour)) {
+      setCopied(colour)
+    }
+  }
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <button type="button" className="photo-metadata-hotspot" aria-label="Capture data">
+        <button
+          type="button"
+          className="photo-metadata-hotspot"
+          aria-label="Capture data"
+          aria-keyshortcuts="I"
+        >
           <span aria-hidden="true" />
           <span className="photo-metadata-hotspot-label" aria-hidden="true">
             Capture data
@@ -44,12 +94,26 @@ export function CaptureDataPopover({ photo }: { photo: Photo }) {
         </button>
       </PopoverTrigger>
       <PopoverContent
-        side={compact ? 'top' : 'left'}
-        align={compact ? 'end' : 'center'}
-        sideOffset={14}
+        side={compact ? 'top' : 'right'}
+        align="end"
+        sideOffset={compact ? 14 : 22}
         collisionPadding={16}
         aria-labelledby={titleId}
-        className="photo-metadata-popover w-[min(22rem,calc(100vw-2rem))] p-0"
+        className="photo-metadata-popover w-[min(23rem,calc(100vw-2rem))] p-0"
+        // Focus the card, not the first palette swatch, so opening it doesn't
+        // look like a swatch was selected. Tab still reaches every swatch.
+        tabIndex={-1}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault()
+          ;(event.currentTarget as HTMLElement | null)?.focus({ preventScroll: true })
+        }}
+        onKeyDown={(event) => {
+          // I closes it again, matching the key that opened it.
+          if ((event.key === 'i' || event.key === 'I') && !event.ctrlKey && !event.metaKey) {
+            event.preventDefault()
+            onOpenChange(false)
+          }
+        }}
       >
         <div className="photo-metadata-popover-head">
           <p className="photo-metadata-kicker">Digital contact point</p>
@@ -59,30 +123,56 @@ export function CaptureDataPopover({ photo }: { photo: Photo }) {
           <p className="photo-metadata-subtitle">
             {cameraExif ? 'Read from the file’s own metadata.' : 'Measured from the archived file.'}
           </p>
+          {exposure ? (
+            <p className="photo-metadata-exposure" aria-label={`Exposure: ${exposure}`}>
+              {exposure}
+            </p>
+          ) : null}
         </div>
 
-        {details.length > 0 ? (
-          <dl className="photo-metadata-grid">
-            {details.map((detail) => (
-              <div key={detail.label}>
-                <dt>{detail.label}</dt>
-                <dd title={detail.value}>{detail.value}</dd>
-              </div>
-            ))}
-          </dl>
-        ) : null}
+        {sections.map((section) => (
+          <section
+            key={section.title}
+            className="photo-metadata-section"
+            aria-label={section.title}
+          >
+            <h3 className="photo-metadata-section-title">{section.title}</h3>
+            <dl className="photo-metadata-grid">
+              {section.rows.map((detail) => (
+                <div key={detail.label}>
+                  <dt>{detail.label}</dt>
+                  <dd title={detail.value}>{detail.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
 
         {palette.length > 0 ? (
           <div className="photo-metadata-palette">
-            <p id={`${titleId}-palette`}>Palette</p>
+            <p id={`${titleId}-palette`}>
+              Palette <span aria-hidden="true">· {coarse ? 'tap' : 'click'} to copy</span>
+            </p>
             <ul aria-labelledby={`${titleId}-palette`}>
               {palette.map((colour) => (
                 <li key={colour}>
-                  <span aria-hidden="true" style={{ background: colour }} />
-                  <code>{colour}</code>
+                  <button
+                    type="button"
+                    onClick={() => void handleCopy(colour)}
+                    aria-label={`Copy ${colour}`}
+                    data-copied={copied === colour ? '' : undefined}
+                  >
+                    <span aria-hidden="true" style={{ background: colour }}>
+                      {copied === colour ? <Check /> : null}
+                    </span>
+                    <code>{copied === colour ? 'Copied' : colour}</code>
+                  </button>
                 </li>
               ))}
             </ul>
+            <span className="sr-only" role="status" aria-live="polite">
+              {copied ? `Copied ${copied}` : ''}
+            </span>
           </div>
         ) : null}
 
@@ -92,7 +182,13 @@ export function CaptureDataPopover({ photo }: { photo: Photo }) {
           </p>
         ) : null}
         <p className="photo-metadata-dismiss" aria-hidden="true">
-          Esc or tap outside to close
+          {coarse ? (
+            'Tap outside to close'
+          ) : (
+            <>
+              <kbd>I</kbd> or <kbd>Esc</kbd> to close
+            </>
+          )}
         </p>
       </PopoverContent>
     </Popover>

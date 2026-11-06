@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildCaptureDetails,
+  buildCaptureSections,
   capturePalette,
+  exposureSummary,
   formatAspectRatio,
   formatCaptureDate,
   formatFileSize,
@@ -99,5 +101,46 @@ describe('capture details', () => {
       metadata: { ...fileOnly.metadata, palette: ['#0588f2', '#0588F2', '#555250', '#0588f2'] },
     }
     expect(capturePalette(repeated)).toEqual(['#0588f2', '#555250'])
+  })
+})
+
+describe('capture sections', () => {
+  const full = {
+    captureDate: '2025-06-14',
+    locationLabel: 'Chennai',
+    metadata: {
+      ...fileOnly.metadata,
+      camera: 'Pixel 9 Pro',
+      focalLength: '24 mm',
+      aperture: 'f/1.7',
+      shutterSpeed: '1/240',
+      iso: '64',
+    },
+  }
+
+  it('groups rows into exposure, when & where, and file', () => {
+    const sections = buildCaptureSections(full)
+    expect(sections.map((section) => section.title)).toEqual(['Exposure', 'When & where', 'File'])
+    expect(sections[0].rows.map((row) => row.label)).toEqual([
+      'Camera',
+      'Focal length',
+      'Aperture',
+      'Shutter',
+      'ISO',
+    ])
+    expect(sections[1].rows.map((row) => row.label)).toEqual(['Captured', 'Place'])
+  })
+
+  it('drops empty groups', () => {
+    expect(buildCaptureSections(fileOnly).map((section) => section.title)).toEqual(['File'])
+  })
+
+  it('reads exposure like a camera back, normalising only the affixes', () => {
+    expect(exposureSummary(full)).toBe('24 mm · ƒ/1.7 · 1/240 s · ISO 64')
+    expect(
+      exposureSummary({ metadata: { ...full.metadata, shutterSpeed: '1/60s', iso: 'ISO 200' } })
+    ).toBe('24 mm · ƒ/1.7 · 1/60s · ISO 200')
+    expect(exposureSummary({ metadata: { ...fileOnly.metadata, iso: '100' } })).toBeNull()
+    expect(exposureSummary(fileOnly)).toBeNull()
   })
 })

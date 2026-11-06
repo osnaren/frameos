@@ -167,3 +167,62 @@ export function capturePalette(photo: Pick<Photo, 'metadata'>) {
     return true
   })
 }
+
+export interface CaptureSection {
+  title: string
+  rows: CaptureDetail[]
+}
+
+const SECTION_OF: Record<string, string> = {
+  Camera: 'Exposure',
+  Lens: 'Exposure',
+  'Focal length': 'Exposure',
+  Aperture: 'Exposure',
+  Shutter: 'Exposure',
+  ISO: 'Exposure',
+  Captured: 'When & where',
+  Place: 'When & where',
+  GPS: 'When & where',
+}
+
+/**
+ * The same rows as buildCaptureDetails, grouped the way a photographer reads
+ * them: how it was exposed, when and where, then the archived file. Empty
+ * groups are dropped.
+ */
+export function buildCaptureSections(
+  photo: Pick<Photo, 'metadata' | 'captureDate' | 'locationLabel'>
+): CaptureSection[] {
+  const order = ['Exposure', 'When & where', 'File']
+  const groups = new Map<string, CaptureDetail[]>(order.map((title) => [title, []]))
+
+  for (const detail of buildCaptureDetails(photo)) {
+    groups.get(SECTION_OF[detail.label] ?? 'File')?.push(detail)
+  }
+
+  return order
+    .map((title) => ({ title, rows: groups.get(title) ?? [] }))
+    .filter((section) => section.rows.length > 0)
+}
+
+/**
+ * One-line exposure readout in the order it's read off a camera back —
+ * "26 mm · ƒ/1.8 · 1/120 s · ISO 100" — or null when no exposure values
+ * survived. Values are shown as recorded, with only the conventional
+ * prefix/suffix added when missing.
+ */
+export function exposureSummary(photo: Pick<Photo, 'metadata'>) {
+  const { focalLength, aperture, shutterSpeed, iso } = photo.metadata
+  const parts = [
+    present(focalLength) ? focalLength.trim() : null,
+    present(aperture) ? aperture.trim().replace(/^f\s*\/?\s*/i, 'ƒ/') : null,
+    present(shutterSpeed)
+      ? /s$/i.test(shutterSpeed.trim())
+        ? shutterSpeed.trim()
+        : `${shutterSpeed.trim()} s`
+      : null,
+    present(iso) ? (/^iso/i.test(iso.trim()) ? iso.trim() : `ISO ${iso.trim()}`) : null,
+  ].filter((part): part is string => part !== null)
+
+  return parts.length >= 2 ? parts.join(' · ') : null
+}
