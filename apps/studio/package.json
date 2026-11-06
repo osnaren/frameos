@@ -1,0 +1,46 @@
+{
+  "name": "@frameos/studio",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "deploy-graphql": "sanity graphql deploy",
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "schema:extract": "sanity schema extract --force",
+    "seed:production": "sanity exec scripts/seed-production.ts --with-user-token",
+    "seed:production:apply": "sanity exec scripts/seed-production.ts --with-user-token -- --apply",
+    "typegen": "sanity typegen generate",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/icons": "^5.2.1",
+    "@sanity/vision": "^6.9.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "sanity": "^6.9.1",
+    "styled-components": "^6.1.18"
+  },
+  "devDependencies": {
+    "@frameos/typescript-config": "workspace:*",
+    "@sanity/eslint-config-studio": "^6.0.0",
+    "@types/react": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  },
+  "prettier": {
+    "bracketSpacing": false,
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true
+  }
+}

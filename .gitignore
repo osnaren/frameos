@@ -11,13 +11,22 @@ node_modules
 dist
 dist-ssr
 *.local
+*.tsbuildinfo
+.nitro
+.output
+.tanstack
+.turbo
+.codex-temp
+.playwright-cli/
+.playwright-mcp/
+output/
 
 # Environment files
 .env
 .env.*
+!.env.example
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -26,3 +35,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Source photography originals (not served, not committed)
+photo-source/
+artifacts/pocket-worlds/
+w*.jpeg
+
+.sanity-dist/
+.sanity-dist-check/
+
+.sanity/
+.vercel

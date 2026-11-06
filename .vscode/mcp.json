@@ -1,0 +1,18 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "sanityToken",
+      "description": "Sanity MCP token",
+      "password": true
+    }
+  ],
+  "servers": {
+    "Sanity": {
+      "url": "https://mcp.sanity.io",
+      "headers": {
+        "Authorization": "Bearer ${input:sanityToken}"
+      }
+    }
+  }
+}

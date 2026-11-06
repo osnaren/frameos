@@ -1,0 +1,12 @@
+{
+  "name": "@frameos/content-schema",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "types": "./src/index.ts",
+  "devDependencies": {
+    "@frameos/typescript-config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
